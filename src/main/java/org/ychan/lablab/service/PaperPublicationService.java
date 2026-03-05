@@ -1,5 +1,6 @@
 package org.ychan.lablab.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ychan.lablab.dto.req.PaperPublicationAddReqDTO;
 import org.ychan.lablab.dto.req.PaperPublicationUpdateReqDTO;
@@ -15,6 +16,11 @@ public interface PaperPublicationService extends IService<PaperPublication> {
      * @return
      */
     List<PaperPublicationRespDTO> listPaperPublication();
+
+    /**
+     * 分页获取论文发表
+     */
+    IPage<PaperPublicationRespDTO> pagePaperPublication(int pageNum, int pageSize);
 
     /**
      * 根据id获取论文发表详情

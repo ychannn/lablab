@@ -1,5 +1,7 @@
 package org.ychan.lablab.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +42,15 @@ public class LabNewsServiceImpl extends ServiceImpl<LabNewsMapper, LabNews> impl
                     return respDTO;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public IPage<LabNewsRespDTO> pageLabNews(int pageNum, int pageSize) {
+        IPage<LabNews> page = lambdaQuery()
+                .eq(LabNews::getDeleted, CommonConstants.FALSE)
+                .orderByDesc(LabNews::getCreateTime)
+                .page(new Page<>(pageNum, pageSize));
+        return page.convert(LabNewsRespDTO::from);
     }
 
     /**

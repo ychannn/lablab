@@ -1,5 +1,6 @@
 package org.ychan.lablab.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ychan.lablab.dto.req.LabNewsAddReqDTO;
 import org.ychan.lablab.dto.req.LabNewsUpdateReqDTO;
@@ -15,6 +16,11 @@ public interface LabNewsService extends IService<LabNews> {
      * @return
      */
     List<LabNewsRespDTO> listLabNews();
+
+    /**
+     * 分页获取实验室新闻
+     */
+    IPage<LabNewsRespDTO> pageLabNews(int pageNum, int pageSize);
 
     /**
      * 根据id获取实验室新闻详情

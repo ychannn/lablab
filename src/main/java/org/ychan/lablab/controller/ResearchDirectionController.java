@@ -1,5 +1,6 @@
 package org.ychan.lablab.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.PageResult;
@@ -32,10 +33,14 @@ public class ResearchDirectionController extends BaseController{
      * @return
      */
     @GetMapping("/direction/page")
-    public PageResult<ResearchDirectionRespDTO> pageResearchDirection() {
-        startPage();
-        List<ResearchDirectionRespDTO> list = researchDirectionService.listResearchDirection();
-        return PageResult.success(list);
+    public Result<IPage<ResearchDirectionRespDTO>> pageResearchDirection(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+        pageNum = Math.max(pageNum, 1);
+        pageSize = Math.max(Math.min(pageSize, 50), 1);
+        IPage<ResearchDirectionRespDTO> list = researchDirectionService.pageResearchDirection(pageNum, pageSize);
+        return Result.success(list);
     }
 
     /**

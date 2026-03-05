@@ -1,8 +1,8 @@
 package org.ychan.lablab.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.ychan.lablab.common.result.PageResult;
 import org.ychan.lablab.common.result.Result;
 import org.ychan.lablab.dto.req.PaperPublicationAddReqDTO;
 import org.ychan.lablab.dto.req.PaperPublicationUpdateReqDTO;
@@ -32,10 +32,13 @@ public class PaperPublicationController extends BaseController {
      * @return
      */
     @GetMapping("/page")
-    public PageResult<PaperPublicationRespDTO> pagePaperPublication() {
-        startPage();
-        List<PaperPublicationRespDTO> list = paperPublicationService.listPaperPublication();
-        return PageResult.success(list);
+    public Result<IPage<PaperPublicationRespDTO>> pagePaperPublication(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        pageNum = Math.max(pageNum, 1);
+        pageSize = Math.max(Math.min(pageSize, 50), 1);
+        IPage<PaperPublicationRespDTO> list = paperPublicationService.pagePaperPublication(pageNum, pageSize);
+        return Result.success(list);
     }
 
     /**

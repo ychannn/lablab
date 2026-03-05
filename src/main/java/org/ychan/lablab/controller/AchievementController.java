@@ -1,8 +1,8 @@
 package org.ychan.lablab.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.ychan.lablab.common.result.PageResult;
 import org.ychan.lablab.common.result.Result;
 import org.ychan.lablab.dto.req.AchievementAddReqDTO;
 import org.ychan.lablab.dto.req.AchievementUpdateReqDTO;
@@ -32,10 +32,13 @@ public class AchievementController extends BaseController {
      * @return
      */
     @GetMapping("/page")
-    public PageResult<AchievementRespDTO> pageAchievement() {
-        startPage();
-        List<AchievementRespDTO> list = achievementService.listAchievement();
-        return PageResult.success(list);
+    public Result<IPage<AchievementRespDTO>> pageAchievement(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        pageNum = Math.max(pageNum, 1);
+        pageSize = Math.max(Math.min(pageSize, 50), 1);
+        IPage<AchievementRespDTO> list = achievementService.pageAchievement(pageNum, pageSize);
+        return Result.success(list);
     }
 
     /**

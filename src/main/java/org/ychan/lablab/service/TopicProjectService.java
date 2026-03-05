@@ -1,5 +1,6 @@
 package org.ychan.lablab.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ychan.lablab.dto.req.TopicProjectAddReqDTO;
 import org.ychan.lablab.dto.req.TopicProjectUpdateReqDTO;
@@ -15,6 +16,11 @@ public interface TopicProjectService extends IService<TopicProject> {
      * @return
      */
     List<TopicProjectRespDTO> listTopicProject();
+
+    /**
+     * 分页获取课题项目
+     */
+    IPage<TopicProjectRespDTO> pageTopicProject(int pageNum, int pageSize);
 
     /**
      * 根据id获取课题项目详情

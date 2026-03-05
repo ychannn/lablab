@@ -1,5 +1,7 @@
 package org.ychan.lablab.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +42,15 @@ public class AchievementServiceImpl extends ServiceImpl<AchievementMapper, Achie
                     return respDTO;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public IPage<AchievementRespDTO> pageAchievement(int pageNum, int pageSize) {
+        IPage<Achievement> page = lambdaQuery()
+                .eq(Achievement::getDeleted, CommonConstants.FALSE)
+                .orderByDesc(Achievement::getCreateTime)
+                .page(new Page<>(pageNum, pageSize));
+        return page.convert(AchievementRespDTO::from);
     }
 
     /**

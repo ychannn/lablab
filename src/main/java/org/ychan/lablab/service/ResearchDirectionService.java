@@ -1,5 +1,6 @@
 package org.ychan.lablab.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ychan.lablab.dto.req.ResearchDirectionAddReqDTO;
 import org.ychan.lablab.dto.req.ResearchDirectionUpdateReqDTO;
@@ -16,6 +17,11 @@ public interface ResearchDirectionService extends IService<ResearchDirection> {
      */
     List<ResearchDirectionRespDTO> listResearchDirection();
 
+    /**
+     * 分页获取研究方向
+     * @return
+     */
+    IPage<ResearchDirectionRespDTO> pageResearchDirection(int pageNum, int pageSize);
     /**
      * 根据id获取研究方向详情
      * @param id

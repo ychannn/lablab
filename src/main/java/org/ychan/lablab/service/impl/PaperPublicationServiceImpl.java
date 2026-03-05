@@ -1,5 +1,7 @@
 package org.ychan.lablab.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +42,15 @@ public class PaperPublicationServiceImpl extends ServiceImpl<PaperPublicationMap
                     return respDTO;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public IPage<PaperPublicationRespDTO> pagePaperPublication(int pageNum, int pageSize) {
+        IPage<PaperPublication> page = lambdaQuery()
+                .eq(PaperPublication::getDeleted, CommonConstants.FALSE)
+                .orderByDesc(PaperPublication::getCreateTime)
+                .page(new Page<>(pageNum, pageSize));
+        return page.convert(PaperPublicationRespDTO::from);
     }
 
     /**

@@ -1,10 +1,14 @@
 package org.ychan.lablab.service.impl;
 
+import ch.qos.logback.core.joran.util.beans.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ychan.lablab.common.constant.CommonConstants;
@@ -42,6 +46,21 @@ public class ResearchDirectionServiceImpl extends ServiceImpl<ResearchDirectionM
                     return respDTO;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public IPage<ResearchDirectionRespDTO> pageResearchDirection(int pageNum, int pageSize) {
+        IPage<ResearchDirection> page = lambdaQuery()
+                .eq(ResearchDirection::getDeleted, CommonConstants.FALSE)
+                .orderByDesc(ResearchDirection::getCreateTime)
+                .page(new Page<>(pageNum, pageSize));
+        IPage<ResearchDirectionRespDTO> result = page.convert(entity -> {
+            ResearchDirectionRespDTO researchDirectionRespDTO = new ResearchDirectionRespDTO();
+            BeanUtils.copyProperties(entity, researchDirectionRespDTO);
+            return researchDirectionRespDTO;
+        });
+
+        return result;
     }
 
     /**

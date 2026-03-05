@@ -2,10 +2,14 @@ package org.ychan.lablab.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.ychan.lablab.common.result.Result;
 import org.ychan.lablab.eception.BusinessException;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -21,6 +25,27 @@ public class GlobalExceptionHandler {
     public Result<?> handleBusinessException(BusinessException e, HttpServletRequest request){
         log.error("业务异常, 请求地址{}, 异常信息：{}", request.getRequestURL(), e.getMessage());
         return Result.error(e.getMessage());
+    }
+
+    /**
+     * 处理 @Valid 校验失败（如 NotBlank）
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Result<?> handleValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        log.warn("参数校验失败, 请求地址{}, 信息：{}", request.getRequestURL(), message);
+        return Result.error(message);
+    }
+
+    @ExceptionHandler(BindException.class)
+    public Result<?> handleBindException(BindException e, HttpServletRequest request) {
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        log.warn("参数绑定失败, 请求地址{}, 信息：{}", request.getRequestURL(), message);
+        return Result.error(message);
     }
 
     /**

@@ -1,5 +1,6 @@
 package org.ychan.lablab.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ychan.lablab.dto.req.AchievementAddReqDTO;
 import org.ychan.lablab.dto.req.AchievementUpdateReqDTO;
@@ -15,6 +16,11 @@ public interface AchievementService extends IService<Achievement> {
      * @return
      */
     List<AchievementRespDTO> listAchievement();
+
+    /**
+     * 分页获取成果奖项
+     */
+    IPage<AchievementRespDTO> pageAchievement(int pageNum, int pageSize);
 
     /**
      * 根据id获取成果奖项详情
