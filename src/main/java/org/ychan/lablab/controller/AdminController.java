@@ -4,10 +4,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
+import org.ychan.lablab.config.RequiredRole;
+import org.ychan.lablab.dto.req.AdminAddReqDTO;
 import org.ychan.lablab.dto.req.AdminLoginReqDTO;
 import org.ychan.lablab.dto.req.AdminResetPasswordReqDTO;
 import org.ychan.lablab.dto.resp.admin.AdminLoginRespDTO;
 import org.ychan.lablab.entity.admin.Admin;
+import org.ychan.lablab.enums.RoleEnum;
 import org.ychan.lablab.service.AdminService;
 
 /**
@@ -78,5 +81,16 @@ public class AdminController {
     public Result<AdminLoginRespDTO> refreshToken(@RequestHeader(value = "Authorization", required = false) String authorization) {
         String token = parseToken(authorization);
         return Result.success(adminService.refreshToken(token));
+    }
+
+    /**
+     * 添加管理员
+     */
+    @PostMapping("/add")
+    @RequiredRole({RoleEnum.ADMIN})
+    public Result<Void> addAdmin(@RequestHeader(value = "Authorization", required = false) String authorization, @Valid @RequestBody AdminAddReqDTO req) {
+        String token = parseToken(authorization);
+        adminService.addAdmin(token, req.getUsername(), req.getPassword(), req.getRole());
+        return Result.success();
     }
 }

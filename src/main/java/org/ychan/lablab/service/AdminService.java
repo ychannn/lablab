@@ -38,4 +38,9 @@ public interface AdminService {
      * 刷新 token
      */
     AdminLoginRespDTO refreshToken(String token);
+
+    /**
+     * 添加管理员
+     */
+    void addAdmin(String token, String username, String password, String role);
 }

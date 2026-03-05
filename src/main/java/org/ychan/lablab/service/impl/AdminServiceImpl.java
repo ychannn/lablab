@@ -163,4 +163,32 @@ public class AdminServiceImpl implements AdminService {
         resp.setUsername(admin.getUsername());
         return resp;
     }
+
+    @Override
+    public void addAdmin(String token, String username, String password, String role) {
+        // 验证当前登录的用户是否是超级管理员
+        Admin currentAdmin = getAdminByToken(token);
+        if (currentAdmin == null) {
+            throw new BusinessException("登录已过期，请重新登录");
+        }
+        if (!"admin".equals(currentAdmin.getRole())) {
+            throw new BusinessException("权限不足，只有超级管理员才能添加管理员");
+        }
+
+        // 检查用户名是否已存在
+        Admin existingAdmin = adminMapper.selectOne(
+                new LambdaQueryWrapper<Admin>()
+                        .eq(Admin::getUsername, username)
+                        .eq(Admin::getDeleted, CommonConstants.FALSE));
+        if (existingAdmin != null) {
+            throw new BusinessException("用户名已存在");
+        }
+
+        // 创建新管理员
+        Admin admin = new Admin();
+        admin.setUsername(username);
+        admin.setPassword(PASSWORD_ENCODER.encode(password));
+        admin.setRole(role);
+        adminMapper.insert(admin);
+    }
 }
