@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.PageResult;
 import org.ychan.lablab.common.result.Result;
+import org.ychan.lablab.config.RequiredRole;
 import org.ychan.lablab.dto.req.ResearchDirectionAddReqDTO;
 import org.ychan.lablab.dto.req.ResearchDirectionUpdateReqDTO;
 import org.ychan.lablab.dto.resp.research.ResearchDirectionRespDTO;
+import org.ychan.lablab.enums.RoleEnum;
 import org.ychan.lablab.service.ResearchDirectionService;
 
 import java.util.List;
@@ -59,6 +61,7 @@ public class ResearchDirectionController extends BaseController{
      * @return
      */
     @PostMapping("/direction/add")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> addResearchDirection(@RequestBody ResearchDirectionAddReqDTO requestParam) {
         researchDirectionService.addResearchDirection(requestParam);
         return Result.success();
@@ -70,6 +73,7 @@ public class ResearchDirectionController extends BaseController{
      * @return
      */
     @PutMapping("/direction/update")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> updateResearchDirection(@RequestBody ResearchDirectionUpdateReqDTO requestParam) {
         researchDirectionService.updateResearchDirection(requestParam);
         return Result.success();
@@ -81,6 +85,7 @@ public class ResearchDirectionController extends BaseController{
      * @return
      */
     @DeleteMapping("/direction/delete/{id}")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> deleteResearchDirectionById(@PathVariable Integer id) {
         researchDirectionService.deleteResearchDirectionById(id);
         return Result.success();

@@ -3,10 +3,12 @@ package org.ychan.lablab.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
+import org.ychan.lablab.config.RequiredRole;
 import org.ychan.lablab.dto.req.TeamAddScholarReqDTO;
 import org.ychan.lablab.dto.req.TeamUpdateScholarReqDTO;
 import org.ychan.lablab.dto.resp.team.TeamScholarDetailsRespDTO;
 import org.ychan.lablab.dto.resp.team.TeamBasicScholarRespDTO;
+import org.ychan.lablab.enums.RoleEnum;
 import org.ychan.lablab.service.ScholarService;
 
 import java.util.List;
@@ -41,6 +43,7 @@ public class TeamController {
      * @return
      */
     @PostMapping("/scholar/add")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result addScholar(@RequestBody TeamAddScholarReqDTO requestParam){
         scholarService.addScholar(requestParam);
         return Result.success();
@@ -52,6 +55,7 @@ public class TeamController {
      * @return
      */
     @PutMapping("/scholar/update")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result updateScholar(@RequestBody TeamUpdateScholarReqDTO requestParam){
         scholarService.updateScholar(requestParam);
         return Result.success();
@@ -63,6 +67,7 @@ public class TeamController {
      * @return
      */
     @DeleteMapping("/scholar/delete/{id}")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result deleteScholarById(@PathVariable int id){
         scholarService.deleteScholarById(id);
         return Result.success();

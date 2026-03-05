@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
+import org.ychan.lablab.config.RequiredRole;
 import org.ychan.lablab.dto.req.LabNewsAddReqDTO;
 import org.ychan.lablab.dto.req.LabNewsUpdateReqDTO;
 import org.ychan.lablab.dto.resp.news.LabNewsRespDTO;
+import org.ychan.lablab.enums.RoleEnum;
 import org.ychan.lablab.service.LabNewsService;
 
 import java.util.List;
@@ -57,6 +59,7 @@ public class LabNewsController extends BaseController {
      * @return
      */
     @PostMapping("/add")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> addLabNews(@RequestBody LabNewsAddReqDTO requestParam) {
         labNewsService.addLabNews(requestParam);
         return Result.success();
@@ -68,6 +71,7 @@ public class LabNewsController extends BaseController {
      * @return
      */
     @PutMapping("/update")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> updateLabNews(@RequestBody LabNewsUpdateReqDTO requestParam) {
         labNewsService.updateLabNews(requestParam);
         return Result.success();
@@ -79,6 +83,7 @@ public class LabNewsController extends BaseController {
      * @return
      */
     @DeleteMapping("/delete/{id}")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> deleteLabNewsById(@PathVariable Integer id) {
         labNewsService.deleteLabNewsById(id);
         return Result.success();

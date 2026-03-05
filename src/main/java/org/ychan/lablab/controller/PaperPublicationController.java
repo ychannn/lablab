@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
+import org.ychan.lablab.config.RequiredRole;
 import org.ychan.lablab.dto.req.PaperPublicationAddReqDTO;
 import org.ychan.lablab.dto.req.PaperPublicationUpdateReqDTO;
 import org.ychan.lablab.dto.resp.research.PaperPublicationRespDTO;
+import org.ychan.lablab.enums.RoleEnum;
 import org.ychan.lablab.service.PaperPublicationService;
 
 import java.util.List;
@@ -57,6 +59,7 @@ public class PaperPublicationController extends BaseController {
      * @return
      */
     @PostMapping("/add")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> addPaperPublication(@RequestBody PaperPublicationAddReqDTO requestParam) {
         paperPublicationService.addPaperPublication(requestParam);
         return Result.success();
@@ -68,6 +71,7 @@ public class PaperPublicationController extends BaseController {
      * @return
      */
     @PutMapping("/update")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> updatePaperPublication(@RequestBody PaperPublicationUpdateReqDTO requestParam) {
         paperPublicationService.updatePaperPublication(requestParam);
         return Result.success();
@@ -79,6 +83,7 @@ public class PaperPublicationController extends BaseController {
      * @return
      */
     @DeleteMapping("/delete/{id}")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> deletePaperPublicationById(@PathVariable Integer id) {
         paperPublicationService.deletePaperPublicationById(id);
         return Result.success();

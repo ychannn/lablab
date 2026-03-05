@@ -3,10 +3,12 @@ package org.ychan.lablab.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
+import org.ychan.lablab.config.RequiredRole;
 import org.ychan.lablab.dto.req.AreaAddReqDTO;
 import org.ychan.lablab.dto.req.AreaUpdateReqDTO;
 import org.ychan.lablab.dto.req.AreaSortReqDTO;
 import org.ychan.lablab.dto.resp.AreaRespDTO;
+import org.ychan.lablab.enums.RoleEnum;
 import org.ychan.lablab.service.AreaService;
 
 import java.util.List;
@@ -43,6 +45,7 @@ public class AreaController {
      * @return
      */
     @PostMapping("/add")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> addArea(@RequestBody AreaAddReqDTO requestParam) {
         areaService.addArea(requestParam);
         return Result.success();
@@ -54,6 +57,7 @@ public class AreaController {
      * @return
      */
     @PutMapping("/update")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> updateArea(@RequestBody AreaUpdateReqDTO requestParam) {
         areaService.updateArea(requestParam);
         return Result.success();
@@ -65,6 +69,7 @@ public class AreaController {
      * @return
      */
     @DeleteMapping("/delete/{id}")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> deleteAreaById(@PathVariable int id) {
         areaService.deleteAreaById(id);
         return Result.success();
@@ -77,6 +82,7 @@ public class AreaController {
      * @return
      */
     @PostMapping("/sort")
+    @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> sort(@RequestBody List<AreaSortReqDTO> sortList){
         areaService.sort(sortList);
         return Result.success();
