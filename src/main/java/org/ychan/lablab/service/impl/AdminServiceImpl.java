@@ -51,7 +51,7 @@ public class AdminServiceImpl implements AdminService {
         // 将 token 存储到 Redis，用于登出功能
         String redisKey = AdminConstants.REDIS_TOKEN_PREFIX + token;
         RBucket<Integer> bucket = redissonClient.getBucket(redisKey);
-        bucket.set(admin.getId(), AdminConstants.TOKEN_EXPIRE_SECONDS);
+        bucket.set(admin.getId(), java.time.Duration.ofSeconds(AdminConstants.TOKEN_EXPIRE_SECONDS));
 
         AdminLoginRespDTO resp = new AdminLoginRespDTO();
         resp.setToken(token);
@@ -155,7 +155,7 @@ public class AdminServiceImpl implements AdminService {
         // 存储新 token
         String newRedisKey = AdminConstants.REDIS_TOKEN_PREFIX + newToken;
         RBucket<Integer> bucket = redissonClient.getBucket(newRedisKey);
-        bucket.set(admin.getId(), AdminConstants.TOKEN_EXPIRE_SECONDS);
+        bucket.set(admin.getId(), java.time.Duration.ofSeconds(AdminConstants.TOKEN_EXPIRE_SECONDS));
 
         AdminLoginRespDTO resp = new AdminLoginRespDTO();
         resp.setToken(newToken);

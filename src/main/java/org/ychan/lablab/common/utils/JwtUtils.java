@@ -3,10 +3,8 @@ package org.ychan.lablab.common.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.ychan.lablab.common.constant.AdminConstants;
 
-import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Map;
 
@@ -19,7 +17,7 @@ public class JwtUtils {
      * 生成 JWT token
      */
     public static String generateToken(Map<String, Object> claims) {
-        SecretKey key = Keys.hmacShaKeyFor("your-secret-key-for-jwt-token-generation".getBytes());
+        String key = "your-secret-key-for-jwt-token-generation";
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + AdminConstants.TOKEN_EXPIRE_SECONDS * 1000);
 
@@ -27,7 +25,7 @@ public class JwtUtils {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(SignatureAlgorithm.HS256, key.getBytes())
                 .compact();
     }
 
@@ -35,10 +33,9 @@ public class JwtUtils {
      * 解析 JWT token
      */
     public static Claims parseToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor("your-secret-key-for-jwt-token-generation".getBytes());
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
+        String key = "your-secret-key-for-jwt-token-generation";
+        return Jwts.parser()
+                .setSigningKey(key.getBytes())
                 .parseClaimsJws(token)
                 .getBody();
     }
