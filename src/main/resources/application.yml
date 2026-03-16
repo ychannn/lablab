@@ -5,11 +5,17 @@ spring:
     username: root # 你的数据库用户名
     password: edraqwq1 # 你的数据库密码
     driver-class-name: com.mysql.cj.jdbc.Driver
+  # Elasticsearch 配置
+  elasticsearch:
+    uris: http://localhost:9200
+    connection-timeout: 5s
+    socket-timeout: 30s
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true # 下划线转驼峰（可选）
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 输出到控制台
   mapper-locations: classpath:mapper/*.xml
+
 # application.yml
 logging:
   level:
