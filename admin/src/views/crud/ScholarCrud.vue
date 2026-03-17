@@ -57,6 +57,36 @@
             </div>
           </div>
         </div>
+        <div class="form-group">
+          <label>个人简介</label>
+          <div class="list-edit">
+            <div v-for="(item, idx) in form.introList" :key="'intro-' + idx" class="list-row">
+              <textarea v-model="item.content" class="form-input" rows="2" placeholder="一段简介"></textarea>
+              <button type="button" class="btn-link danger" @click="form.introList.splice(idx, 1)">删除</button>
+            </div>
+            <button type="button" class="btn btn-secondary" @click="form.introList.push({ content: '' })">+ 添加一条</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>论文发表</label>
+          <div class="list-edit">
+            <div v-for="(item, idx) in form.paperList" :key="'paper-' + idx" class="list-row">
+              <input v-model="item.content" type="text" class="form-input" placeholder="论文标题/内容" />
+              <button type="button" class="btn-link danger" @click="form.paperList.splice(idx, 1)">删除</button>
+            </div>
+            <button type="button" class="btn btn-secondary" @click="form.paperList.push({ content: '' })">+ 添加一条</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>科研项目</label>
+          <div class="list-edit">
+            <div v-for="(item, idx) in form.projectList" :key="'project-' + idx" class="list-row">
+              <input v-model="item.content" type="text" class="form-input" placeholder="项目内容" />
+              <button type="button" class="btn-link danger" @click="form.projectList.splice(idx, 1)">删除</button>
+            </div>
+            <button type="button" class="btn btn-secondary" @click="form.projectList.push({ content: '' })">+ 添加一条</button>
+          </div>
+        </div>
         <div class="modal-footer">
           <button type="button" class="btn" @click="showModal = false">取消</button>
           <button type="button" class="btn btn-primary" :disabled="saving" @click="submit">{{ saving ? "保存中…" : "保存" }}</button>
@@ -108,18 +138,33 @@ export default {
       this.form = { name: "", areaId: 0, rank: 0, photo: "", introList: [], paperList: [], projectList: [] }
       this.showModal = true
     },
-    openEdit(row) {
+    async openEdit(row) {
       this.editId = row.id
       this.form = {
         name: row.name || "",
-        areaId: row.area || 0,
-        rank: row.rank || 0,
+        areaId: row.area ?? row.areaId ?? 0,
+        rank: row.rank ?? 0,
         photo: row.photo || "",
         introList: [],
         paperList: [],
         projectList: []
       }
       this.showModal = true
+      try {
+        const data = await request("/team/scholar/details/" + row.id)
+        if (data.code === 200 && data.data) {
+          const d = data.data
+          this.form.name = d.name || this.form.name
+          this.form.areaId = d.area ?? this.form.areaId
+          this.form.rank = d.rank ?? this.form.rank
+          this.form.photo = d.photo || this.form.photo
+          this.form.introList = (d.intro || []).map(i => ({ content: i.content || "" }))
+          this.form.paperList = (d.paperList || []).map(p => ({ content: p.content || "" }))
+          this.form.projectList = (d.projectList || []).map(p => ({ content: p.content || "" }))
+        }
+      } catch (e) {
+        console.error("加载学者详情失败", e)
+      }
     },
     async onPhotoChange(e) {
       const file = e.target.files && e.target.files[0]
@@ -158,9 +203,9 @@ export default {
           areaId: this.form.areaId,
           rank: this.form.rank,
           photo: this.form.photo || "",
-          introList: this.form.introList || [],
-          paperList: this.form.paperList || [],
-          projectList: this.form.projectList || []
+          introList: (this.form.introList || []).filter(i => (i.content || "").trim() !== "").map(i => ({ content: (i.content || "").trim() })),
+          paperList: (this.form.paperList || []).filter(p => (p.content || "").trim() !== "").map(p => ({ content: (p.content || "").trim() })),
+          projectList: (this.form.projectList || []).filter(p => (p.content || "").trim() !== "").map(p => ({ content: (p.content || "").trim() }))
         }
         if (this.editId) {
           payload.id = this.editId
@@ -198,18 +243,24 @@ export default {
 .pagination { margin-top: 16px; display: flex; align-items: center; gap: 16px; }
 .pagination button { padding: 6px 12px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; cursor: pointer; }
 .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
-.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.modal { background: #fff; border-radius: 8px; padding: 24px; min-width: 400px; max-width: 90vw; max-height: 90vh; overflow-y: auto; }
-.modal h3 { margin-bottom: 20px; }
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
-.form-input { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; }
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+.modal { background: #fff; border-radius: 8px; padding: 28px; min-width: 900px; width: 94vw; max-width: 1200px; min-height: 480px; max-height: 92vh; overflow-y: auto; }
+.modal h3 { margin-bottom: 24px; font-size: 20px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
+.form-input { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; }
 .hidden { display: none; }
 .photo-upload { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .photo-upload .btn-secondary { background: #f0f0f0; color: #333; }
 .upload-status { font-size: 14px; color: #666; }
 .photo-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #e8e8e8; }
-.modal-footer { margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; }
-.btn { padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; }
+.list-edit { border: 1px solid #e8e8e8; border-radius: 6px; padding: 12px; background: #fafafa; }
+.list-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
+.list-row .form-input { flex: 1; min-width: 0; }
+.list-row textarea.form-input { min-height: 60px; resize: vertical; }
+.list-row:last-of-type { margin-bottom: 0; }
+.list-edit .btn-secondary { margin-top: 10px; }
+.modal-footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+.btn { padding: 10px 20px; border-radius: 4px; border: none; cursor: pointer; font-size: 14px; }
 .btn-primary { background: #1890ff; color: #fff; }
 </style>

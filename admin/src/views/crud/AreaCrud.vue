@@ -81,13 +81,13 @@ export default {
 .data-table th { background: #fafafa; font-weight: 500; }
 .btn-link { background: none; border: none; color: #1890ff; cursor: pointer; padding: 0 8px; }
 .btn-link.danger { color: #ff4d4f; }
-.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.modal { background: #fff; border-radius: 8px; padding: 24px; min-width: 400px; max-width: 90vw; }
-.modal h3 { margin-bottom: 20px; }
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
-.form-input { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; }
-.modal-footer { margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; }
-.btn { padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; }
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+.modal { background: #fff; border-radius: 8px; padding: 28px; min-width: 900px; width: 94vw; max-width: 1200px; min-height: 480px; max-height: 92vh; overflow-y: auto; }
+.modal h3 { margin-bottom: 24px; font-size: 20px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
+.form-input { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; }
+.modal-footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+.btn { padding: 10px 20px; border-radius: 4px; border: none; cursor: pointer; font-size: 14px; }
 .btn-primary { background: #1890ff; color: #fff; }
 </style>

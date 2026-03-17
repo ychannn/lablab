@@ -9,6 +9,7 @@
         <tr>
           <th>ID</th>
           <th>标题</th>
+          <th>内容</th>
           <th>时间</th>
           <th width="140">操作</th>
         </tr>
@@ -17,6 +18,7 @@
         <tr v-for="row in list" :key="row.id">
           <td>{{ row.id }}</td>
           <td>{{ row.title }}</td>
+          <td class="content-cell">{{ (row.content || '').slice(0, 80) }}{{ (row.content || '').length > 80 ? '…' : '' }}</td>
           <td>{{ formatTime(row.time) }}</td>
           <td>
             <button type="button" class="btn-link" @click="openEdit(row)">编辑</button>
@@ -38,9 +40,9 @@
           <label>标题</label>
           <input v-model="form.title" type="text" class="form-input" />
         </div>
-        <div class="form-group">
+        <div class="form-group content-group">
           <label>内容</label>
-          <textarea v-model="form.content" class="form-input" rows="5"></textarea>
+          <textarea v-model="form.content" class="form-input content-field" rows="8"></textarea>
         </div>
         <div class="form-group">
           <label>时间</label>
@@ -151,13 +153,15 @@ export default {
 .pagination { margin-top: 16px; display: flex; align-items: center; gap: 16px; }
 .pagination button { padding: 6px 12px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; cursor: pointer; }
 .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
-.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.modal { background: #fff; border-radius: 8px; padding: 24px; min-width: 400px; max-width: 90vw; }
-.modal h3 { margin-bottom: 20px; }
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
-.form-input { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; }
-.modal-footer { margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; }
-.btn { padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; }
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+.modal { background: #fff; border-radius: 8px; padding: 28px; min-width: 900px; width: 94vw; max-width: 1200px; min-height: 480px; max-height: 92vh; overflow-y: auto; }
+.modal h3 { margin-bottom: 24px; font-size: 20px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
+.form-input { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; }
+.content-group .content-field { width: 65%; min-width: 300px; resize: vertical; min-height: 120px; }
+.content-cell { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.modal-footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+.btn { padding: 10px 20px; border-radius: 4px; border: none; cursor: pointer; font-size: 14px; }
 .btn-primary { background: #1890ff; color: #fff; }
 </style>

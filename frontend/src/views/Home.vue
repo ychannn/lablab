@@ -64,7 +64,7 @@
             <button class="intro-btn" @click="navigate('about')">了解更多</button>
           </div>
           <div class="intro-img">
-            <img src="https://via.placeholder.com/500x300" alt="实验室图片">
+            <img :src="labIntroImageUrl || 'https://via.placeholder.com/500x300'" alt="实验室图片">
           </div>
         </div>
       </div>
@@ -93,7 +93,7 @@
           </div>
         </div>
         <div class="contact-more">
-          <button type="button" class="intro-btn" @click="navigate('contact')">查看更多 / 发送消息</button>
+          <button type="button" class="intro-btn" @click="navigate('contact')">查看更多</button>
         </div>
       </div>
     </div>
@@ -127,6 +127,19 @@ export default {
         transform: `translateX(-${this.currentIndex * 100}%)`,
         transition: 'transform 0.5s ease'
       }
+    },
+    labIntroImageUrl() {
+      const base = this.apiBase
+      const photos = this.labIntro.photos
+      if (photos && photos.length) {
+        const url = photos[0]
+        return url && (url.startsWith('http') ? url : base + (url.startsWith('/') ? '' : '/') + url)
+      }
+      if (this.labIntro.logo) {
+        const url = this.labIntro.logo
+        return url.startsWith('http') ? url : base + (url.startsWith('/') ? '' : '/') + url
+      }
+      return ''
     }
   },
   mounted() {

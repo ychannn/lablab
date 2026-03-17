@@ -30,12 +30,22 @@
         <textarea v-model="form.leaderIntroduction" class="form-textarea" rows="4"></textarea>
       </div>
       <div class="form-group">
-        <label>实验室 Logo URL</label>
-        <input v-model="form.logo" type="text" class="form-input" placeholder="图片地址" />
+        <label>实验室 Logo</label>
+        <div class="upload-row">
+          <input ref="logoInput" type="file" accept="image/*" class="hidden" @change="e => onImageUpload(e, 'logo')" />
+          <button type="button" class="btn btn-secondary" @click="$refs.logoInput.click()">{{ form.logo ? '更换图片' : '上传图片' }}</button>
+          <span v-if="uploadingLogo" class="upload-status">上传中…</span>
+          <div v-if="form.logo" class="thumb-wrap"><img :src="imageUrl(form.logo)" alt="Logo" class="thumb-img" /></div>
+        </div>
       </div>
       <div class="form-group">
-        <label>负责人照片 URL</label>
-        <input v-model="form.leaderPhoto" type="text" class="form-input" placeholder="图片地址" />
+        <label>负责人照片</label>
+        <div class="upload-row">
+          <input ref="leaderPhotoInput" type="file" accept="image/*" class="hidden" @change="e => onImageUpload(e, 'leaderPhoto')" />
+          <button type="button" class="btn btn-secondary" @click="$refs.leaderPhotoInput.click()">{{ form.leaderPhoto ? '更换图片' : '上传图片' }}</button>
+          <span v-if="uploadingLeader" class="upload-status">上传中…</span>
+          <div v-if="form.leaderPhoto" class="thumb-wrap"><img :src="imageUrl(form.leaderPhoto)" alt="负责人" class="thumb-img" /></div>
+        </div>
       </div>
       <div class="form-group">
         <label>研究方向（每行一项）</label>
@@ -46,8 +56,13 @@
         <textarea v-model="honorsText" class="form-textarea" rows="3" placeholder="荣誉一&#10;荣誉二"></textarea>
       </div>
       <div class="form-group">
-        <label>实验室图片 URL 列表（每行一项）</label>
-        <textarea v-model="photosText" class="form-textarea" rows="2" placeholder="https://..."></textarea>
+        <label>实验室图片</label>
+        <div class="upload-row">
+          <input ref="photosInput" type="file" accept="image/*" class="hidden" @change="onPhotosUpload" />
+          <button type="button" class="btn btn-secondary" @click="$refs.photosInput.click()">上传图片（可多张）</button>
+          <span v-if="uploadingPhotos" class="upload-status">上传中…</span>
+        </div>
+        <textarea v-model="photosText" class="form-textarea photos-list" rows="3" placeholder="上传后图片地址会显示在此，每行一张"></textarea>
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn-primary" :disabled="saving" @click="save">{{ saving ? '保存中…' : '保存' }}</button>
@@ -57,7 +72,7 @@
 </template>
 
 <script>
-import { request } from '../api/auth'
+import { request, API_BASE } from '../api/auth'
 
 export default {
   name: 'LabIntroManage',
@@ -79,13 +94,58 @@ export default {
       researchAreasText: '',
       honorsText: '',
       photosText: '',
-      saving: false
+      saving: false,
+      uploadingLogo: false,
+      uploadingLeader: false,
+      uploadingPhotos: false
     }
   },
   mounted() {
     this.fetchIntro()
   },
   methods: {
+    imageUrl(url) {
+      if (!url) return ''
+      return url.startsWith('http') ? url : API_BASE + url
+    },
+    async onImageUpload(e, field) {
+      const file = e.target.files?.[0]
+      e.target.value = ''
+      if (!file) return
+      const key = field === 'logo' ? 'uploadingLogo' : 'uploadingLeader'
+      this[key] = true
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        const data = await request('/api/config/admin/upload', { method: 'POST', body: formData })
+        if (data.code === 200 && data.data) this.form[field] = data.data
+        else alert(data.message || '上传失败')
+      } catch (err) {
+        alert(err.message || '上传失败')
+      } finally {
+        this[key] = false
+      }
+    },
+    async onPhotosUpload(e) {
+      const file = e.target.files?.[0]
+      e.target.value = ''
+      if (!file) return
+      this.uploadingPhotos = true
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        const data = await request('/api/config/admin/upload', { method: 'POST', body: formData })
+        if (data.code === 200 && data.data) {
+          const lines = this.photosText.trim() ? this.photosText.split('\n').map(s => s.trim()).filter(Boolean) : []
+          lines.push(data.data)
+          this.photosText = lines.join('\n')
+        } else alert(data.message || '上传失败')
+      } catch (err) {
+        alert(err.message || '上传失败')
+      } finally {
+        this.uploadingPhotos = false
+      }
+    },
     async fetchIntro() {
       try {
         const data = await request('/api/config/lab-intro')
@@ -151,5 +211,11 @@ export default {
 .form-actions { margin-top: 24px; }
 .btn { padding: 8px 20px; border-radius: 4px; border: none; cursor: pointer; font-size: 14px; }
 .btn-primary { background: #1890ff; color: #fff; }
+.btn-secondary { background: #f0f0f0; color: #333; }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.hidden { display: none; }
+.upload-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.upload-status { font-size: 14px; color: #666; }
+.thumb-wrap .thumb-img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #e8e8e8; }
+.photos-list { margin-top: 8px; }
 </style>

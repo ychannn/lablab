@@ -6,6 +6,9 @@
       <!-- 实验室基本信息 -->
       <div class="about-section">
         <h3>基本信息</h3>
+        <div v-if="labIntro.logo" class="intro-logo-wrap">
+          <img :src="imageUrl(labIntro.logo)" alt="实验室Logo" class="intro-logo">
+        </div>
         <div class="info-grid">
           <div class="info-item">
             <label>实验室名称</label>
@@ -50,7 +53,7 @@
         <h3>实验室负责人</h3>
         <div class="leader-info">
           <div class="leader-photo">
-            <img :src="labIntro.leaderPhoto || 'https://via.placeholder.com/200x200'" alt="负责人照片">
+            <img :src="imageUrl(labIntro.leaderPhoto) || 'https://via.placeholder.com/200x200'" alt="负责人照片">
           </div>
           <div class="leader-details">
             <h4>{{ labIntro.leaderName || 'XXX教授' }}</h4>
@@ -63,8 +66,8 @@
       <div class="about-section">
         <h3>实验室环境</h3>
         <div class="photo-grid">
-          <div v-for="(photo, index) in labIntro.photos || Array(4).fill('')" :key="index" class="photo-item">
-            <img :src="photo || 'https://via.placeholder.com/400x300'" alt="实验室照片">
+          <div v-for="(photo, index) in labIntro.photos && labIntro.photos.length ? labIntro.photos : Array(4).fill('')" :key="index" class="photo-item">
+            <img :src="imageUrl(photo) || 'https://via.placeholder.com/400x300'" alt="实验室照片">
           </div>
         </div>
       </div>
@@ -84,6 +87,10 @@ export default {
     this.fetchLabIntro()
   },
   methods: {
+    imageUrl(url) {
+      if (!url) return ''
+      return url.startsWith('http') ? url : 'http://localhost:8080' + (url.startsWith('/') ? '' : '/') + url
+    },
     async fetchLabIntro() {
       try {
         const response = await fetch('http://localhost:8080/api/config/lab-intro')
@@ -132,6 +139,8 @@ export default {
   padding-bottom: 12px;
 }
 
+.intro-logo-wrap { margin-bottom: 24px; }
+.intro-logo { max-height: 64px; max-width: 200px; object-fit: contain; }
 .info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));

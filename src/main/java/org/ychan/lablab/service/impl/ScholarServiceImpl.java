@@ -138,32 +138,43 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
     }
 
     /**
-     * 修改学者
+     * 修改学者（含关联：简介、论文、项目按“先删后插”同步）
      * @param requestParam
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateScholar(TeamUpdateScholarReqDTO requestParam){
-        Scholar exist = scholarMapper.selectById(requestParam.getId());
-        if(ObjectUtils.isNull(exist) || exist.getDeleted() == CommonConstants.TRUE){
+        int scholarId = requestParam.getId();
+        Scholar exist = scholarMapper.selectById(scholarId);
+        if (ObjectUtils.isNull(exist) || exist.getDeleted() == CommonConstants.TRUE) {
             throw new BusinessException("学者不存在");
         }
+        // 1. 更新学者主表
         Scholar scholar = new Scholar();
         BeanUtils.copyProperties(requestParam, scholar);
         scholar.setTitle(requestParam.getRank());
         scholar.setAreaId(requestParam.getAreaId());
         scholarMapper.updateById(scholar);
-        if(CollectionUtils.isNotEmpty(requestParam.getIntroList())){
-            introService.updateBatchById(requestParam.getIntroList());
+
+        // 2. 简介：按关联同步（先删该学者的全部，再插入请求中的列表）
+        introService.remove(new LambdaQueryWrapper<>(Intro.class).eq(Intro::getScholarId, scholarId));
+        if (CollectionUtils.isNotEmpty(requestParam.getIntroList())) {
+            requestParam.getIntroList().forEach(e -> e.setScholarId(scholarId));
+            introService.saveBatch(requestParam.getIntroList());
         }
-        if(CollectionUtils.isNotEmpty(requestParam.getPaperList())){
-            paperService.updateBatchById(requestParam.getPaperList());
+
+        // 3. 论文：按关联同步
+        paperService.remove(new LambdaQueryWrapper<>(Paper.class).eq(Paper::getScholarId, scholarId));
+        if (CollectionUtils.isNotEmpty(requestParam.getPaperList())) {
+            requestParam.getPaperList().forEach(e -> e.setScholarId(scholarId));
+            paperService.saveBatch(requestParam.getPaperList());
         }
-        if(CollectionUtils.isNotEmpty(requestParam.getIntroList())){
-            introService.updateBatchById(requestParam.getIntroList());
-        }
-        if(CollectionUtils.isNotEmpty(requestParam.getProjectList())){
-            projectService.updateBatchById(requestParam.getProjectList());
+
+        // 4. 科研项目：按关联同步
+        projectService.remove(new LambdaQueryWrapper<>(Project.class).eq(Project::getScholarId, scholarId));
+        if (CollectionUtils.isNotEmpty(requestParam.getProjectList())) {
+            requestParam.getProjectList().forEach(e -> e.setScholarId(scholarId));
+            projectService.saveBatch(requestParam.getProjectList());
         }
     }
 
