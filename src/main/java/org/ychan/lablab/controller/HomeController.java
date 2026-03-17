@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ychan.lablab.common.result.Result;
+import org.ychan.lablab.dto.resp.config.BannerItemDTO;
 import org.ychan.lablab.dto.resp.config.ContactRespDTO;
 import org.ychan.lablab.dto.resp.config.LabIntroRespDTO;
-import org.ychan.lablab.dto.resp.news.LabNewsRespDTO;
 import org.ychan.lablab.dto.resp.research.*;
 import org.ychan.lablab.service.*;
 
@@ -32,12 +32,10 @@ public class HomeController {
     public Result<HomeRespDTO> getHomeData() {
         HomeRespDTO resp = new HomeRespDTO();
 
-        // 获取轮播图新闻（最新3条）
-        List<LabNewsRespDTO> newsList = labNewsService.listLabNews();
-        if (newsList.size() > 3) {
-            newsList = newsList.subList(0, 3);
-        }
-        resp.setBannerNews(newsList);
+        // 网站标题（可后台修改）
+        resp.setSiteTitle(configService.getSiteTitle());
+        // 轮播图：从 config 读取，后台配置、门户只展示图片
+        resp.setBannerList(configService.getBannerList());
 
         // 获取最新成果（最新6条，混合类型）
         List<HomeAchievementDTO> achievementList = new ArrayList<>();
@@ -47,6 +45,7 @@ public class HomeController {
         for (PaperPublicationRespDTO paper : paperList) {
             if (achievementList.size() >= 6) break;
             HomeAchievementDTO dto = new HomeAchievementDTO();
+            dto.setId(paper.getId());
             dto.setType("paper");
             dto.setTitle(paper.getContent());
             dto.setTime(paper.getPublishTime());
@@ -58,6 +57,7 @@ public class HomeController {
         for (TopicProjectRespDTO project : projectList) {
             if (achievementList.size() >= 6) break;
             HomeAchievementDTO dto = new HomeAchievementDTO();
+            dto.setId(project.getId());
             dto.setType("project");
             dto.setTitle(project.getContent());
             dto.setTime(project.getStartTime());
@@ -69,6 +69,7 @@ public class HomeController {
         for (AchievementRespDTO award : awardList) {
             if (achievementList.size() >= 6) break;
             HomeAchievementDTO dto = new HomeAchievementDTO();
+            dto.setId(award.getId());
             dto.setType("award");
             dto.setTitle(award.getContent());
             dto.setTime(award.getCreateTime());
@@ -92,17 +93,28 @@ public class HomeController {
      * 首页响应DTO
      */
     public static class HomeRespDTO {
-        private List<LabNewsRespDTO> bannerNews;
+        /** 网站标题（导航、页脚、浏览器标题） */
+        private String siteTitle;
+        /** 首页轮播图列表（config 配置，仅展示图片） */
+        private List<BannerItemDTO> bannerList;
         private List<HomeAchievementDTO> latestAchievements;
         private LabIntroRespDTO labIntro;
         private ContactRespDTO contact;
 
-        public List<LabNewsRespDTO> getBannerNews() {
-            return bannerNews;
+        public String getSiteTitle() {
+            return siteTitle;
         }
 
-        public void setBannerNews(List<LabNewsRespDTO> bannerNews) {
-            this.bannerNews = bannerNews;
+        public void setSiteTitle(String siteTitle) {
+            this.siteTitle = siteTitle;
+        }
+
+        public List<BannerItemDTO> getBannerList() {
+            return bannerList;
+        }
+
+        public void setBannerList(List<BannerItemDTO> bannerList) {
+            this.bannerList = bannerList;
         }
 
         public List<HomeAchievementDTO> getLatestAchievements() {
@@ -134,9 +146,18 @@ public class HomeController {
      * 首页成果DTO
      */
     public static class HomeAchievementDTO {
+        private Integer id;
         private String type; // paper, project, award
         private String title;
         private java.time.LocalDateTime time;
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
 
         public String getType() {
             return type;

@@ -23,21 +23,34 @@ public class AdminInitializer {
     @Bean
     public ApplicationRunner initAdmin() {
         return args -> {
-            // 检查是否已存在超级管理员账号
+            // 先查未删除的 admin
             Admin admin = adminMapper.selectOne(
                     new LambdaQueryWrapper<Admin>()
                             .eq(Admin::getUsername, "admin")
                             .eq(Admin::getDeleted, CommonConstants.FALSE));
-
-            if (admin == null) {
-                // 创建默认超级管理员账号
-                Admin newAdmin = new Admin();
-                newAdmin.setUsername("admin");
-                newAdmin.setPassword(PASSWORD_ENCODER.encode("admin123"));
-                newAdmin.setRole("admin");
-                adminMapper.insert(newAdmin);
-                System.out.println("默认超级管理员账号已创建：用户名=admin，密码=admin123");
+            if (admin != null) {
+                return; // 已有可用账号
             }
+            // 再查是否存在（含已删除的），避免唯一约束冲突
+            Admin anyAdmin = adminMapper.selectOne(
+                    new LambdaQueryWrapper<Admin>()
+                            .eq(Admin::getUsername, "admin"));
+            if (anyAdmin != null) {
+                // 恢复已删除的 admin 并重置为默认密码
+                anyAdmin.setDeleted(CommonConstants.FALSE);
+                anyAdmin.setPassword(PASSWORD_ENCODER.encode("admin123"));
+                anyAdmin.setRole("admin");
+                adminMapper.updateById(anyAdmin);
+                System.out.println("默认超级管理员已恢复：用户名=admin，密码=admin123");
+                return;
+            }
+            // 不存在则新建
+            Admin newAdmin = new Admin();
+            newAdmin.setUsername("admin");
+            newAdmin.setPassword(PASSWORD_ENCODER.encode("admin123"));
+            newAdmin.setRole("admin");
+            adminMapper.insert(newAdmin);
+            System.out.println("默认超级管理员账号已创建：用户名=admin，密码=admin123");
         };
     }
 }

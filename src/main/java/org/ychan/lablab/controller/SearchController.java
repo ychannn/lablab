@@ -26,10 +26,10 @@ public class SearchController extends BaseController {
      * @param size 每页大小
      */
     @GetMapping("/query")
-    public Result<SearchRespDTO> search(@RequestParam String keyword, 
-                                      @RequestParam(defaultValue = "1") int page, 
+    public Result<SearchRespDTO> search(@RequestParam(required = false) String keyword,
+                                      @RequestParam(defaultValue = "1") int page,
                                       @RequestParam(defaultValue = "10") int size) {
-        SearchRespDTO result = searchService.search(keyword, page, size);
+        SearchRespDTO result = searchService.search(keyword != null ? keyword.trim() : "", page, size);
         return Result.success(result);
     }
 

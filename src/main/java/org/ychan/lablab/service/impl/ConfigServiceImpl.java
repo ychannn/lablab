@@ -1,13 +1,19 @@
 package org.ychan.lablab.service.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.ychan.lablab.dto.resp.config.BannerItemDTO;
 import org.ychan.lablab.dto.resp.config.ContactRespDTO;
 import org.ychan.lablab.dto.resp.config.LabIntroRespDTO;
 import org.ychan.lablab.entity.config.Config;
 import org.ychan.lablab.mapper.ConfigMapper;
 import org.ychan.lablab.service.ConfigService;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * 系统配置 Service 实现
@@ -20,6 +26,18 @@ public class ConfigServiceImpl implements ConfigService {
 
     private static final String TYPE_CONTACT = "contact";
     private static final String TYPE_LAB_INTRO = "lab_intro";
+    private static final String TYPE_HOME_BANNER = "home_banner";
+    private static final String TYPE_SITE_TITLE = "site_title";
+    private static final String DEFAULT_SITE_TITLE = "实验室网站";
+
+    @Override
+    public String getSiteTitle() {
+        Config config = configMapper.selectByType(TYPE_SITE_TITLE);
+        if (config == null || config.getConfigValue() == null || config.getConfigValue().isBlank()) {
+            return DEFAULT_SITE_TITLE;
+        }
+        return config.getConfigValue().trim();
+    }
 
     @Override
     public ContactRespDTO getContactInfo() {
@@ -37,6 +55,45 @@ public class ConfigServiceImpl implements ConfigService {
             return getDefaultLabIntro();
         }
         return JSON.parseObject(config.getConfigValue(), LabIntroRespDTO.class);
+    }
+
+    /** 门户轮播最多展示张数 */
+    private static final int BANNER_PORTAL_LIMIT = 5;
+
+    @Override
+    public List<BannerItemDTO> getBannerList() {
+        List<BannerItemDTO> full = getBannerListForAdmin();
+        return full.size() <= BANNER_PORTAL_LIMIT ? full : full.subList(0, BANNER_PORTAL_LIMIT);
+    }
+
+    @Override
+    public List<BannerItemDTO> getBannerListForAdmin() {
+        Config config = configMapper.selectByType(TYPE_HOME_BANNER);
+        if (config == null || config.getConfigValue() == null || config.getConfigValue().isBlank()) {
+            return new ArrayList<>();
+        }
+        List<BannerItemDTO> list = JSON.parseObject(config.getConfigValue(), new TypeReference<List<BannerItemDTO>>() {});
+        if (list == null) return new ArrayList<>();
+        list.sort(Comparator.comparingInt((BannerItemDTO b) -> b.getSort() != null ? b.getSort() : 0).reversed());
+        return list;
+    }
+
+    @Override
+    public void updateSiteTitle(String title) {
+        Config config = configMapper.selectByType(TYPE_SITE_TITLE);
+        if (config == null) {
+            config = new Config();
+            config.setConfigType(TYPE_SITE_TITLE);
+            config.setConfigName("网站标题");
+            config.setDescription("门户导航栏、页脚及浏览器标题显示名称");
+            config.setSort(0);
+        }
+        config.setConfigValue(title != null ? title.trim() : DEFAULT_SITE_TITLE);
+        if (config.getId() == null) {
+            configMapper.insert(config);
+        } else {
+            configMapper.updateById(config);
+        }
     }
 
     @Override
@@ -70,6 +127,29 @@ public class ConfigServiceImpl implements ConfigService {
         }
         config.setConfigValue(JSON.toJSONString(introDTO));
         
+        if (config.getId() == null) {
+            configMapper.insert(config);
+        } else {
+            configMapper.updateById(config);
+        }
+    }
+
+    @Override
+    public void updateBannerList(List<BannerItemDTO> list) {
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                list.get(i).setSort(list.size() - 1 - i);
+            }
+        }
+        Config config = configMapper.selectByType(TYPE_HOME_BANNER);
+        if (config == null) {
+            config = new Config();
+            config.setConfigType(TYPE_HOME_BANNER);
+            config.setConfigName("首页轮播图");
+            config.setDescription("门户首页轮播图，后台上传图片后在此配置");
+            config.setSort(0);
+        }
+        config.setConfigValue(list != null ? JSON.toJSONString(list) : "[]");
         if (config.getId() == null) {
             configMapper.insert(config);
         } else {

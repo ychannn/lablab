@@ -1,0 +1,365 @@
+<template>
+  <div class="search-page">
+    <div class="container">
+      <div class="search-header">
+        <h2 class="page-title">站内搜索</h2>
+        <div class="search-box">
+          <input
+            v-model="query"
+            type="text"
+            class="search-input"
+            placeholder="输入关键词搜索新闻、师资、成果…"
+            @keyup.enter="doSearch"
+          >
+          <button type="button" class="search-btn" @click="doSearch">搜索</button>
+        </div>
+      </div>
+
+      <div v-if="searched" class="search-result">
+        <p v-if="!loading && result.items.length === 0" class="no-result">
+          {{ query ? '未找到相关结果' : '请输入关键词' }}
+        </p>
+        <div v-else-if="loading" class="loading">搜索中…</div>
+        <template v-else>
+          <p class="result-summary">共找到 {{ result.total }} 条结果</p>
+          <ul class="result-list">
+            <li
+              v-for="item in result.items"
+              :key="item.id"
+              class="result-item"
+              @click="goTo(item)"
+            >
+              <span class="item-type">{{ getTypeLabel(item.type) }}</span>
+              <div class="item-body">
+                <h4 class="item-title">{{ item.title || item.content || '无标题' }}</h4>
+                <p v-if="item.content && item.content !== (item.title || '')" class="item-content">{{ item.content }}</p>
+                <span v-if="item.createTime" class="item-time">{{ item.createTime }}</span>
+              </div>
+            </li>
+          </ul>
+          <div v-if="result.totalPages > 1" class="pagination">
+            <button type="button" :disabled="result.page <= 1" @click="fetchPage(result.page - 1)">上一页</button>
+            <span class="page-info">第 {{ result.page }} / {{ result.totalPages }} 页</span>
+            <button type="button" :disabled="result.page >= result.totalPages" @click="fetchPage(result.page + 1)">下一页</button>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Search',
+  props: {
+    keyword: { type: String, default: '' }
+  },
+  data() {
+    return {
+      apiBase: 'http://localhost:8080',
+      query: '',
+      searched: false,
+      loading: false,
+      result: {
+        total: 0,
+        page: 1,
+        size: 20,
+        totalPages: 0,
+        items: []
+      }
+    }
+  },
+  watch: {
+    keyword: {
+      immediate: true,
+      handler(v) {
+        this.query = v || ''
+        if (v && v.trim()) {
+          this.result.page = 1
+          this.fetchSearch()
+        } else {
+          this.searched = false
+        }
+      }
+    }
+  },
+  methods: {
+    doSearch() {
+      const q = (this.query || '').trim()
+      if (!q) return
+      this.$emit('search', q)
+      this.result.page = 1
+      this.fetchSearch()
+    },
+    async fetchSearch() {
+      const q = (this.query || '').trim()
+      if (!q) {
+        this.searched = true
+        this.result.items = []
+        this.result.total = 0
+        this.result.totalPages = 0
+        return
+      }
+      this.searched = true
+      this.loading = true
+      try {
+        const url = `${this.apiBase}/api/search/query?keyword=${encodeURIComponent(q)}&page=${this.result.page}&size=${this.result.size}`
+        const res = await fetch(url)
+        const data = await res.json()
+        if (data.code === 200 && data.data) {
+          this.result = {
+            total: data.data.total ?? 0,
+            page: data.data.page ?? 1,
+            size: data.data.size ?? 20,
+            totalPages: data.data.totalPages ?? 0,
+            items: data.data.items || []
+          }
+        }
+      } catch (e) {
+        console.error(e)
+        this.result.items = []
+        this.result.total = 0
+        this.result.totalPages = 0
+      } finally {
+        this.loading = false
+      }
+    },
+    fetchPage(page) {
+      if (page < 1 || page > this.result.totalPages) return
+      this.result.page = page
+      this.fetchSearch()
+    },
+    getTypeLabel(type) {
+      const map = {
+        news: '新闻',
+        notice: '公告',
+        scholar: '师资',
+        achievement: '成果',
+        paper: '论文',
+        project: '项目'
+      }
+      return map[type] || type || '其他'
+    },
+    goTo(item) {
+      const idStr = (item.id || '').toString()
+      const numId = idStr.replace(/^\w+_/, '')
+      const num = parseInt(numId, 10)
+      const id = isNaN(num) ? null : num
+      switch (item.type) {
+        case 'news':
+          if (id != null) this.$emit('go', { page: 'detail', type: 'news', id })
+          else this.$emit('go', { page: 'news' })
+          break
+        case 'notice':
+          this.$emit('go', { page: 'news' })
+          break
+        case 'scholar':
+          if (id != null) this.$emit('go', { page: 'detail', type: 'scholar', id })
+          else this.$emit('go', { page: 'team' })
+          break
+        case 'paper':
+          if (id != null) this.$emit('go', { page: 'detail', type: 'paper', id })
+          else this.$emit('go', { page: 'achievements', tab: 'paper' })
+          break
+        case 'project':
+          if (id != null) this.$emit('go', { page: 'detail', type: 'project', id })
+          else this.$emit('go', { page: 'achievements', tab: 'project' })
+          break
+        case 'achievement':
+          if (id != null) this.$emit('go', { page: 'detail', type: 'award', id })
+          else this.$emit('go', { page: 'achievements', tab: 'award' })
+          break
+        default:
+          this.$emit('go', { page: 'home' })
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+.search-page {
+  min-height: 80vh;
+  padding: 48px 0 80px;
+  background-color: #f6faf8;
+}
+
+.search-header {
+  margin-bottom: 40px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24px;
+  color: #2c3e50;
+  letter-spacing: 0.02em;
+}
+
+.search-box {
+  display: flex;
+  max-width: 560px;
+  margin: 0 auto;
+  gap: 12px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 14px 18px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: #2d9d78;
+}
+
+.search-btn {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.search-btn:hover {
+  opacity: 0.9;
+}
+
+.search-result {
+  background-color: #fff;
+  border: 1px solid #dde8e4;
+  border-radius: 12px;
+  padding: 32px;
+}
+
+.no-result,
+.loading {
+  text-align: center;
+  color: #5a6c7d;
+  padding: 48px 0;
+}
+
+.result-summary {
+  font-size: 14px;
+  color: #5a6c7d;
+  margin-bottom: 20px;
+}
+
+.result-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.result-item {
+  display: flex;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.result-item:last-child {
+  border-bottom: none;
+}
+
+.result-item:hover {
+  background-color: #f0f7f4;
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.item-type {
+  flex-shrink: 0;
+  width: 56px;
+  padding: 4px 8px;
+  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 6px 0;
+  color: #2c3e50;
+  line-height: 1.4;
+}
+
+.item-content {
+  font-size: 14px;
+  color: #5a6c7d;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.item-time {
+  font-size: 12px;
+  color: #999;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid #dde8e4;
+}
+
+.pagination button {
+  padding: 10px 18px;
+  border: 1px solid #dde8e4;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  border-color: #2d9d78;
+  color: #2d9d78;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.page-info {
+  font-size: 14px;
+  color: #5a6c7d;
+}
+
+@media (max-width: 768px) {
+  .search-box {
+    flex-direction: column;
+  }
+}
+</style>

@@ -1,7 +1,11 @@
 # application.yml
+# 上传目录：相对路径表示相对进程工作目录（启动时的项目根），上线时保持一致即可
+app:
+  upload-dir: uploads
+
 spring:
   datasource:
-    url: jdbc:mysql://localhost:4406/lab?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/lab?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root # 你的数据库用户名
     password: edraqwq1 # 你的数据库密码
     driver-class-name: com.mysql.cj.jdbc.Driver

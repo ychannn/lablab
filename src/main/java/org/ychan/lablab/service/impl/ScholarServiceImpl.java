@@ -1,8 +1,10 @@
 package org.ychan.lablab.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -53,12 +55,26 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
         List<Scholar> scholarList = baseMapper.selectList(new LambdaQueryWrapper<>(Scholar.class)
                 .eq(Scholar::getDeleted, 0));
         return scholarList.stream()
-                .map(each -> {
-                    TeamBasicScholarRespDTO teamSimpleScholarRespDTO = new TeamBasicScholarRespDTO();
-                    BeanUtils.copyProperties(each, teamSimpleScholarRespDTO);
-                    return teamSimpleScholarRespDTO;
-                })
+                .map(this::toBasicDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public IPage<TeamBasicScholarRespDTO> pageScholar(int pageNum, int pageSize) {
+        IPage<Scholar> page = baseMapper.selectPage(
+                new Page<>(pageNum, pageSize),
+                new LambdaQueryWrapper<>(Scholar.class).eq(Scholar::getDeleted, 0));
+        return page.convert(this::toBasicDto);
+    }
+
+    private TeamBasicScholarRespDTO toBasicDto(Scholar s) {
+        TeamBasicScholarRespDTO dto = new TeamBasicScholarRespDTO();
+        dto.setId(s.getId());
+        dto.setArea(s.getAreaId());
+        dto.setName(s.getName());
+        dto.setRank(s.getTitle());
+        dto.setPhoto(s.getPhoto());
+        return dto;
     }
 
     /**
@@ -68,8 +84,11 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
      */
     @Override
     public TeamScholarDetailsRespDTO getScholarDetails(int id) {
-        TeamScholarDetailsRespDTO resp = new TeamScholarDetailsRespDTO();
         Scholar scholar = baseMapper.selectById(id);
+        if (scholar == null || scholar.getDeleted() == CommonConstants.TRUE) {
+            throw new BusinessException("学者不存在");
+        }
+        TeamScholarDetailsRespDTO resp = new TeamScholarDetailsRespDTO();
         BeanUtils.copyProperties(scholar, resp);
         List<Intro> introList = introMapper.selectList(new LambdaQueryWrapper<>(Intro.class)
                 .eq(Intro::getScholarId, id));
@@ -92,6 +111,8 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
     public void addScholar(TeamAddScholarReqDTO requestParam){
         Scholar scholar = new Scholar();
         BeanUtils.copyProperties(requestParam, scholar);
+        scholar.setTitle(requestParam.getRank());
+        scholar.setAreaId(requestParam.getAreaId());
         int insert = scholarMapper.insert(scholar);
         if (insert < 1){
             throw new BusinessException("新增学者失败");
@@ -129,6 +150,8 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
         }
         Scholar scholar = new Scholar();
         BeanUtils.copyProperties(requestParam, scholar);
+        scholar.setTitle(requestParam.getRank());
+        scholar.setAreaId(requestParam.getAreaId());
         scholarMapper.updateById(scholar);
         if(CollectionUtils.isNotEmpty(requestParam.getIntroList())){
             introService.updateBatchById(requestParam.getIntroList());

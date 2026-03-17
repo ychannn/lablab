@@ -21,6 +21,10 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // CORS 预检请求不带 token，必须放行，否则浏览器会报 CORS 错误
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
         String authorization = request.getHeader("Authorization");
         String token = parseToken(authorization);
         if (token == null || token.isBlank()) {

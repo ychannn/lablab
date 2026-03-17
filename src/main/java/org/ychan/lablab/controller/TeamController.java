@@ -1,5 +1,6 @@
 package org.ychan.lablab.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
@@ -20,11 +21,23 @@ public class TeamController {
 
     private final ScholarService scholarService;
     /**
-     * 返回学者基础信息列表
+     * 返回学者基础信息列表（门户用）
      */
     @GetMapping("/scholar/basic-list")
     public List<TeamBasicScholarRespDTO> listBasicScholar(){
         return scholarService.listBasicScholar();
+    }
+
+    /**
+     * 分页查询学者列表（后台用）
+     */
+    @GetMapping("/scholar/page")
+    public Result<IPage<TeamBasicScholarRespDTO>> pageScholar(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        pageNum = Math.max(pageNum, 1);
+        pageSize = Math.max(Math.min(pageSize, 50), 1);
+        return Result.success(scholarService.pageScholar(pageNum, pageSize));
     }
 
     /**

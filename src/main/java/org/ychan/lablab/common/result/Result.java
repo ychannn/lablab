@@ -48,4 +48,11 @@ public class Result<T> {
     public static <T> Result<T> error(String message){
         return new Result<>(500, message, null);
     }
+
+    /**
+     * 业务失败（与 error 同义，便于与 success 对应）
+     */
+    public static <T> Result<T> fail(String message) {
+        return new Result<>(500, message, null);
+    }
 }

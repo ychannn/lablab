@@ -37,7 +37,15 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public SearchRespDTO search(String keyword, int page, int size) {
         List<SearchRespDTO.SearchItemDTO> allResults = new ArrayList<>();
-        
+        if (keyword == null || keyword.isBlank()) {
+            SearchRespDTO empty = new SearchRespDTO();
+            empty.setTotal(0);
+            empty.setPage(page);
+            empty.setSize(size);
+            empty.setTotalPages(0);
+            empty.setItems(allResults);
+            return empty;
+        }
         // 从各个表中搜索
         allResults.addAll(searchNews(keyword));
         allResults.addAll(searchNotices(keyword));

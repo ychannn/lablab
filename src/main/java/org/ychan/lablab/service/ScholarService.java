@@ -1,5 +1,6 @@
 package org.ychan.lablab.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ychan.lablab.dto.req.TeamAddScholarReqDTO;
 import org.ychan.lablab.dto.req.TeamUpdateScholarReqDTO;
@@ -12,10 +13,14 @@ import java.util.List;
 public interface ScholarService extends IService<Scholar> {
 
     /**
-     * 返回简单学者列表
-     * @return
+     * 返回简单学者列表（门户用）
      */
     List<TeamBasicScholarRespDTO> listBasicScholar();
+
+    /**
+     * 分页查询学者列表（后台用）
+     */
+    IPage<TeamBasicScholarRespDTO> pageScholar(int pageNum, int pageSize);
 
     /**
      * 返回学者详情
