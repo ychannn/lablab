@@ -4,14 +4,14 @@
     <div class="toolbar"><button type="button" class="btn btn-primary" @click="openAdd">新增</button></div>
     <table class="data-table">
       <thead>
-        <tr><th>ID</th><th>姓名</th><th>领域</th><th>级别</th><th>照片</th><th width="140">操作</th></tr>
+        <tr><th>ID</th><th>姓名</th><th>领域</th><th>职级</th><th>照片</th><th width="140">操作</th></tr>
       </thead>
       <tbody>
         <tr v-for="row in list" :key="row.id">
           <td>{{ row.id }}</td>
           <td>{{ row.name }}</td>
           <td>{{ areaName(row.area) }}</td>
-          <td>{{ row.rank }}</td>
+          <td>{{ row.rankLabel || row.rank }}</td>
           <td>
             <img v-if="row.photo" :src="imageUrl(row.photo)" class="thumb" alt="" />
             <span v-else class="no-photo">—</span>
@@ -41,8 +41,10 @@
           <input v-model.number="form.areaId" type="number" class="form-input" />
         </div>
         <div class="form-group">
-          <label>级别</label>
-          <input v-model.number="form.rank" type="number" class="form-input" />
+          <label>职级</label>
+          <select v-model.number="form.rank" class="form-input">
+            <option v-for="r in rankOptions" :key="r.code" :value="r.code">{{ r.label }}</option>
+          </select>
         </div>
         <div class="form-group">
           <label>照片</label>
@@ -113,11 +115,13 @@ export default {
       saving: false,
       uploading: false,
       areaList: [],
-      form: { name: "", areaId: 0, rank: 0, photo: "", introList: [], paperList: [], projectList: [] }
+      rankOptions: [],
+      form: { name: "", areaId: 0, rank: 1, photo: "", introList: [], paperList: [], projectList: [] }
     }
   },
   mounted() {
     this.loadAreas()
+    this.loadRanks()
     this.load(1)
   },
   methods: {
@@ -132,6 +136,13 @@ export default {
         if (data.code === 200 && Array.isArray(data.data)) this.areaList = data.data
       } catch (e) { this.areaList = [] }
     },
+    async loadRanks() {
+      try {
+        const data = await request("/team/scholar/ranks")
+        if (data.code === 200 && Array.isArray(data.data)) this.rankOptions = data.data
+        else this.rankOptions = []
+      } catch (e) { this.rankOptions = [] }
+    },
     async load(p) {
       const data = await request("/team/scholar/page?pageNum=" + p + "&pageSize=" + this.pageSize)
       if (data.code === 200 && data.data) {
@@ -145,7 +156,7 @@ export default {
     },
     openAdd() {
       this.editId = null
-      this.form = { name: "", areaId: 0, rank: 0, photo: "", introList: [], paperList: [], projectList: [] }
+      this.form = { name: "", areaId: 0, rank: 1, photo: "", introList: [], paperList: [], projectList: [] }
       this.showModal = true
     },
     async openEdit(row) {

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ychan.lablab.common.constant.CommonConstants;
 import org.ychan.lablab.dto.req.TeamAddScholarReqDTO;
+import org.ychan.lablab.enums.ScholarRankEnum;
 import org.ychan.lablab.dto.req.TeamUpdateScholarReqDTO;
 import org.ychan.lablab.dto.resp.team.TeamBasicScholarRespDTO;
 import org.ychan.lablab.dto.resp.team.TeamScholarDetailsRespDTO;
@@ -52,8 +53,10 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
      * @return
      */
     public List<TeamBasicScholarRespDTO> listBasicScholar(){
-        List<Scholar> scholarList = baseMapper.selectList(new LambdaQueryWrapper<>(Scholar.class)
-                .eq(Scholar::getDeleted, 0));
+        List<Scholar> scholarList = baseMapper.selectList(
+                new LambdaQueryWrapper<>(Scholar.class)
+                        .eq(Scholar::getDeleted, 0)
+                        .orderByAsc(Scholar::getTitle));
         return scholarList.stream()
                 .map(this::toBasicDto)
                 .collect(Collectors.toList());
@@ -63,7 +66,9 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
     public IPage<TeamBasicScholarRespDTO> pageScholar(int pageNum, int pageSize) {
         IPage<Scholar> page = baseMapper.selectPage(
                 new Page<>(pageNum, pageSize),
-                new LambdaQueryWrapper<>(Scholar.class).eq(Scholar::getDeleted, 0));
+                new LambdaQueryWrapper<>(Scholar.class)
+                        .eq(Scholar::getDeleted, 0)
+                        .orderByAsc(Scholar::getTitle));
         return page.convert(this::toBasicDto);
     }
 
@@ -73,6 +78,7 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
         dto.setArea(s.getAreaId());
         dto.setName(s.getName());
         dto.setRank(s.getTitle());
+        dto.setRankLabel(ScholarRankEnum.getLabelByCode(s.getTitle()));
         dto.setPhoto(s.getPhoto());
         return dto;
     }
@@ -89,7 +95,12 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
             throw new BusinessException("学者不存在");
         }
         TeamScholarDetailsRespDTO resp = new TeamScholarDetailsRespDTO();
-        BeanUtils.copyProperties(scholar, resp);
+        resp.setId(scholar.getId());
+        resp.setArea(scholar.getAreaId());
+        resp.setName(scholar.getName());
+        resp.setRank(scholar.getTitle());
+        resp.setRankLabel(ScholarRankEnum.getLabelByCode(scholar.getTitle()));
+        resp.setPhoto(scholar.getPhoto());
         List<Intro> introList = introMapper.selectList(new LambdaQueryWrapper<>(Intro.class)
                 .eq(Intro::getScholarId, id));
         List<Paper> paperList = paperMapper.selectList(new LambdaQueryWrapper<>(Paper.class)

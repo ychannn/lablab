@@ -10,9 +10,13 @@ import org.ychan.lablab.dto.req.TeamUpdateScholarReqDTO;
 import org.ychan.lablab.dto.resp.team.TeamScholarDetailsRespDTO;
 import org.ychan.lablab.dto.resp.team.TeamBasicScholarRespDTO;
 import org.ychan.lablab.enums.RoleEnum;
+import org.ychan.lablab.dto.resp.team.ScholarRankOptionDTO;
+import org.ychan.lablab.enums.ScholarRankEnum;
 import org.ychan.lablab.service.ScholarService;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/team")
@@ -26,6 +30,17 @@ public class TeamController {
     @GetMapping("/scholar/basic-list")
     public List<TeamBasicScholarRespDTO> listBasicScholar(){
         return scholarService.listBasicScholar();
+    }
+
+    /**
+     * 职级列表（后台下拉用）：教授、副教授、讲师、助教，按职级高到低
+     */
+    @GetMapping("/scholar/ranks")
+    public Result<List<ScholarRankOptionDTO>> listScholarRanks() {
+        List<ScholarRankOptionDTO> list = Arrays.stream(ScholarRankEnum.values())
+                .map(ScholarRankOptionDTO::from)
+                .collect(Collectors.toList());
+        return Result.success(list);
     }
 
     /**

@@ -25,9 +25,14 @@ public class TeamScholarDetailsRespDTO {
     private String name;
 
     /**
-     * 级别
+     * 级别（数字，1=教授 2=副教授 3=讲师 4=助教）
      */
     private int rank;
+
+    /**
+     * 职级名称（教授/副教授/讲师/助教）
+     */
+    private String rankLabel;
 
     /**
      * 简介
