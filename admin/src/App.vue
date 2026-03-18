@@ -15,9 +15,9 @@
         <aside class="admin-sidebar">
           <nav class="sidebar-nav">
             <div class="nav-group">站点配置</div>
-            <a v-for="item in menus" :key="item.key" href="javascript:;" :class="{ active: currentMenu === item.key }" @click.prevent="currentMenu = item.key">{{ item.label }}</a>
+            <a v-for="item in menus" :key="item.key" :href="'#' + item.key" :class="{ active: currentMenu === item.key }" @click.prevent="setMenu(item.key)">{{ item.label }}</a>
             <div class="nav-group">业务管理</div>
-            <a v-for="item in crudMenus" :key="item.key" href="javascript:;" :class="{ active: currentMenu === item.key }" @click.prevent="currentMenu = item.key">{{ item.label }}</a>
+            <a v-for="item in crudMenus" :key="item.key" :href="'#' + item.key" :class="{ active: currentMenu === item.key }" @click.prevent="setMenu(item.key)">{{ item.label }}</a>
           </nav>
         </aside>
         <main class="admin-main">
@@ -53,6 +53,8 @@ import DirectionCrud from './views/crud/DirectionCrud.vue'
 import ScholarCrud from './views/crud/ScholarCrud.vue'
 import AreaCrud from './views/crud/AreaCrud.vue'
 
+const MENU_KEYS = ['site', 'banner', 'contact', 'lab-intro', 'lab-news', 'publication', 'topic-project', 'achievement', 'direction', 'scholar', 'area']
+
 export default {
   name: 'AdminApp',
   components: {
@@ -70,10 +72,12 @@ export default {
     AreaCrud
   },
   data() {
+    const hash = typeof window !== 'undefined' ? (window.location.hash || '').replace(/^#/, '') : ''
+    const initialMenu = MENU_KEYS.includes(hash) ? hash : 'site'
     return {
       showLogin: !isLoggedIn(),
       portalUrl: 'http://localhost:5173',
-      currentMenu: 'site',
+      currentMenu: initialMenu,
       menus: [
         { key: 'site', label: '站点设置' },
         { key: 'banner', label: '首页轮播图' },
@@ -93,11 +97,25 @@ export default {
   },
   mounted() {
     window.addEventListener('admin-logout', this.onLogout)
+    window.addEventListener('hashchange', this.onHashChange)
+    this.syncHashToMenu()
   },
   beforeUnmount() {
     window.removeEventListener('admin-logout', this.onLogout)
+    window.removeEventListener('hashchange', this.onHashChange)
   },
   methods: {
+    setMenu(key) {
+      this.currentMenu = key
+      window.location.hash = key
+    },
+    onHashChange() {
+      this.syncHashToMenu()
+    },
+    syncHashToMenu() {
+      const hash = (window.location.hash || '').replace(/^#/, '')
+      if (MENU_KEYS.includes(hash)) this.currentMenu = hash
+    },
     logout() {
       setToken(null)
       this.showLogin = true
