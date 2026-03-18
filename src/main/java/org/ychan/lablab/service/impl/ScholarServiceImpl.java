@@ -17,6 +17,7 @@ import org.ychan.lablab.dto.req.TeamUpdateScholarReqDTO;
 import org.ychan.lablab.dto.resp.team.TeamBasicScholarRespDTO;
 import org.ychan.lablab.dto.resp.team.TeamScholarDetailsRespDTO;
 import org.ychan.lablab.eception.BusinessException;
+import org.ychan.lablab.entity.team.Area;
 import org.ychan.lablab.entity.team.Intro;
 import org.ychan.lablab.entity.team.Paper;
 import org.ychan.lablab.entity.team.Project;
@@ -48,6 +49,8 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
     private final IntroMapper introMapper;
 
     private final ScholarMapper scholarMapper;
+
+    private final AreaMapper areaMapper;
     /**
      * 返回简单教师列表
      * @return
@@ -76,11 +79,18 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
         TeamBasicScholarRespDTO dto = new TeamBasicScholarRespDTO();
         dto.setId(s.getId());
         dto.setArea(s.getAreaId());
+        dto.setAreaName(resolveAreaName(s.getAreaId()));
         dto.setName(s.getName());
         dto.setRank(s.getTitle());
         dto.setRankLabel(ScholarRankEnum.getLabelByCode(s.getTitle()));
         dto.setPhoto(s.getPhoto());
         return dto;
+    }
+
+    private String resolveAreaName(int areaId) {
+        if (areaId <= 0) return "";
+        Area area = areaMapper.selectById(areaId);
+        return area != null ? area.getTitle() : "";
     }
 
     /**
@@ -97,6 +107,7 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
         TeamScholarDetailsRespDTO resp = new TeamScholarDetailsRespDTO();
         resp.setId(scholar.getId());
         resp.setArea(scholar.getAreaId());
+        resp.setAreaName(resolveAreaName(scholar.getAreaId()));
         resp.setName(scholar.getName());
         resp.setRank(scholar.getTitle());
         resp.setRankLabel(ScholarRankEnum.getLabelByCode(scholar.getTitle()));

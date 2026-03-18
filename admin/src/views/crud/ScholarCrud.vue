@@ -10,7 +10,7 @@
         <tr v-for="row in list" :key="row.id">
           <td>{{ row.id }}</td>
           <td>{{ row.name }}</td>
-          <td>{{ areaName(row.area) }}</td>
+          <td>{{ row.areaName || areaName(row.area) }}</td>
           <td>{{ row.rankLabel || row.rank }}</td>
           <td>
             <img v-if="row.photo" :src="imageUrl(row.photo)" class="thumb" alt="" />
@@ -37,8 +37,11 @@
           <input v-model="form.name" type="text" class="form-input" />
         </div>
         <div class="form-group">
-          <label>领域ID</label>
-          <input v-model.number="form.areaId" type="number" class="form-input" />
+          <label>领域</label>
+          <select v-model.number="form.areaId" class="form-input">
+            <option v-for="a in areaList" :key="a.id" :value="a.id">{{ a.title }}</option>
+            <option v-if="!areaList.length" :value="0">请先添加领域</option>
+          </select>
         </div>
         <div class="form-group">
           <label>职级</label>

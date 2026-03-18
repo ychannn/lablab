@@ -15,9 +15,14 @@ public class TeamScholarDetailsRespDTO {
     private int id;
 
     /**
-     * 分组
+     * 领域 id
      */
     private int area;
+
+    /**
+     * 领域名称
+     */
+    private String areaName;
 
     /**
      * 姓名
