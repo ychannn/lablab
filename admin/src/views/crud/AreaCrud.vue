@@ -1,10 +1,10 @@
 <template>
   <div class="crud-page">
-    <h2 class="page-title">区域管理</h2>
+    <h2 class="page-title">领域管理</h2>
     <div class="toolbar"><button type="button" class="btn btn-primary" @click="openAdd">新增</button></div>
     <table class="data-table">
       <thead>
-        <tr><th>ID</th><th>标题</th><th width="140">操作</th></tr>
+        <tr><th>ID</th><th>领域名称</th><th width="140">操作</th></tr>
       </thead>
       <tbody>
         <tr v-for="row in list" :key="row.id">
@@ -19,8 +19,8 @@
     </table>
     <div v-if="showModal" class="modal-mask" @click.self="showModal = false">
       <div class="modal">
-        <h3>{{ editId ? "编辑" : "新增" }}区域</h3>
-        <div class="form-group"><label>标题</label><input v-model="form.title" type="text" class="form-input" /></div>
+        <h3>{{ editId ? "编辑" : "新增" }}领域</h3>
+        <div class="form-group"><label>领域名称</label><input v-model="form.title" type="text" class="form-input" /></div>
         <div class="modal-footer">
           <button type="button" class="btn" @click="showModal = false">取消</button>
           <button type="button" class="btn btn-primary" :disabled="saving" @click="submit">{{ saving ? "保存中…" : "保存" }}</button>

@@ -37,20 +37,6 @@
           <input v-model="form.workTime" type="text" class="form-input" placeholder="如：周一至周五 9:00-17:00" />
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>经度（地图）</label>
-          <input v-model.number="form.longitude" type="number" step="any" class="form-input" />
-        </div>
-        <div class="form-group">
-          <label>纬度（地图）</label>
-          <input v-model.number="form.latitude" type="number" step="any" class="form-input" />
-        </div>
-        <div class="form-group">
-          <label>地图缩放</label>
-          <input v-model.number="form.mapZoom" type="number" class="form-input" />
-        </div>
-      </div>
       <div class="form-group">
         <label>微信公众号</label>
         <input v-model="form.wechat" type="text" class="form-input" />
@@ -82,10 +68,7 @@ export default {
         fax: '',
         workTime: '',
         wechat: '',
-        introduction: '',
-        longitude: null,
-        latitude: null,
-        mapZoom: 15
+        introduction: ''
       },
       saving: false
     }

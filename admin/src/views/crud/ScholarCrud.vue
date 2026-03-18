@@ -112,16 +112,26 @@ export default {
       editId: null,
       saving: false,
       uploading: false,
+      areaList: [],
       form: { name: "", areaId: 0, rank: 0, photo: "", introList: [], paperList: [], projectList: [] }
     }
   },
-  mounted() { this.load(1) },
+  mounted() {
+    this.loadAreas()
+    this.load(1)
+  },
   methods: {
     imageUrl(url) {
       if (!url) return ""
       return url.startsWith("http") ? url : API_BASE + url
     },
-    areaName(id) { return "区域" + id },
+    areaName(id) { return this.areaList.find((a) => a.id === id)?.title ?? "领域" + (id || "") },
+    async loadAreas() {
+      try {
+        const data = await request("/area/list")
+        if (data.code === 200 && Array.isArray(data.data)) this.areaList = data.data
+      } catch (e) { this.areaList = [] }
+    },
     async load(p) {
       const data = await request("/team/scholar/page?pageNum=" + p + "&pageSize=" + this.pageSize)
       if (data.code === 200 && data.data) {

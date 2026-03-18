@@ -87,7 +87,7 @@ export default {
         { key: 'achievement', label: '成果奖项' },
         { key: 'direction', label: '研究方向' },
         { key: 'scholar', label: '师资队伍' },
-        { key: 'area', label: '区域管理' }
+        { key: 'area', label: '领域管理' }
       ]
     }
   },
