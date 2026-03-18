@@ -25,6 +25,10 @@ public class SearchRespDTO {
         private String type;
         private String title;
         private String content;
+        /** 标题中关键词高亮（含 &lt;em&gt; 标签，前端可 v-html 渲染） */
+        private String highlightTitle;
+        /** 内容摘要中关键词高亮（含 &lt;em&gt; 标签） */
+        private String highlightContent;
         private String author;
         private String createTime;
         private String url;

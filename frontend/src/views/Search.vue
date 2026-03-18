@@ -31,8 +31,8 @@
             >
               <span class="item-type">{{ getTypeLabel(item.type) }}</span>
               <div class="item-body">
-                <h4 class="item-title">{{ item.title || item.content || '无标题' }}</h4>
-                <p v-if="item.content && item.content !== (item.title || '')" class="item-content">{{ item.content }}</p>
+                <h4 class="item-title" v-html="item.highlightTitle || escapeHtml(item.title || item.content || '无标题')"></h4>
+                <p v-if="(item.highlightContent || item.content) && (item.content || '') !== (item.title || '')" class="item-content" v-html="item.highlightContent || escapeHtml(item.content)"></p>
                 <span v-if="item.createTime" class="item-time">{{ item.createTime }}</span>
               </div>
             </li>
@@ -84,6 +84,11 @@ export default {
     }
   },
   methods: {
+    escapeHtml(s) {
+      if (s == null) return ''
+      const t = String(s)
+      return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+    },
     doSearch() {
       const q = (this.query || '').trim()
       if (!q) return
@@ -314,6 +319,15 @@ export default {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.item-title :deep(.search-highlight),
+.item-content :deep(.search-highlight) {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+  padding: 0 2px;
+  border-radius: 2px;
+  font-style: normal;
+  font-weight: 600;
 }
 
 .item-time {
