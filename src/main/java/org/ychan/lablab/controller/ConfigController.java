@@ -1,6 +1,7 @@
 package org.ychan.lablab.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +21,7 @@ import java.util.UUID;
  * 系统配置 Controller
  * 提供联系我们、实验室介绍等配置信息的查询和更新接口
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/config")
 @RequiredArgsConstructor
@@ -102,7 +104,8 @@ public class ConfigController extends BaseController {
             String url = "/uploads/" + subDir + "/" + filename;
             return Result.success(url);
         } catch (Exception e) {
-            return Result.fail("上传失败: " + e.getMessage());
+            log.error("图片上传失败", e);
+            return Result.fail("上传失败，请稍后重试");
         }
     }
 

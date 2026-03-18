@@ -49,14 +49,11 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理所有异常
-     * @param e
-     * @param request
-     * @return
+     * 处理所有未预期异常：仅记录完整堆栈到日志，对前端统一返回友好提示，不暴露异常栈与内部信息
      */
     @ExceptionHandler(Exception.class)
-    public Result<?> handleException(Exception e, HttpServletRequest request){
-        log.error("业务异常, 请求地址{}, 异常信息:{}", request.getRequestURL(), e.getMessage());
-        return Result.error(e.getMessage());
+    public Result<?> handleException(Exception e, HttpServletRequest request) {
+        log.error("请求异常, 地址: {}", request.getRequestURI(), e);
+        return Result.error("操作失败，请稍后重试");
     }
 }

@@ -179,8 +179,9 @@ public class AreaServiceImpl extends ServiceImpl<AreaMapper, Area> implements Ar
             areaList.forEach(each -> each.setSort(each.getSort() - max));
             updateBatchById(areaList);
         }
-        catch (Exception e){
-            e.printStackTrace();
+        catch (Exception e) {
+            log.error("领域排序失败", e);
+            throw new BusinessException("排序失败，请稍后重试");
         }
         finally {
             lock.unlock();

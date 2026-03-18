@@ -2,7 +2,7 @@
   <div class="banner-manage">
     <div class="container">
       <h2 class="page-title">首页轮播图管理</h2>
-      <p class="hint">门户按当前顺序倒序取前 5 张展示，可拖动调整顺序。</p>
+      <p class="hint">门户按当前顺序倒序取前 5 张展示，可拖动调整顺序。上传后会自动保存；拖动排序后请点击「保存顺序」。</p>
 
       <div class="upload-area">
         <input
@@ -91,6 +91,7 @@ export default {
         const data = await request('/api/config/admin/upload', { method: 'POST', body: form })
         if (data.code === 200 && data.data) {
           this.list.unshift({ imageUrl: data.data, title: '', link: '', sort: 0 })
+          await this.persistBannerList()
         } else {
           this.uploadError = data.message || '上传失败'
         }
@@ -120,6 +121,19 @@ export default {
       const item = this.list.splice(this.draggedIndex, 1)[0]
       this.list.splice(toIndex, 0, item)
       this.draggedIndex = null
+    },
+    async persistBannerList() {
+      try {
+        const data = await request('/api/config/admin/banner', {
+          method: 'PUT',
+          body: JSON.stringify(this.list)
+        })
+        if (data.code !== 200) {
+          this.uploadError = data.message || '保存列表失败'
+        }
+      } catch (e) {
+        this.uploadError = e.message || '保存列表失败'
+      }
     },
     async save() {
       this.saving = true
