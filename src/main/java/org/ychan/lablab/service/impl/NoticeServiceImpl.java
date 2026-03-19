@@ -1,11 +1,14 @@
 package org.ychan.lablab.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ychan.lablab.common.constant.CommonConstants;
+import org.ychan.lablab.util.DateTimeParseUtil;
 import org.ychan.lablab.dto.req.NoticeAddReqDTO;
 import org.ychan.lablab.dto.req.NoticeUpdateReqDTO;
 import org.ychan.lablab.dto.resp.news.NoticeRespDTO;
@@ -40,6 +43,25 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
                     return respDTO;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public IPage<NoticeRespDTO> pageNotice(int pageNum, int pageSize, String keyword, String timeStart, String timeEnd) {
+        var wrapper = lambdaQuery()
+                .eq(Notice::getDeleted, CommonConstants.FALSE);
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.and(w -> w.like(Notice::getTitle, keyword).or().like(Notice::getContent, keyword));
+        }
+        var start = DateTimeParseUtil.parse(timeStart);
+        if (start != null) wrapper.ge(Notice::getTime, start);
+        var end = DateTimeParseUtil.parse(timeEnd);
+        if (end != null) wrapper.le(Notice::getTime, end);
+        IPage<Notice> page = wrapper.orderByDesc(Notice::getCreateTime).page(new Page<>(pageNum, pageSize));
+        return page.convert(notice -> {
+            NoticeRespDTO dto = new NoticeRespDTO();
+            BeanUtils.copyProperties(notice, dto);
+            return dto;
+        });
     }
 
     /**

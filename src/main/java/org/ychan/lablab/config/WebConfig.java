@@ -24,7 +24,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns(
                         "/admin/**",
                         "/api/config/admin/**",
+                        "/api/search/admin/**",
                         "/lab-news/add", "/lab-news/update", "/lab-news/delete/**",
+                        "/notice/add", "/notice/update", "/notice/delete/**",
                         "/achievement/add", "/achievement/update", "/achievement/delete/**",
                         "/publication/add", "/publication/update", "/publication/delete/**",
                         "/topic-project/add", "/topic-project/update", "/topic-project/delete/**",

@@ -32,6 +32,27 @@
       </div>
     </div>
 
+    <!-- 最新公告 -->
+    <div v-if="latestNotices.length" class="notices-section">
+      <div class="container">
+        <div class="section-head">
+          <h2 class="section-title">最新公告</h2>
+          <button type="button" class="section-more" @click="navigate('notice')">更多</button>
+        </div>
+        <ul class="notices-list">
+          <li
+            v-for="item in latestNotices"
+            :key="item.id"
+            class="notices-item"
+            @click="goToNotice(item.id)"
+          >
+            <span class="notices-date">{{ formatTime(item.time || item.createTime) }}</span>
+            <span class="notices-title">{{ item.title }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <!-- 最新成果 -->
     <div class="achievements">
       <div class="container">
@@ -111,6 +132,7 @@ export default {
       currentIndex: 0,
       autoPlayTimer: null,
       latestAchievements: [],
+      latestNotices: [],
       labIntro: {
         introduction: '实验室致力于科学研究，追求卓越，为社会做出贡献。'
       },
@@ -166,6 +188,7 @@ export default {
         if (data.code === 200) {
           this.bannerList = data.data.bannerList || []
           this.latestAchievements = data.data.latestAchievements || []
+          this.latestNotices = data.data.latestNotices || []
           this.labIntro = data.data.labIntro || this.labIntro
           this.contact = data.data.contact || this.contact
         }
@@ -223,6 +246,9 @@ export default {
       } else {
         this.navigate('achievements', { tab: achievement.type })
       }
+    },
+    goToNotice(id) {
+      if (id != null) this.navigate('detail', { type: 'notice', id })
     }
   }
 }
@@ -427,6 +453,54 @@ export default {
 .achievement-time {
   font-size: 14px;
   color: #5a6c7d;
+}
+
+/* 最新公告 */
+.notices-section {
+  padding: 48px 0 72px;
+  background-color: #f6faf8;
+}
+
+.notices-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #dde8e4;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.notices-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e8f0ed;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.notices-item:last-child {
+  border-bottom: none;
+}
+
+.notices-item:hover {
+  background-color: #f0f7f4;
+}
+
+.notices-date {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: #5a6c7d;
+}
+
+.notices-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: #2c3e50;
 }
 
 /* 实验室简介 */

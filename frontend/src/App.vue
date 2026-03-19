@@ -17,6 +17,7 @@
             <li><a href="#" @click.prevent="navigate('home')">首页</a></li>
             <li><a href="#" @click.prevent="navigate('about')">实验室介绍</a></li>
             <li><a href="#" @click.prevent="navigate('news')">新闻公告</a></li>
+            <li><a href="#" @click.prevent="navigate('notice')">公告</a></li>
             <li><a href="#" @click.prevent="navigate('team')">师资队伍</a></li>
             <li><a href="#" @click.prevent="navigate('achievements')">科研成果</a></li>
             <li><a href="#" @click.prevent="navigate('contact')">联系我们</a></li>
@@ -29,6 +30,7 @@
       <Home v-if="currentPage === 'home'" />
       <About v-else-if="currentPage === 'about'" />
       <News v-else-if="currentPage === 'news'" />
+      <Notice v-else-if="currentPage === 'notice'" />
       <Team v-else-if="currentPage === 'team'" />
       <Achievements v-else-if="currentPage === 'achievements'" :initial-tab="initialParams.achievementsTab" />
       <Contact v-else-if="currentPage === 'contact'" />
@@ -59,6 +61,7 @@ import { apiBase } from './api/config.js'
 import Home from './views/Home.vue'
 import About from './views/About.vue'
 import News from './views/News.vue'
+import Notice from './views/Notice.vue'
 import Team from './views/Team.vue'
 import Achievements from './views/Achievements.vue'
 import Contact from './views/Contact.vue'
@@ -71,6 +74,7 @@ export default {
     Home,
     About,
     News,
+    Notice,
     Team,
     Achievements,
     Contact,
@@ -116,7 +120,7 @@ export default {
       const hash = (typeof window !== 'undefined' ? window.location.hash : '').replace(/^#/, '') || 'home'
       const parts = hash.split('/').map(p => decodeURIComponent(p))
       const page = parts[0] || 'home'
-      const validPages = ['home', 'about', 'news', 'team', 'achievements', 'contact', 'search', 'detail']
+      const validPages = ['home', 'about', 'news', 'notice', 'team', 'achievements', 'contact', 'search', 'detail']
       const res = { page: validPages.includes(page) ? page : 'home', searchKeyword: null, achievementsTab: null, detailType: '', detailId: null }
       if (page === 'search' && parts[1]) res.searchKeyword = parts[1]
       if (page === 'achievements' && parts[1]) res.achievementsTab = parts[1]

@@ -1,5 +1,6 @@
 package org.ychan.lablab.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ychan.lablab.dto.req.NoticeAddReqDTO;
 import org.ychan.lablab.dto.req.NoticeUpdateReqDTO;
@@ -15,6 +16,11 @@ public interface NoticeService extends IService<Notice> {
      * @return
      */
     List<NoticeRespDTO> listNotice();
+
+    /**
+     * 分页获取公告（支持关键词、时间范围筛选）
+     */
+    IPage<NoticeRespDTO> pageNotice(int pageNum, int pageSize, String keyword, String timeStart, String timeEnd);
 
     /**
      * 根据id获取通知详情

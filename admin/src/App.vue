@@ -29,6 +29,7 @@
           <ContactManage v-show="currentMenu === 'contact'" />
           <LabIntroManage v-show="currentMenu === 'lab-intro'" />
           <LabNewsCrud v-show="currentMenu === 'lab-news'" />
+          <NoticeCrud v-show="currentMenu === 'notice'" />
           <PublicationCrud v-show="currentMenu === 'publication'" />
           <TopicProjectCrud v-show="currentMenu === 'topic-project'" />
           <AchievementCrud v-show="currentMenu === 'achievement'" />
@@ -129,6 +130,7 @@ import BannerManage from './views/BannerManage.vue'
 import ContactManage from './views/ContactManage.vue'
 import LabIntroManage from './views/LabIntroManage.vue'
 import LabNewsCrud from './views/crud/LabNewsCrud.vue'
+import NoticeCrud from './views/crud/NoticeCrud.vue'
 import PublicationCrud from './views/crud/PublicationCrud.vue'
 import TopicProjectCrud from './views/crud/TopicProjectCrud.vue'
 import AchievementCrud from './views/crud/AchievementCrud.vue'
@@ -137,7 +139,7 @@ import ScholarCrud from './views/crud/ScholarCrud.vue'
 import AreaCrud from './views/crud/AreaCrud.vue'
 import AdminManage from './views/AdminManage.vue'
 
-const MENU_KEYS = ['site', 'banner', 'contact', 'lab-intro', 'lab-news', 'publication', 'topic-project', 'achievement', 'direction', 'scholar', 'area', 'admins']
+const MENU_KEYS = ['site', 'banner', 'contact', 'lab-intro', 'lab-news', 'notice', 'publication', 'topic-project', 'achievement', 'direction', 'scholar', 'area', 'admins']
 
 export default {
   name: 'AdminApp',
@@ -148,6 +150,7 @@ export default {
     ContactManage,
     LabIntroManage,
     LabNewsCrud,
+    NoticeCrud,
     PublicationCrud,
     TopicProjectCrud,
     AchievementCrud,
@@ -185,6 +188,7 @@ export default {
       ],
       crudMenus: [
         { key: 'lab-news', label: '新闻公告' },
+        { key: 'notice', label: '公告' },
         { key: 'publication', label: '论文发表' },
         { key: 'topic-project', label: '课题项目' },
         { key: 'achievement', label: '成果奖项' },

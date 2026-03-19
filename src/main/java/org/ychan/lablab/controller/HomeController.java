@@ -5,9 +5,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ychan.lablab.common.result.Result;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.ychan.lablab.dto.resp.config.BannerItemDTO;
 import org.ychan.lablab.dto.resp.config.ContactRespDTO;
 import org.ychan.lablab.dto.resp.config.LabIntroRespDTO;
+import org.ychan.lablab.dto.resp.news.NoticeRespDTO;
 import org.ychan.lablab.dto.resp.research.*;
 import org.ychan.lablab.service.*;
 
@@ -24,6 +26,7 @@ public class HomeController {
     private final TopicProjectService topicProjectService;
     private final AchievementService achievementService;
     private final ConfigService configService;
+    private final NoticeService noticeService;
 
     /**
      * 首页聚合接口
@@ -78,6 +81,10 @@ public class HomeController {
 
         resp.setLatestAchievements(achievementList);
 
+        // 最新 5 条公告
+        IPage<NoticeRespDTO> noticePage = noticeService.pageNotice(1, 5, null, null, null);
+        resp.setLatestNotices(noticePage.getRecords());
+
         // 获取实验室简介
         LabIntroRespDTO labIntro = configService.getLabIntro();
         resp.setLabIntro(labIntro);
@@ -98,6 +105,8 @@ public class HomeController {
         /** 首页轮播图列表（config 配置，仅展示图片） */
         private List<BannerItemDTO> bannerList;
         private List<HomeAchievementDTO> latestAchievements;
+        /** 最新 5 条公告 */
+        private List<NoticeRespDTO> latestNotices;
         private LabIntroRespDTO labIntro;
         private ContactRespDTO contact;
 
@@ -123,6 +132,14 @@ public class HomeController {
 
         public void setLatestAchievements(List<HomeAchievementDTO> latestAchievements) {
             this.latestAchievements = latestAchievements;
+        }
+
+        public List<NoticeRespDTO> getLatestNotices() {
+            return latestNotices;
+        }
+
+        public void setLatestNotices(List<NoticeRespDTO> latestNotices) {
+            this.latestNotices = latestNotices;
         }
 
         public LabIntroRespDTO getLabIntro() {

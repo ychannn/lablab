@@ -14,6 +14,8 @@
         <div class="detail-body">
           <!-- 新闻 -->
           <div v-if="type === 'news'" class="detail-content">{{ data.content }}</div>
+          <!-- 公告 -->
+          <div v-else-if="type === 'notice'" class="detail-content">{{ data.content }}</div>
           <!-- 师资 -->
           <template v-else-if="type === 'scholar'">
             <div v-if="data.photo" class="scholar-photo">
@@ -67,6 +69,7 @@ export default {
     title() {
       if (!this.data) return ''
       if (this.type === 'news') return this.data.title || '新闻'
+      if (this.type === 'notice') return this.data.title || '公告'
       if (this.type === 'scholar') return this.data.name || '师资'
       if (this.type === 'direction') return this.data.title || '研究方向'
       return this.data.content || this.data.title || '详情'
@@ -74,6 +77,7 @@ export default {
     meta() {
       if (!this.data) return ''
       if (this.type === 'news' && this.data.time) return this.formatDate(this.data.time)
+      if (this.type === 'notice' && (this.data.time || this.data.createTime)) return this.formatDate(this.data.time || this.data.createTime)
       if (this.type === 'paper' && this.data.publishTime) return '发布时间：' + this.formatDate(this.data.publishTime)
       if (this.type === 'project') return '项目时间：' + this.formatDate(this.data.startTime) + ' 至 ' + this.formatDate(this.data.endTime)
       if (this.type === 'award' && this.data.createTime) return '时间：' + this.formatDate(this.data.createTime)
@@ -111,6 +115,7 @@ export default {
       let url = ''
       switch (this.type) {
         case 'news': url = `${this.apiBase}/lab-news/${this.id}`; break
+        case 'notice': url = `${this.apiBase}/notice/${this.id}`; break
         case 'scholar': url = `${this.apiBase}/team/scholar/details/${this.id}`; break
         case 'paper': url = `${this.apiBase}/publication/${this.id}`; break
         case 'project': url = `${this.apiBase}/topic-project/${this.id}`; break
