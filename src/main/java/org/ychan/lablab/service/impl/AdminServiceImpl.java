@@ -125,21 +125,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void resetPassword(String token, String oldPassword, String newPassword) {
-        Admin admin = getAdminByToken(token);
-        if (admin == null) {
-            throw new BusinessException("登录已过期，请重新登录");
-        }
-
-        if (!PASSWORD_ENCODER.matches(oldPassword, admin.getPassword())) {
-            throw new BusinessException("旧密码错误");
-        }
-
-        admin.setPassword(PASSWORD_ENCODER.encode(newPassword));
-        adminMapper.updateById(admin);
-    }
-
-    @Override
     public AdminLoginRespDTO refreshToken(String token) {
         Admin admin = getAdminByToken(token);
         if (admin == null) {
@@ -198,12 +183,39 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void bindEmail(String token, String email) {
+    public void sendBindEmailCode(String token, String email) {
         Admin admin = getAdminByToken(token);
         if (admin == null) {
             throw new BusinessException("登录已过期，请重新登录");
         }
-        admin.setEmail(email.trim());
+        email = email.trim().toLowerCase();
+        String code = String.format("%06d", ThreadLocalRandom.current().nextInt(1000000));
+        String key = AdminConstants.REDIS_BIND_EMAIL_CODE_PREFIX + email;
+        String value = admin.getId() + ":" + code;
+        RBucket<String> bucket = redissonClient.getBucket(key);
+        bucket.set(value, Duration.ofSeconds(AdminConstants.EMAIL_CODE_EXPIRE_SECONDS));
+        emailService.sendVerificationCode(email, code);
+    }
+
+    @Override
+    public void bindEmail(String token, String email, String code) {
+        Admin admin = getAdminByToken(token);
+        if (admin == null) {
+            throw new BusinessException("登录已过期，请重新登录");
+        }
+        email = email.trim().toLowerCase();
+        String key = AdminConstants.REDIS_BIND_EMAIL_CODE_PREFIX + email;
+        RBucket<String> bucket = redissonClient.getBucket(key);
+        String stored = bucket.get();
+        if (stored == null) {
+            throw new BusinessException("验证码已过期或未发送，请重新获取");
+        }
+        String[] parts = stored.split(":", 2);
+        if (parts.length != 2 || !parts[0].equals(String.valueOf(admin.getId())) || !parts[1].equals(code.trim())) {
+            throw new BusinessException("验证码错误");
+        }
+        bucket.delete();
+        admin.setEmail(email);
         adminMapper.updateById(admin);
     }
 

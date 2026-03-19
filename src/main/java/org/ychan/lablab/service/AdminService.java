@@ -30,11 +30,6 @@ public interface AdminService {
     Admin getAdminByToken(String token);
 
     /**
-     * 重置密码
-     */
-    void resetPassword(String token, String oldPassword, String newPassword);
-
-    /**
      * 刷新 token
      */
     AdminLoginRespDTO refreshToken(String token);
@@ -45,12 +40,17 @@ public interface AdminService {
     void addAdmin(String token, String username, String password, String role);
 
     /**
-     * 绑定当前管理员的邮箱（用于接收验证码修改密码）
+     * 发送绑定/换绑邮箱的验证码到指定邮箱（该邮箱将收到验证码，验证后即可绑定或换绑）
      */
-    void bindEmail(String token, String email);
+    void sendBindEmailCode(String token, String email);
 
     /**
-     * 发送邮箱验证码到当前管理员的绑定邮箱，验证码存入 Redis，有效期 10 分钟
+     * 绑定或换绑当前管理员的邮箱（需先获取验证码）
+     */
+    void bindEmail(String token, String email, String code);
+
+    /**
+     * 发送验证码到当前管理员的绑定邮箱（用于修改密码），验证码存入 Redis，有效期 10 分钟
      */
     void sendEmailCode(String token);
 

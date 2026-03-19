@@ -7,9 +7,9 @@ import org.ychan.lablab.common.result.Result;
 import org.ychan.lablab.config.RequiredRole;
 import org.ychan.lablab.dto.req.AdminAddReqDTO;
 import org.ychan.lablab.dto.req.AdminLoginReqDTO;
-import org.ychan.lablab.dto.req.AdminResetPasswordReqDTO;
 import org.ychan.lablab.dto.req.BindEmailReqDTO;
 import org.ychan.lablab.dto.req.ChangePasswordByEmailReqDTO;
+import org.ychan.lablab.dto.req.SendBindEmailCodeReqDTO;
 import org.ychan.lablab.dto.resp.admin.AdminLoginRespDTO;
 import org.ychan.lablab.entity.admin.Admin;
 import org.ychan.lablab.enums.RoleEnum;
@@ -67,22 +67,22 @@ public class AdminController {
     }
 
     /**
-     * 重置密码（需旧密码）
+     * 发送绑定/换绑邮箱的验证码到指定邮箱
      */
-    @PostMapping("/reset-password")
-    public Result<Void> resetPassword(@RequestHeader(value = "Authorization", required = false) String authorization, @Valid @RequestBody AdminResetPasswordReqDTO req) {
+    @PostMapping("/send-bind-email-code")
+    public Result<Void> sendBindEmailCode(@RequestHeader(value = "Authorization", required = false) String authorization, @Valid @RequestBody SendBindEmailCodeReqDTO req) {
         String token = parseToken(authorization);
-        adminService.resetPassword(token, req.getOldPassword(), req.getNewPassword());
+        adminService.sendBindEmailCode(token, req.getEmail());
         return Result.success();
     }
 
     /**
-     * 绑定当前管理员的邮箱（用于接收验证码修改密码）
+     * 绑定或换绑当前管理员的邮箱（需先获取验证码）
      */
     @PostMapping("/bind-email")
     public Result<Void> bindEmail(@RequestHeader(value = "Authorization", required = false) String authorization, @Valid @RequestBody BindEmailReqDTO req) {
         String token = parseToken(authorization);
-        adminService.bindEmail(token, req.getEmail());
+        adminService.bindEmail(token, req.getEmail(), req.getCode());
         return Result.success();
     }
 

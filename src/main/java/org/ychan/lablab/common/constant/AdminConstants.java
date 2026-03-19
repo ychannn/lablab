@@ -12,6 +12,8 @@ public final class AdminConstants {
 
     /** 邮箱验证码 Redis key 前缀，完整 key: admin:email:code:{email}，value: adminId:code */
     public static final String REDIS_EMAIL_CODE_PREFIX = "admin:email:code:";
+    /** 绑定/换绑邮箱验证码 Redis key 前缀，完整 key: admin:bind-email:code:{email}，value: adminId:code */
+    public static final String REDIS_BIND_EMAIL_CODE_PREFIX = "admin:bind-email:code:";
     /** 邮箱验证码有效期（秒），默认 10 分钟 */
     public static final long EMAIL_CODE_EXPIRE_SECONDS = 10 * 60;
 
