@@ -15,6 +15,7 @@ import org.ychan.lablab.eception.BusinessException;
 import org.ychan.lablab.entity.science.TopicProject;
 import org.ychan.lablab.mapper.TopicProjectMapper;
 import org.ychan.lablab.service.TopicProjectService;
+import org.ychan.lablab.util.DateTimeParseUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,11 +46,21 @@ public class TopicProjectServiceImpl extends ServiceImpl<TopicProjectMapper, Top
     }
 
     @Override
-    public IPage<TopicProjectRespDTO> pageTopicProject(int pageNum, int pageSize) {
-        IPage<TopicProject> page = lambdaQuery()
-                .eq(TopicProject::getDeleted, CommonConstants.FALSE)
-                .orderByDesc(TopicProject::getCreateTime)
-                .page(new Page<>(pageNum, pageSize));
+    public IPage<TopicProjectRespDTO> pageTopicProject(int pageNum, int pageSize, String keyword, String startTimeStart, String startTimeEnd, String endTimeStart, String endTimeEnd) {
+        var wrapper = lambdaQuery()
+                .eq(TopicProject::getDeleted, CommonConstants.FALSE);
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.like(TopicProject::getContent, keyword);
+        }
+        var t = DateTimeParseUtil.parse(startTimeStart);
+        if (t != null) wrapper.ge(TopicProject::getStartTime, t);
+        t = DateTimeParseUtil.parse(startTimeEnd);
+        if (t != null) wrapper.le(TopicProject::getStartTime, t);
+        t = DateTimeParseUtil.parse(endTimeStart);
+        if (t != null) wrapper.ge(TopicProject::getEndTime, t);
+        t = DateTimeParseUtil.parse(endTimeEnd);
+        if (t != null) wrapper.le(TopicProject::getEndTime, t);
+        IPage<TopicProject> page = wrapper.orderByDesc(TopicProject::getCreateTime).page(new Page<>(pageNum, pageSize));
         return page.convert(TopicProjectRespDTO::from);
     }
 

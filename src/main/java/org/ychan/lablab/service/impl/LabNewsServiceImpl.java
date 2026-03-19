@@ -15,6 +15,7 @@ import org.ychan.lablab.eception.BusinessException;
 import org.ychan.lablab.entity.news.LabNews;
 import org.ychan.lablab.mapper.LabNewsMapper;
 import org.ychan.lablab.service.LabNewsService;
+import org.ychan.lablab.util.DateTimeParseUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,11 +46,17 @@ public class LabNewsServiceImpl extends ServiceImpl<LabNewsMapper, LabNews> impl
     }
 
     @Override
-    public IPage<LabNewsRespDTO> pageLabNews(int pageNum, int pageSize) {
-        IPage<LabNews> page = lambdaQuery()
-                .eq(LabNews::getDeleted, CommonConstants.FALSE)
-                .orderByDesc(LabNews::getCreateTime)
-                .page(new Page<>(pageNum, pageSize));
+    public IPage<LabNewsRespDTO> pageLabNews(int pageNum, int pageSize, String keyword, String timeStart, String timeEnd) {
+        var wrapper = lambdaQuery()
+                .eq(LabNews::getDeleted, CommonConstants.FALSE);
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.and(w -> w.like(LabNews::getTitle, keyword).or().like(LabNews::getContent, keyword));
+        }
+        var start = DateTimeParseUtil.parse(timeStart);
+        if (start != null) wrapper.ge(LabNews::getTime, start);
+        var end = DateTimeParseUtil.parse(timeEnd);
+        if (end != null) wrapper.le(LabNews::getTime, end);
+        IPage<LabNews> page = wrapper.orderByDesc(LabNews::getCreateTime).page(new Page<>(pageNum, pageSize));
         return page.convert(LabNewsRespDTO::from);
     }
 

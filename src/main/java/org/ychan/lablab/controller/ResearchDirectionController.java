@@ -37,11 +37,12 @@ public class ResearchDirectionController extends BaseController{
     @GetMapping("/direction/page")
     public Result<IPage<ResearchDirectionRespDTO>> pageResearchDirection(
             @RequestParam(defaultValue = "1") int pageNum,
-            @RequestParam(defaultValue = "10") int pageSize
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String keyword
     ) {
         pageNum = Math.max(pageNum, 1);
         pageSize = Math.max(Math.min(pageSize, 50), 1);
-        IPage<ResearchDirectionRespDTO> list = researchDirectionService.pageResearchDirection(pageNum, pageSize);
+        IPage<ResearchDirectionRespDTO> list = researchDirectionService.pageResearchDirection(pageNum, pageSize, keyword);
         return Result.success(list);
     }
 

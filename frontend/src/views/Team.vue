@@ -2,7 +2,24 @@
   <div class="team">
     <div class="container">
       <h2 class="page-title">师资队伍</h2>
-      
+      <div class="filter-wrap">
+        <div class="filter-row">
+          <label class="filter-label">关键词</label>
+          <input v-model="filter.keyword" type="text" placeholder="姓名/邮箱" class="filter-input filter-input-text" />
+          <label class="filter-label">领域</label>
+          <select v-model.number="filter.areaId" class="filter-input filter-select">
+            <option :value="0">全部领域</option>
+            <option v-for="a in areaList" :key="a.id" :value="a.id">{{ a.title }}</option>
+          </select>
+          <label class="filter-label">职级</label>
+          <select v-model.number="filter.rank" class="filter-input filter-select">
+            <option :value="0">全部职级</option>
+            <option v-for="r in rankOptions" :key="r.value" :value="r.value">{{ r.label }}</option>
+          </select>
+          <button type="button" class="filter-btn filter-btn-query" @click="onSearch">查询</button>
+          <button type="button" class="filter-btn filter-btn-clear" @click="onResetFilter" title="清空筛选">清空</button>
+        </div>
+      </div>
       <!-- 团队成员列表 -->
       <div class="team-list">
         <div
@@ -39,10 +56,19 @@ export default {
       pageNum: 1,
       total: 0,
       totalPages: 0,
-      teamMembers: []
+      teamMembers: [],
+      areaList: [],
+      rankOptions: [
+        { value: 1, label: '教授' },
+        { value: 2, label: '副教授' },
+        { value: 3, label: '讲师' },
+        { value: 4, label: '助教' }
+      ],
+      filter: { keyword: '', areaId: 0, rank: 0 }
     }
   },
   mounted() {
+    this.loadAreas()
     this.fetchTeamMembers(1)
   },
   methods: {
@@ -50,11 +76,26 @@ export default {
       if (!url) return ''
       return url.startsWith('http') ? url : this.apiBase + url
     },
+    async loadAreas() {
+      try {
+        const res = await fetch(`${this.apiBase}/area/list`)
+        const data = await res.json()
+        if (data.code === 200 && Array.isArray(data.data)) this.areaList = data.data
+      } catch (e) { this.areaList = [] }
+    },
+    buildPageUrl(page) {
+      const params = new URLSearchParams()
+      params.set('pageNum', String(page))
+      params.set('pageSize', String(this.pageSize))
+      if (this.filter.keyword && this.filter.keyword.trim()) params.set('keyword', this.filter.keyword.trim())
+      if (this.filter.areaId > 0) params.set('areaId', String(this.filter.areaId))
+      if (this.filter.rank > 0) params.set('rank', String(this.filter.rank))
+      return `${this.apiBase}/team/scholar/page?${params.toString()}`
+    },
     async fetchTeamMembers(page) {
       if (page != null) this.pageNum = Math.max(1, page)
       try {
-        const url = `${this.apiBase}/team/scholar/page?pageNum=${this.pageNum}&pageSize=${this.pageSize}`
-        const response = await fetch(url)
+        const response = await fetch(this.buildPageUrl(this.pageNum))
         const data = await response.json()
         if (data.code === 200 && data.data) {
           this.teamMembers = data.data.records || []
@@ -65,6 +106,11 @@ export default {
       } catch (error) {
         console.error('获取团队成员列表失败:', error)
       }
+    },
+    onSearch() { this.fetchTeamMembers(1) },
+    onResetFilter() {
+      this.filter = { keyword: '', areaId: 0, rank: 0 }
+      this.fetchTeamMembers(1)
     },
     goToDetail(id) {
       if (id == null || id === undefined || id === '') return
@@ -89,10 +135,54 @@ export default {
   font-size: 28px;
   font-weight: 600;
   text-align: center;
-  margin-bottom: 48px;
+  margin-bottom: 24px;
   color: #2c3e50;
   letter-spacing: 0.02em;
 }
+
+.filter-wrap {
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #dde8e4;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.filter-label { font-size: 14px; color: #5a6c7d; }
+.filter-input {
+  padding: 10px 12px;
+  border: 1px solid #dde8e4;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.filter-input:focus { outline: none; border-color: #2d9d78; }
+.filter-input-text { min-width: 140px; }
+.filter-select { min-width: 100px; }
+.filter-btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+.filter-btn-query {
+  border: 1px solid #2d9d78;
+  background: #2d9d78;
+  color: #fff;
+}
+.filter-btn-query:hover { opacity: 0.9; }
+.filter-btn-clear {
+  border: 1px solid #dde8e4;
+  background: #fff;
+  color: #5a6c7d;
+}
+.filter-btn-clear:hover { border-color: #e86c6c; color: #e86c6c; }
 
 .team-list {
   display: grid;

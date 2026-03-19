@@ -1,7 +1,17 @@
 <template>
   <div class="crud-page">
     <h2 class="page-title">研究方向</h2>
-    <div class="toolbar"><button type="button" class="btn btn-primary" @click="openAdd">新增</button></div>
+    <div class="toolbar">
+      <div class="filter-wrap">
+        <div class="filter-row">
+          <label class="filter-label">关键词</label>
+          <input v-model="filter.keyword" type="text" placeholder="标题/内容" class="filter-input filter-input-text" />
+          <button type="button" class="btn btn-query" @click="onSearch">查询</button>
+          <button type="button" class="btn btn-clear" @click="onResetFilter" title="清空筛选">清空</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" @click="openAdd">新增</button>
+    </div>
     <table class="data-table">
       <thead>
         <tr><th>ID</th><th>标题</th><th>内容</th><th width="140">操作</th></tr>
@@ -52,13 +62,21 @@ export default {
     return {
       list: [], pageNum: 1, pageSize: 10, total: 0, pages: 0,
       showModal: false, editId: null, saving: false,
-      form: { title: '', content: '' }
+      form: { title: '', content: '' },
+      filter: { keyword: '' }
     }
   },
   mounted() { this.load(1) },
   methods: {
+    buildPageQuery(p) {
+      const params = new URLSearchParams()
+      params.set('pageNum', String(p))
+      params.set('pageSize', String(this.pageSize))
+      if (this.filter.keyword && this.filter.keyword.trim()) params.set('keyword', this.filter.keyword.trim())
+      return `/research/direction/page?${params.toString()}`
+    },
     async load(p) {
-      const data = await request(`/research/direction/page?pageNum=${p}&pageSize=${this.pageSize}`)
+      const data = await request(this.buildPageQuery(p))
       if (data.code === 200 && data.data) {
         this.list = data.data.records || []
         this.pageNum = data.data.current || 1
@@ -66,6 +84,8 @@ export default {
         this.pages = data.data.pages || 0
       }
     },
+    onSearch() { this.load(1) },
+    onResetFilter() { this.filter = { keyword: '' }; this.load(1) },
     openAdd() {
       this.editId = null
       this.form = { title: '', content: '' }
@@ -105,7 +125,15 @@ export default {
 <style scoped>
 .crud-page { padding: 0; }
 .page-title { font-size: 24px; margin-bottom: 20px; color: #333; }
-.toolbar { margin-bottom: 16px; }
+.toolbar { margin-bottom: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.filter-wrap { flex: 1; background: #fafafa; border: 1px solid #e8e8e8; border-radius: 8px; padding: 12px 16px; }
+.filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.filter-label { font-size: 13px; color: #666; }
+.filter-input { padding: 8px 10px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; }
+.filter-input-text { min-width: 180px; }
+.btn-query { padding: 8px 16px; background: #1890ff; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
+.btn-clear { padding: 8px 12px; background: #fff; color: #666; border: 1px solid #d9d9d9; border-radius: 6px; cursor: pointer; font-size: 13px; }
+.btn-clear:hover { color: #ff4d4f; border-color: #ff4d4f; }
 .data-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .data-table th, .data-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; }
 .data-table th { background: #fafafa; font-weight: 500; }

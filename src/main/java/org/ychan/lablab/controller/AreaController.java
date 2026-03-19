@@ -21,12 +21,12 @@ public class AreaController {
     private final AreaService areaService;
 
     /**
-     * 获取所有领域列表
+     * 获取所有领域列表（可选 keyword 按标题模糊筛选）
      * @return
      */
     @GetMapping("/list")
-    public Result<List<AreaRespDTO>> listArea() {
-        return Result.success(areaService.listArea());
+    public Result<List<AreaRespDTO>> listArea(@RequestParam(required = false) String keyword) {
+        return Result.success(areaService.listArea(keyword));
     }
 
     /**

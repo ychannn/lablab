@@ -18,10 +18,10 @@ public interface ResearchDirectionService extends IService<ResearchDirection> {
     List<ResearchDirectionRespDTO> listResearchDirection();
 
     /**
-     * 分页获取研究方向
+     * 分页获取研究方向（支持关键词筛选）
      * @return
      */
-    IPage<ResearchDirectionRespDTO> pageResearchDirection(int pageNum, int pageSize);
+    IPage<ResearchDirectionRespDTO> pageResearchDirection(int pageNum, int pageSize, String keyword);
     /**
      * 根据id获取研究方向详情
      * @param id

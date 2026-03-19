@@ -18,9 +18,9 @@ public interface LabNewsService extends IService<LabNews> {
     List<LabNewsRespDTO> listLabNews();
 
     /**
-     * 分页获取实验室新闻
+     * 分页获取实验室新闻（支持关键词、时间范围筛选）
      */
-    IPage<LabNewsRespDTO> pageLabNews(int pageNum, int pageSize);
+    IPage<LabNewsRespDTO> pageLabNews(int pageNum, int pageSize, String keyword, String timeStart, String timeEnd);
 
     /**
      * 根据id获取实验室新闻详情

@@ -45,11 +45,13 @@ public class AchievementServiceImpl extends ServiceImpl<AchievementMapper, Achie
     }
 
     @Override
-    public IPage<AchievementRespDTO> pageAchievement(int pageNum, int pageSize) {
-        IPage<Achievement> page = lambdaQuery()
-                .eq(Achievement::getDeleted, CommonConstants.FALSE)
-                .orderByDesc(Achievement::getCreateTime)
-                .page(new Page<>(pageNum, pageSize));
+    public IPage<AchievementRespDTO> pageAchievement(int pageNum, int pageSize, String keyword) {
+        var wrapper = lambdaQuery()
+                .eq(Achievement::getDeleted, CommonConstants.FALSE);
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.like(Achievement::getContent, keyword);
+        }
+        IPage<Achievement> page = wrapper.orderByDesc(Achievement::getCreateTime).page(new Page<>(pageNum, pageSize));
         return page.convert(AchievementRespDTO::from);
     }
 

@@ -2,6 +2,46 @@
   <div class="crud-page">
     <h2 class="page-title">新闻公告</h2>
     <div class="toolbar">
+      <div class="filter-wrap">
+        <div class="filter-row">
+          <label class="filter-label">关键词</label>
+          <input v-model="filter.keyword" type="text" placeholder="标题/内容" class="filter-input filter-input-text" />
+          <span class="filter-label time-label">时间</span>
+          <div class="filter-time-group" ref="dtWrap">
+            <div class="dt-wrap">
+              <button type="button" class="dt-trigger" :class="{ filled: filter.timeStartDate }" @click.stop="dtpOpen = dtpOpen === 'start' ? null : 'start'" title="开始时间">
+                <span class="dt-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                <span class="dt-text">{{ startDisplay }}</span>
+              </button>
+              <div v-show="dtpOpen === 'start'" class="dt-popover" @click.stop>
+                <div class="dt-popover-title">开始日期</div>
+                <label class="date-only-wrap" for="labnews-dtp-start" @click="openDatePicker">
+                  <span class="date-only-text">{{ filter.timeStartDate ? dateLabel(filter.timeStartDate) : '请选择日期' }}</span>
+                  <input id="labnews-dtp-start" v-model="filter.timeStartDate" type="date" class="date-only-input" />
+                </label>
+                <div class="dt-popover-actions"><button type="button" class="dt-btn-clear" @click="clearDtp('start')">清空</button><button type="button" class="dt-btn-ok" @click="dtpOpen = null">确定</button></div>
+              </div>
+            </div>
+            <span class="filter-sep">至</span>
+            <div class="dt-wrap">
+              <button type="button" class="dt-trigger" :class="{ filled: filter.timeEndDate }" @click.stop="dtpOpen = dtpOpen === 'end' ? null : 'end'" title="结束时间">
+                <span class="dt-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                <span class="dt-text">{{ endDisplay }}</span>
+              </button>
+              <div v-show="dtpOpen === 'end'" class="dt-popover" @click.stop>
+                <div class="dt-popover-title">结束日期</div>
+                <label class="date-only-wrap" for="labnews-dtp-end" @click="openDatePicker">
+                  <span class="date-only-text">{{ filter.timeEndDate ? dateLabel(filter.timeEndDate) : '请选择日期' }}</span>
+                  <input id="labnews-dtp-end" v-model="filter.timeEndDate" type="date" class="date-only-input" />
+                </label>
+                <div class="dt-popover-actions"><button type="button" class="dt-btn-clear" @click="clearDtp('end')">清空</button><button type="button" class="dt-btn-ok" @click="dtpOpen = null">确定</button></div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-query" @click="onSearch">查询</button>
+          <button type="button" class="btn btn-clear" @click="onResetFilter" title="清空筛选">清空</button>
+        </div>
+      </div>
       <button type="button" class="btn btn-primary" @click="openAdd">新增</button>
     </div>
     <table class="data-table">
@@ -72,25 +112,82 @@ export default {
       showModal: false,
       editId: null,
       saving: false,
-      form: { title: '', content: '', time: '' }
+      form: { title: '', content: '', time: '' },
+      filter: { keyword: '', timeStartDate: '', timeStartTime: '', timeEndDate: '', timeEndTime: '' },
+      dtpOpen: null
+    }
+  },
+  computed: {
+    startDisplay() {
+      const d = this.filter.timeStartDate
+      if (!d || !d.trim()) return '开始'
+      return this.dateLabel(d)
+    },
+    endDisplay() {
+      const d = this.filter.timeEndDate
+      if (!d || !d.trim()) return '结束'
+      return this.dateLabel(d)
     }
   },
   mounted() {
     this.load(1)
+    this.clickOutside = (e) => {
+      if (this.dtpOpen && this.$refs.dtWrap && !this.$refs.dtWrap.contains(e.target)) this.dtpOpen = null
+    }
+    document.addEventListener('click', this.clickOutside)
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.clickOutside)
   },
   methods: {
+    openDatePicker(e) {
+      const input = e.currentTarget.querySelector('input[type="date"]')
+      if (input && typeof input.showPicker === 'function') input.showPicker()
+    },
     formatTime(t) {
       if (!t) return ''
       return t.replace('T', ' ').slice(0, 19)
     },
+    buildPageQuery(p) {
+      const params = new URLSearchParams()
+      params.set('pageNum', String(p))
+      params.set('pageSize', String(this.pageSize))
+      if (this.filter.keyword && this.filter.keyword.trim()) params.set('keyword', this.filter.keyword.trim())
+      const timeStart = this.buildDateTime(this.filter.timeStartDate, this.filter.timeStartTime, '00:00')
+      if (timeStart) params.set('timeStart', timeStart)
+      const timeEnd = this.buildDateTime(this.filter.timeEndDate, this.filter.timeEndTime, '23:59')
+      if (timeEnd) params.set('timeEnd', timeEnd)
+      return `/lab-news/page?${params.toString()}`
+    },
     async load(p) {
-      const data = await request(`/lab-news/page?pageNum=${p}&pageSize=${this.pageSize}`)
+      const data = await request(this.buildPageQuery(p))
       if (data.code === 200 && data.data) {
         this.list = data.data.records || []
         this.pageNum = data.data.current || 1
         this.total = data.data.total || 0
         this.pages = data.data.pages || 0
       }
+    },
+    onSearch() {
+      this.load(1)
+    },
+    dateLabel(d) {
+      if (!d || d.length < 10) return ''
+      return parseInt(d.slice(5, 7), 10) + '月' + parseInt(d.slice(8, 10), 10) + '日'
+    },
+    buildDateTime(date, time, defaultTime) {
+      if (!date || !date.trim()) return ''
+      return (date + 'T' + (time && time.trim() ? time : defaultTime) + ':00').slice(0, 19)
+    },
+    clearDtp(which) {
+      if (which === 'start') { this.filter.timeStartDate = ''; this.filter.timeStartTime = '' }
+      else { this.filter.timeEndDate = ''; this.filter.timeEndTime = '' }
+      this.dtpOpen = null
+    },
+    onResetFilter() {
+      this.filter = { keyword: '', timeStartDate: '', timeStartTime: '', timeEndDate: '', timeEndTime: '' }
+      this.dtpOpen = null
+      this.load(1)
     },
     openAdd() {
       this.editId = null
@@ -144,7 +241,47 @@ export default {
 <style scoped>
 .crud-page { padding: 0; }
 .page-title { font-size: 24px; margin-bottom: 20px; color: #333; }
-.toolbar { margin-bottom: 16px; }
+.toolbar { margin-bottom: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.filter-wrap { flex: 1; background: #fafafa; border: 1px solid #e8e8e8; border-radius: 8px; padding: 12px 16px; }
+.filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.filter-label { font-size: 13px; color: #666; white-space: nowrap; }
+.filter-label.time-label { margin-left: 8px; }
+.filter-input { padding: 8px 10px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; }
+.filter-input-text { min-width: 160px; }
+.filter-date { width: 132px; }
+.filter-time { width: 88px; }
+.filter-time-group { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.filter-sep { font-size: 12px; color: #999; }
+.dt-wrap { position: relative; display: inline-block; }
+.dt-trigger {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 10px;
+  min-width: 72px; max-width: 100px;
+  border: 1px solid #d9d9d9; border-radius: 6px;
+  background: #fff; color: #595959;
+  font-size: 12px; cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.dt-trigger:hover { border-color: #1890ff; color: #1890ff; }
+.dt-trigger.filled { color: #1890ff; border-color: #91d5ff; background: #e6f7ff; }
+.dt-icon { flex-shrink: 0; display: inline-flex; }
+.dt-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dt-popover {
+  position: absolute; left: 0; top: calc(100% + 4px); z-index: 1000;
+  min-width: 200px; padding: 12px;
+  background: #fff; border: 1px solid #e8e8e8; border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.dt-popover-title { font-size: 12px; color: #8c8c8c; margin-bottom: 8px; }
+.date-only-wrap { position: relative; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 6px; height: 40px; display: flex; align-items: center; cursor: pointer; margin-bottom: 10px; }
+.date-only-text { color: #333; font-size: 13px; pointer-events: none; }
+.date-only-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1; font-size: 16px; }
+.dt-popover-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.dt-btn-clear { padding: 4px 10px; font-size: 12px; color: #666; background: #fff; border: 1px solid #d9d9d9; border-radius: 4px; cursor: pointer; }
+.dt-btn-ok { padding: 4px 12px; font-size: 12px; color: #fff; background: #1890ff; border: none; border-radius: 4px; cursor: pointer; }
+.btn-query { padding: 8px 16px; background: #1890ff; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
+.btn-clear { padding: 8px 12px; background: #fff; color: #666; border: 1px solid #d9d9d9; border-radius: 6px; cursor: pointer; font-size: 13px; }
+.btn-clear:hover { color: #ff4d4f; border-color: #ff4d4f; }
 .data-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .data-table th, .data-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; }
 .data-table th { background: #fafafa; font-weight: 500; }

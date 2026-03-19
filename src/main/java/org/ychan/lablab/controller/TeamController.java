@@ -44,15 +44,18 @@ public class TeamController {
     }
 
     /**
-     * 分页查询学者列表（后台用）
+     * 分页查询学者列表（支持 keyword、areaId、rank 筛选）
      */
     @GetMapping("/scholar/page")
     public Result<IPage<TeamBasicScholarRespDTO>> pageScholar(
             @RequestParam(defaultValue = "1") int pageNum,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer areaId,
+            @RequestParam(required = false) Integer rank) {
         pageNum = Math.max(pageNum, 1);
         pageSize = Math.max(Math.min(pageSize, 50), 1);
-        return Result.success(scholarService.pageScholar(pageNum, pageSize));
+        return Result.success(scholarService.pageScholar(pageNum, pageSize, keyword, areaId, rank));
     }
 
     /**

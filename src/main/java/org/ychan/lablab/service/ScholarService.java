@@ -18,9 +18,9 @@ public interface ScholarService extends IService<Scholar> {
     List<TeamBasicScholarRespDTO> listBasicScholar();
 
     /**
-     * 分页查询学者列表（后台用）
+     * 分页查询学者列表（支持关键词、领域、职级筛选）
      */
-    IPage<TeamBasicScholarRespDTO> pageScholar(int pageNum, int pageSize);
+    IPage<TeamBasicScholarRespDTO> pageScholar(int pageNum, int pageSize, String keyword, Integer areaId, Integer rank);
 
     /**
      * 返回学者详情

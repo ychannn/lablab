@@ -18,9 +18,9 @@ public interface PaperPublicationService extends IService<PaperPublication> {
     List<PaperPublicationRespDTO> listPaperPublication();
 
     /**
-     * 分页获取论文发表
+     * 分页获取论文发表（支持关键词、发表时间范围筛选）
      */
-    IPage<PaperPublicationRespDTO> pagePaperPublication(int pageNum, int pageSize);
+    IPage<PaperPublicationRespDTO> pagePaperPublication(int pageNum, int pageSize, String keyword, String publishTimeStart, String publishTimeEnd);
 
     /**
      * 根据id获取论文发表详情

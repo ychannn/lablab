@@ -49,18 +49,18 @@ public class ResearchDirectionServiceImpl extends ServiceImpl<ResearchDirectionM
     }
 
     @Override
-    public IPage<ResearchDirectionRespDTO> pageResearchDirection(int pageNum, int pageSize) {
-        IPage<ResearchDirection> page = lambdaQuery()
-                .eq(ResearchDirection::getDeleted, CommonConstants.FALSE)
-                .orderByDesc(ResearchDirection::getCreateTime)
-                .page(new Page<>(pageNum, pageSize));
-        IPage<ResearchDirectionRespDTO> result = page.convert(entity -> {
+    public IPage<ResearchDirectionRespDTO> pageResearchDirection(int pageNum, int pageSize, String keyword) {
+        var wrapper = lambdaQuery()
+                .eq(ResearchDirection::getDeleted, CommonConstants.FALSE);
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.and(w -> w.like(ResearchDirection::getTitle, keyword).or().like(ResearchDirection::getContent, keyword));
+        }
+        IPage<ResearchDirection> page = wrapper.orderByDesc(ResearchDirection::getCreateTime).page(new Page<>(pageNum, pageSize));
+        return page.convert(entity -> {
             ResearchDirectionRespDTO researchDirectionRespDTO = new ResearchDirectionRespDTO();
             BeanUtils.copyProperties(entity, researchDirectionRespDTO);
             return researchDirectionRespDTO;
         });
-
-        return result;
     }
 
     /**

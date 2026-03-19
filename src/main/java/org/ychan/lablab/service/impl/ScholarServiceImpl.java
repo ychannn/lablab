@@ -66,12 +66,20 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
     }
 
     @Override
-    public IPage<TeamBasicScholarRespDTO> pageScholar(int pageNum, int pageSize) {
-        IPage<Scholar> page = baseMapper.selectPage(
-                new Page<>(pageNum, pageSize),
-                new LambdaQueryWrapper<>(Scholar.class)
-                        .eq(Scholar::getDeleted, 0)
-                        .orderByAsc(Scholar::getTitle));
+    public IPage<TeamBasicScholarRespDTO> pageScholar(int pageNum, int pageSize, String keyword, Integer areaId, Integer rank) {
+        LambdaQueryWrapper<Scholar> wrapper = new LambdaQueryWrapper<>(Scholar.class)
+                .eq(Scholar::getDeleted, 0);
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.and(w -> w.like(Scholar::getName, keyword).or().like(Scholar::getEmail, keyword));
+        }
+        if (areaId != null && areaId > 0) {
+            wrapper.eq(Scholar::getAreaId, areaId);
+        }
+        if (rank != null && rank > 0) {
+            wrapper.eq(Scholar::getTitle, rank);
+        }
+        wrapper.orderByAsc(Scholar::getTitle);
+        IPage<Scholar> page = baseMapper.selectPage(new Page<>(pageNum, pageSize), wrapper);
         return page.convert(this::toBasicDto);
     }
 

@@ -36,10 +36,13 @@ public class LabNewsController extends BaseController {
     @GetMapping("/page")
     public Result<IPage<LabNewsRespDTO>> pageLabNews(
             @RequestParam(defaultValue = "1") int pageNum,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String timeStart,
+            @RequestParam(required = false) String timeEnd) {
         pageNum = Math.max(pageNum, 1);
         pageSize = Math.max(Math.min(pageSize, 50), 1);
-        IPage<LabNewsRespDTO> list = labNewsService.pageLabNews(pageNum, pageSize);
+        IPage<LabNewsRespDTO> list = labNewsService.pageLabNews(pageNum, pageSize, keyword, timeStart, timeEnd);
         return Result.success(list);
     }
 

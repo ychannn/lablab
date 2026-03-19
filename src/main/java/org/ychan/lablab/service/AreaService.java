@@ -12,10 +12,11 @@ import java.util.List;
 public interface AreaService extends IService<Area> {
 
     /**
-     * 获取所有领域列表
+     * 获取所有领域列表（可选关键词筛选 title）
+     * @param keyword 可选，领域名称模糊搜索
      * @return
      */
-    List<AreaRespDTO> listArea();
+    List<AreaRespDTO> listArea(String keyword);
 
     /**
      * 根据id获取领域详情

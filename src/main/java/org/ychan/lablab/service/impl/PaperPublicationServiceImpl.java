@@ -15,6 +15,7 @@ import org.ychan.lablab.eception.BusinessException;
 import org.ychan.lablab.entity.science.PaperPublication;
 import org.ychan.lablab.mapper.PaperPublicationMapper;
 import org.ychan.lablab.service.PaperPublicationService;
+import org.ychan.lablab.util.DateTimeParseUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,11 +46,17 @@ public class PaperPublicationServiceImpl extends ServiceImpl<PaperPublicationMap
     }
 
     @Override
-    public IPage<PaperPublicationRespDTO> pagePaperPublication(int pageNum, int pageSize) {
-        IPage<PaperPublication> page = lambdaQuery()
-                .eq(PaperPublication::getDeleted, CommonConstants.FALSE)
-                .orderByDesc(PaperPublication::getCreateTime)
-                .page(new Page<>(pageNum, pageSize));
+    public IPage<PaperPublicationRespDTO> pagePaperPublication(int pageNum, int pageSize, String keyword, String publishTimeStart, String publishTimeEnd) {
+        var wrapper = lambdaQuery()
+                .eq(PaperPublication::getDeleted, CommonConstants.FALSE);
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.like(PaperPublication::getContent, keyword);
+        }
+        var start = DateTimeParseUtil.parse(publishTimeStart);
+        if (start != null) wrapper.ge(PaperPublication::getPublishTime, start);
+        var end = DateTimeParseUtil.parse(publishTimeEnd);
+        if (end != null) wrapper.le(PaperPublication::getPublishTime, end);
+        IPage<PaperPublication> page = wrapper.orderByDesc(PaperPublication::getCreateTime).page(new Page<>(pageNum, pageSize));
         return page.convert(PaperPublicationRespDTO::from);
     }
 

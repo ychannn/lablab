@@ -36,10 +36,13 @@ public class PaperPublicationController extends BaseController {
     @GetMapping("/page")
     public Result<IPage<PaperPublicationRespDTO>> pagePaperPublication(
             @RequestParam(defaultValue = "1") int pageNum,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String publishTimeStart,
+            @RequestParam(required = false) String publishTimeEnd) {
         pageNum = Math.max(pageNum, 1);
         pageSize = Math.max(Math.min(pageSize, 50), 1);
-        IPage<PaperPublicationRespDTO> list = paperPublicationService.pagePaperPublication(pageNum, pageSize);
+        IPage<PaperPublicationRespDTO> list = paperPublicationService.pagePaperPublication(pageNum, pageSize, keyword, publishTimeStart, publishTimeEnd);
         return Result.success(list);
     }
 

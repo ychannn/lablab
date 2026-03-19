@@ -18,9 +18,9 @@ public interface TopicProjectService extends IService<TopicProject> {
     List<TopicProjectRespDTO> listTopicProject();
 
     /**
-     * 分页获取课题项目
+     * 分页获取课题项目（支持关键词、开始/结束时间范围筛选）
      */
-    IPage<TopicProjectRespDTO> pageTopicProject(int pageNum, int pageSize);
+    IPage<TopicProjectRespDTO> pageTopicProject(int pageNum, int pageSize, String keyword, String startTimeStart, String startTimeEnd, String endTimeStart, String endTimeEnd);
 
     /**
      * 根据id获取课题项目详情

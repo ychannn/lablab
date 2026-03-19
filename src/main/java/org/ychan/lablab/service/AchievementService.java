@@ -18,9 +18,9 @@ public interface AchievementService extends IService<Achievement> {
     List<AchievementRespDTO> listAchievement();
 
     /**
-     * 分页获取成果奖项
+     * 分页获取成果奖项（支持关键词筛选）
      */
-    IPage<AchievementRespDTO> pageAchievement(int pageNum, int pageSize);
+    IPage<AchievementRespDTO> pageAchievement(int pageNum, int pageSize, String keyword);
 
     /**
      * 根据id获取成果奖项详情

@@ -43,9 +43,13 @@ public class AreaServiceImpl extends ServiceImpl<AreaMapper, Area> implements Ar
      * @return
      */
     @Override
-    public List<AreaRespDTO> listArea() {
-        List<Area> areaList = lambdaQuery()
-                .eq(Area::getDeleted, 0)
+    public List<AreaRespDTO> listArea(String keyword) {
+        var wrapper = lambdaQuery()
+                .eq(Area::getDeleted, 0);
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.like(Area::getTitle, keyword);
+        }
+        List<Area> areaList = wrapper
                 .orderByDesc(Area::getSort)
                 .orderByDesc(Area::getUpdateTime)
                 .list();

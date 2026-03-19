@@ -36,10 +36,15 @@ public class TopicProjectController extends BaseController {
     @GetMapping("/page")
     public Result<IPage<TopicProjectRespDTO>> pageTopicProject(
             @RequestParam(defaultValue = "1") int pageNum,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String startTimeStart,
+            @RequestParam(required = false) String startTimeEnd,
+            @RequestParam(required = false) String endTimeStart,
+            @RequestParam(required = false) String endTimeEnd) {
         pageNum = Math.max(pageNum, 1);
         pageSize = Math.max(Math.min(pageSize, 50), 1);
-        IPage<TopicProjectRespDTO> list = topicProjectService.pageTopicProject(pageNum, pageSize);
+        IPage<TopicProjectRespDTO> list = topicProjectService.pageTopicProject(pageNum, pageSize, keyword, startTimeStart, startTimeEnd, endTimeStart, endTimeEnd);
         return Result.success(list);
     }
 
