@@ -1,0 +1,3 @@
+# 在加载 application 配置后、创建 Bean 前，从文件注入邮件账号/授权码
+org.springframework.boot.env.EnvironmentPostProcessor=\
+org.ychan.lablab.config.MailCredentialsEnvironmentPostProcessor
