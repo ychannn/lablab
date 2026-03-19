@@ -1,8 +1,11 @@
 package org.ychan.lablab.service;
 
 import org.ychan.lablab.dto.req.AdminLoginReqDTO;
+import org.ychan.lablab.dto.resp.admin.AdminListItemRespDTO;
 import org.ychan.lablab.dto.resp.admin.AdminLoginRespDTO;
 import org.ychan.lablab.entity.admin.Admin;
+
+import java.util.List;
 
 /**
  * 管理员登录等
@@ -35,9 +38,19 @@ public interface AdminService {
     AdminLoginRespDTO refreshToken(String token);
 
     /**
-     * 添加管理员
+     * 添加管理员（仅超级管理员）
      */
     void addAdmin(String token, String username, String password, String role);
+
+    /**
+     * 管理员列表（仅超级管理员，不含密码）
+     */
+    List<AdminListItemRespDTO> listAdmins(String token);
+
+    /**
+     * 移除子管理员（仅超级管理员，不能移除自己）
+     */
+    void removeAdmin(String token, Integer adminId);
 
     /**
      * 发送绑定/换绑邮箱的验证码到指定邮箱（该邮箱将收到验证码，验证后即可绑定或换绑）
@@ -58,4 +71,14 @@ public interface AdminService {
      * 通过绑定邮箱的验证码修改密码
      */
     void changePasswordByEmail(String token, String code, String newPassword);
+
+    /**
+     * 忘记密码：向绑定该邮箱的管理员发送验证码（无需登录）
+     */
+    void sendForgotPasswordCode(String email);
+
+    /**
+     * 忘记密码：凭邮箱+验证码重置密码（无需登录）
+     */
+    void resetPasswordByForgotEmail(String email, String code, String newPassword);
 }

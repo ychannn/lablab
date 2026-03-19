@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
 import org.ychan.lablab.config.RequiredRole;
+import org.ychan.lablab.config.lock.EntityLock;
 import org.ychan.lablab.dto.req.PaperPublicationAddReqDTO;
 import org.ychan.lablab.dto.req.PaperPublicationUpdateReqDTO;
 import org.ychan.lablab.dto.resp.research.PaperPublicationRespDTO;
@@ -75,6 +76,7 @@ public class PaperPublicationController extends BaseController {
      */
     @PutMapping("/update")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "publication", idSpel = "#requestParam.id")
     public Result<Void> updatePaperPublication(@RequestBody PaperPublicationUpdateReqDTO requestParam) {
         paperPublicationService.updatePaperPublication(requestParam);
         return Result.success();
@@ -87,6 +89,7 @@ public class PaperPublicationController extends BaseController {
      */
     @DeleteMapping("/delete/{id}")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "publication", idSpel = "#id")
     public Result<Void> deletePaperPublicationById(@PathVariable Integer id) {
         paperPublicationService.deletePaperPublicationById(id);
         return Result.success();

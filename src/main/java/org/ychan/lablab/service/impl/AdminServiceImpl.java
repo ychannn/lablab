@@ -9,19 +9,24 @@ import org.ychan.lablab.common.constant.CommonConstants;
 import java.time.Duration;
 import org.ychan.lablab.common.utils.JwtUtils;
 import org.ychan.lablab.dto.req.AdminLoginReqDTO;
+import org.ychan.lablab.dto.resp.admin.AdminListItemRespDTO;
 import org.ychan.lablab.dto.resp.admin.AdminLoginRespDTO;
 import org.ychan.lablab.eception.BusinessException;
 import org.ychan.lablab.entity.admin.Admin;
+import org.ychan.lablab.enums.RoleEnum;
 import org.ychan.lablab.mapper.AdminMapper;
 import org.ychan.lablab.service.AdminService;
 import org.ychan.lablab.service.EmailService;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -161,8 +166,18 @@ public class AdminServiceImpl implements AdminService {
         if (currentAdmin == null) {
             throw new BusinessException("登录已过期，请重新登录");
         }
-        if (!"admin".equals(currentAdmin.getRole())) {
+        if (!RoleEnum.ADMIN.getCode().equals(currentAdmin.getRole())) {
             throw new BusinessException("权限不足，只有超级管理员才能添加管理员");
+        }
+        // 系统仅允许一个超级管理员，只能添加操作员
+        if (RoleEnum.ADMIN.getCode().equals(role)) {
+            long superCount = adminMapper.selectCount(
+                    new LambdaQueryWrapper<Admin>()
+                            .eq(Admin::getRole, RoleEnum.ADMIN.getCode())
+                            .eq(Admin::getDeleted, CommonConstants.FALSE));
+            if (superCount >= 1) {
+                throw new BusinessException("系统仅允许存在一个超级管理员，只能添加操作员");
+            }
         }
 
         // 检查用户名是否已存在
@@ -174,12 +189,101 @@ public class AdminServiceImpl implements AdminService {
             throw new BusinessException("用户名已存在");
         }
 
-        // 创建新管理员
+        // 创建新管理员（DB 有 uk_username，并发添加同一用户名时后者会触发唯一约束，此处统一提示）
         Admin admin = new Admin();
         admin.setUsername(username);
         admin.setPassword(PASSWORD_ENCODER.encode(password));
         admin.setRole(role);
-        adminMapper.insert(admin);
+        try {
+            adminMapper.insert(admin);
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException("用户名已存在");
+        }
+    }
+
+    @Override
+    public List<AdminListItemRespDTO> listAdmins(String token) {
+        Admin currentAdmin = getAdminByToken(token);
+        if (currentAdmin == null) {
+            throw new BusinessException("登录已过期，请重新登录");
+        }
+        if (!RoleEnum.ADMIN.getCode().equals(currentAdmin.getRole())) {
+            throw new BusinessException("权限不足，只有超级管理员才能查看管理员列表");
+        }
+        List<Admin> list = adminMapper.selectList(
+                new LambdaQueryWrapper<Admin>().eq(Admin::getDeleted, CommonConstants.FALSE).orderByAsc(Admin::getId));
+        return list.stream().map(a -> {
+            AdminListItemRespDTO dto = new AdminListItemRespDTO();
+            dto.setId(a.getId());
+            dto.setUsername(a.getUsername());
+            dto.setRole(a.getRole());
+            dto.setEmail(a.getEmail());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void removeAdmin(String token, Integer adminId) {
+        Admin currentAdmin = getAdminByToken(token);
+        if (currentAdmin == null) {
+            throw new BusinessException("登录已过期，请重新登录");
+        }
+        if (!RoleEnum.ADMIN.getCode().equals(currentAdmin.getRole())) {
+            throw new BusinessException("权限不足，只有超级管理员才能移除管理员");
+        }
+        if (currentAdmin.getId().equals(adminId)) {
+            throw new BusinessException("不能移除自己");
+        }
+        Admin target = adminMapper.selectById(adminId);
+        if (target == null || target.getDeleted() == CommonConstants.TRUE) {
+            throw new BusinessException("管理员不存在");
+        }
+        if (RoleEnum.ADMIN.getCode().equals(target.getRole())) {
+            throw new BusinessException("不能移除超级管理员");
+        }
+        target.setDeleted(CommonConstants.TRUE);
+        adminMapper.updateById(target);
+    }
+
+    @Override
+    public void sendForgotPasswordCode(String email) {
+        email = email.trim().toLowerCase();
+        Admin admin = adminMapper.selectOne(
+                new LambdaQueryWrapper<Admin>()
+                        .eq(Admin::getEmail, email)
+                        .eq(Admin::getDeleted, CommonConstants.FALSE));
+        if (admin == null) {
+            throw new BusinessException("该邮箱未绑定任何管理员账号");
+        }
+        String code = String.format("%06d", ThreadLocalRandom.current().nextInt(1000000));
+        String key = AdminConstants.REDIS_FORGOT_PASSWORD_CODE_PREFIX + email;
+        String value = admin.getId() + ":" + code;
+        RBucket<String> bucket = redissonClient.getBucket(key);
+        bucket.set(value, Duration.ofSeconds(AdminConstants.EMAIL_CODE_EXPIRE_SECONDS));
+        emailService.sendVerificationCode(email, code);
+    }
+
+    @Override
+    public void resetPasswordByForgotEmail(String email, String code, String newPassword) {
+        email = email.trim().toLowerCase();
+        String key = AdminConstants.REDIS_FORGOT_PASSWORD_CODE_PREFIX + email;
+        RBucket<String> bucket = redissonClient.getBucket(key);
+        String stored = bucket.get();
+        if (stored == null) {
+            throw new BusinessException("验证码已过期或未发送，请重新获取");
+        }
+        String[] parts = stored.split(":", 2);
+        if (parts.length != 2 || !parts[1].equals(code.trim())) {
+            throw new BusinessException("验证码错误");
+        }
+        Integer adminId = Integer.valueOf(parts[0]);
+        Admin admin = adminMapper.selectById(adminId);
+        if (admin == null || admin.getDeleted() == CommonConstants.TRUE || !email.equals(admin.getEmail())) {
+            throw new BusinessException("验证码无效，请重新获取");
+        }
+        bucket.delete();
+        admin.setPassword(PASSWORD_ENCODER.encode(newPassword));
+        adminMapper.updateById(admin);
     }
 
     @Override

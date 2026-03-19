@@ -67,11 +67,12 @@
 </template>
 
 <script>
+import { apiBase } from '../api/config.js'
 export default {
   name: 'News',
   data() {
     return {
-      apiBase: 'http://localhost:8080',
+      apiBase,
       pageSize: 10,
       newsList: [],
       newsPageNum: 1,

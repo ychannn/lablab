@@ -97,6 +97,12 @@
             <version>2.3.1</version>
         </dependency>
 
+        <!-- AOP（@EntityLock 等切面需要 aspectj） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
         <!-- 参数校验 @Valid -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

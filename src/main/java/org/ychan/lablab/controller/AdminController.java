@@ -9,11 +9,16 @@ import org.ychan.lablab.dto.req.AdminAddReqDTO;
 import org.ychan.lablab.dto.req.AdminLoginReqDTO;
 import org.ychan.lablab.dto.req.BindEmailReqDTO;
 import org.ychan.lablab.dto.req.ChangePasswordByEmailReqDTO;
+import org.ychan.lablab.dto.req.ForgotPasswordResetReqDTO;
+import org.ychan.lablab.dto.req.ForgotPasswordSendCodeReqDTO;
 import org.ychan.lablab.dto.req.SendBindEmailCodeReqDTO;
+import org.ychan.lablab.dto.resp.admin.AdminListItemRespDTO;
 import org.ychan.lablab.dto.resp.admin.AdminLoginRespDTO;
 import org.ychan.lablab.entity.admin.Admin;
 import org.ychan.lablab.enums.RoleEnum;
 import org.ychan.lablab.service.AdminService;
+
+import java.util.List;
 
 /**
  * 管理员登录等
@@ -116,13 +121,52 @@ public class AdminController {
     }
 
     /**
-     * 添加管理员
+     * 添加管理员（仅超级管理员）
      */
     @PostMapping("/add")
     @RequiredRole({RoleEnum.ADMIN})
     public Result<Void> addAdmin(@RequestHeader(value = "Authorization", required = false) String authorization, @Valid @RequestBody AdminAddReqDTO req) {
         String token = parseToken(authorization);
         adminService.addAdmin(token, req.getUsername(), req.getPassword(), req.getRole());
+        return Result.success();
+    }
+
+    /**
+     * 管理员列表（仅超级管理员，不含密码）
+     */
+    @GetMapping("/list")
+    @RequiredRole({RoleEnum.ADMIN})
+    public Result<List<AdminListItemRespDTO>> listAdmins(@RequestHeader(value = "Authorization", required = false) String authorization) {
+        String token = parseToken(authorization);
+        return Result.success(adminService.listAdmins(token));
+    }
+
+    /**
+     * 移除子管理员（仅超级管理员，不能移除自己或其它超级管理员）
+     */
+    @DeleteMapping("/{adminId}")
+    @RequiredRole({RoleEnum.ADMIN})
+    public Result<Void> removeAdmin(@RequestHeader(value = "Authorization", required = false) String authorization, @PathVariable Integer adminId) {
+        String token = parseToken(authorization);
+        adminService.removeAdmin(token, adminId);
+        return Result.success();
+    }
+
+    /**
+     * 忘记密码：发送验证码到绑定该邮箱的管理员（无需登录）
+     */
+    @PostMapping("/forgot-password/send-code")
+    public Result<Void> sendForgotPasswordCode(@Valid @RequestBody ForgotPasswordSendCodeReqDTO req) {
+        adminService.sendForgotPasswordCode(req.getEmail());
+        return Result.success();
+    }
+
+    /**
+     * 忘记密码：凭邮箱+验证码重置密码（无需登录）
+     */
+    @PostMapping("/forgot-password/reset")
+    public Result<Void> resetPasswordByForgot(@Valid @RequestBody ForgotPasswordResetReqDTO req) {
+        adminService.resetPasswordByForgotEmail(req.getEmail(), req.getCode(), req.getNewPassword());
         return Result.success();
     }
 }

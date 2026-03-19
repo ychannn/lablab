@@ -19,6 +19,8 @@
             <a v-for="item in menus" :key="item.key" :href="'#' + item.key" :class="{ active: currentMenu === item.key }" @click.prevent="setMenu(item.key)">{{ item.label }}</a>
             <div class="nav-group">业务管理</div>
             <a v-for="item in crudMenus" :key="item.key" :href="'#' + item.key" :class="{ active: currentMenu === item.key }" @click.prevent="setMenu(item.key)">{{ item.label }}</a>
+            <div v-if="currentUser && currentUser.role === 'admin'" class="nav-group">系统</div>
+            <a v-if="currentUser && currentUser.role === 'admin'" :href="'#admins'" :class="{ active: currentMenu === 'admins' }" @click.prevent="setMenu('admins')">管理员管理</a>
           </nav>
         </aside>
         <main class="admin-main">
@@ -33,6 +35,7 @@
           <DirectionCrud v-show="currentMenu === 'direction'" />
           <ScholarCrud v-show="currentMenu === 'scholar'" />
           <AreaCrud v-show="currentMenu === 'area'" />
+          <AdminManage v-show="currentMenu === 'admins'" :current-user="currentUser" />
         </main>
       </div>
 
@@ -132,8 +135,9 @@ import AchievementCrud from './views/crud/AchievementCrud.vue'
 import DirectionCrud from './views/crud/DirectionCrud.vue'
 import ScholarCrud from './views/crud/ScholarCrud.vue'
 import AreaCrud from './views/crud/AreaCrud.vue'
+import AdminManage from './views/AdminManage.vue'
 
-const MENU_KEYS = ['site', 'banner', 'contact', 'lab-intro', 'lab-news', 'publication', 'topic-project', 'achievement', 'direction', 'scholar', 'area']
+const MENU_KEYS = ['site', 'banner', 'contact', 'lab-intro', 'lab-news', 'publication', 'topic-project', 'achievement', 'direction', 'scholar', 'area', 'admins']
 
 export default {
   name: 'AdminApp',
@@ -149,7 +153,8 @@ export default {
     AchievementCrud,
     DirectionCrud,
     ScholarCrud,
-    AreaCrud
+    AreaCrud,
+    AdminManage
   },
   data() {
     const hash = typeof window !== 'undefined' ? (window.location.hash || '').replace(/^#/, '') : ''
@@ -157,6 +162,7 @@ export default {
     return {
       showLogin: !isLoggedIn(),
       portalUrl: 'http://localhost:5173',
+      currentUser: null,
       currentMenu: initialMenu,
       showPasswordModal: false,
       passwordModalLoading: false,
@@ -192,6 +198,12 @@ export default {
     window.addEventListener('admin-logout', this.onLogout)
     window.addEventListener('hashchange', this.onHashChange)
     this.syncHashToMenu()
+    if (!this.showLogin) this.fetchCurrentUser()
+  },
+  watch: {
+    showLogin(v) {
+      if (!v) this.fetchCurrentUser()
+    }
   },
   beforeUnmount() {
     window.removeEventListener('admin-logout', this.onLogout)
@@ -200,6 +212,15 @@ export default {
     if (this.bindCodeTimer) clearInterval(this.bindCodeTimer)
   },
   methods: {
+    async fetchCurrentUser() {
+      try {
+        const res = await request('/admin/info')
+        const admin = (res && res.data !== undefined) ? res.data : (res && res.result !== undefined) ? res.result : res
+        this.currentUser = admin && typeof admin === 'object' ? { id: admin.id, username: admin.username, role: admin.role, email: admin.email } : null
+      } catch (_) {
+        this.currentUser = null
+      }
+    },
     async openPasswordModal() {
       this.passwordForm = { code: '', newPassword: '', confirmPassword: '' }
       this.bindEmailInput = ''

@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import { apiBase } from '../api/config.js'
 export default {
   name: 'Detail',
   props: {
@@ -51,7 +52,7 @@ export default {
   },
   data() {
     return {
-      apiBase: 'http://localhost:8080',
+      apiBase,
       loading: true,
       error: '',
       data: null

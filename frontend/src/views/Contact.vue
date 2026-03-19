@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import { apiBase } from '../api/config.js'
 export default {
   name: 'Contact',
   data() {
@@ -64,7 +65,7 @@ export default {
   methods: {
     async fetchContactInfo() {
       try {
-        const response = await fetch('http://localhost:8080/api/config/contact')
+        const response = await fetch(apiBase + '/api/config/contact')
         const data = await response.json()
         if (data.code === 200) {
           this.contact = data.data || this.contact

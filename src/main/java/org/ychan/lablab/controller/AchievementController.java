@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
 import org.ychan.lablab.config.RequiredRole;
+import org.ychan.lablab.config.lock.EntityLock;
 import org.ychan.lablab.dto.req.AchievementAddReqDTO;
 import org.ychan.lablab.dto.req.AchievementUpdateReqDTO;
 import org.ychan.lablab.dto.resp.research.AchievementRespDTO;
@@ -73,6 +74,7 @@ public class AchievementController extends BaseController {
      */
     @PutMapping("/update")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "achievement", idSpel = "#requestParam.id")
     public Result<Void> updateAchievement(@RequestBody AchievementUpdateReqDTO requestParam) {
         achievementService.updateAchievement(requestParam);
         return Result.success();
@@ -85,6 +87,7 @@ public class AchievementController extends BaseController {
      */
     @DeleteMapping("/delete/{id}")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "achievement", idSpel = "#id")
     public Result<Void> deleteAchievementById(@PathVariable Integer id) {
         achievementService.deleteAchievementById(id);
         return Result.success();

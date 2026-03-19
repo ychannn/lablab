@@ -55,6 +55,7 @@
 </template>
 
 <script>
+import { apiBase } from './api/config.js'
 import Home from './views/Home.vue'
 import About from './views/About.vue'
 import News from './views/News.vue'
@@ -146,7 +147,7 @@ export default {
     },
     async fetchSiteTitle() {
       try {
-        const res = await fetch('http://localhost:8080/api/config/site-title')
+        const res = await fetch(apiBase + '/api/config/site-title')
         const data = await res.json()
         if (data.code === 200 && data.data) {
           this.siteTitle = data.data

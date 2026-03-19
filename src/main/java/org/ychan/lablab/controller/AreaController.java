@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
 import org.ychan.lablab.config.RequiredRole;
+import org.ychan.lablab.config.lock.EntityLock;
 import org.ychan.lablab.dto.req.AreaAddReqDTO;
 import org.ychan.lablab.dto.req.AreaUpdateReqDTO;
 import org.ychan.lablab.dto.req.AreaSortReqDTO;
@@ -58,6 +59,7 @@ public class AreaController {
      */
     @PutMapping("/update")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "area", idSpel = "#requestParam.id")
     public Result<Void> updateArea(@RequestBody AreaUpdateReqDTO requestParam) {
         areaService.updateArea(requestParam);
         return Result.success();
@@ -70,6 +72,7 @@ public class AreaController {
      */
     @DeleteMapping("/delete/{id}")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "area", idSpel = "#id")
     public Result<Void> deleteAreaById(@PathVariable int id) {
         areaService.deleteAreaById(id);
         return Result.success();

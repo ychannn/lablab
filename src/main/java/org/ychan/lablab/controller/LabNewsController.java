@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
 import org.ychan.lablab.config.RequiredRole;
+import org.ychan.lablab.config.lock.EntityLock;
 import org.ychan.lablab.dto.req.LabNewsAddReqDTO;
 import org.ychan.lablab.dto.req.LabNewsUpdateReqDTO;
 import org.ychan.lablab.dto.resp.news.LabNewsRespDTO;
@@ -75,6 +76,7 @@ public class LabNewsController extends BaseController {
      */
     @PutMapping("/update")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "lab-news", idSpel = "#requestParam.id")
     public Result<Void> updateLabNews(@RequestBody LabNewsUpdateReqDTO requestParam) {
         labNewsService.updateLabNews(requestParam);
         return Result.success();
@@ -87,6 +89,7 @@ public class LabNewsController extends BaseController {
      */
     @DeleteMapping("/delete/{id}")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "lab-news", idSpel = "#id")
     public Result<Void> deleteLabNewsById(@PathVariable Integer id) {
         labNewsService.deleteLabNewsById(id);
         return Result.success();

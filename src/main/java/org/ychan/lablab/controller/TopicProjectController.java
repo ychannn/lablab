@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
 import org.ychan.lablab.config.RequiredRole;
+import org.ychan.lablab.config.lock.EntityLock;
 import org.ychan.lablab.dto.req.TopicProjectAddReqDTO;
 import org.ychan.lablab.dto.req.TopicProjectUpdateReqDTO;
 import org.ychan.lablab.dto.resp.research.TopicProjectRespDTO;
@@ -77,6 +78,7 @@ public class TopicProjectController extends BaseController {
      */
     @PutMapping("/update")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "topic-project", idSpel = "#requestParam.id")
     public Result<Void> updateTopicProject(@RequestBody TopicProjectUpdateReqDTO requestParam) {
         topicProjectService.updateTopicProject(requestParam);
         return Result.success();
@@ -89,6 +91,7 @@ public class TopicProjectController extends BaseController {
      */
     @DeleteMapping("/delete/{id}")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "topic-project", idSpel = "#id")
     public Result<Void> deleteTopicProjectById(@PathVariable Integer id) {
         topicProjectService.deleteTopicProjectById(id);
         return Result.success();

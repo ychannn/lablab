@@ -76,6 +76,7 @@
 </template>
 
 <script>
+import { apiBase } from '../api/config.js'
 export default {
   name: 'About',
   data() {
@@ -89,11 +90,11 @@ export default {
   methods: {
     imageUrl(url) {
       if (!url) return ''
-      return url.startsWith('http') ? url : 'http://localhost:8080' + (url.startsWith('/') ? '' : '/') + url
+      return url.startsWith('http') ? url : apiBase + (url.startsWith('/') ? '' : '/') + url
     },
     async fetchLabIntro() {
       try {
-        const response = await fetch('http://localhost:8080/api/config/lab-intro')
+        const response = await fetch(apiBase + '/api/config/lab-intro')
         const data = await response.json()
         if (data.code === 200) {
           this.labIntro = data.data || {}

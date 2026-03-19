@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import { apiBase } from '../api/config.js'
 export default {
   name: 'Search',
   props: {
@@ -56,7 +57,7 @@ export default {
   },
   data() {
     return {
-      apiBase: 'http://localhost:8080',
+      apiBase,
       query: '',
       searched: false,
       loading: false,

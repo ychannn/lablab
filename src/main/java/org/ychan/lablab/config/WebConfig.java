@@ -32,7 +32,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/team/scholar/add", "/team/scholar/update", "/team/scholar/delete/**",
                         "/area/add", "/area/update", "/area/delete/**", "/area/sort"
                 )
-                .excludePathPatterns("/admin/login");
+                .excludePathPatterns("/admin/login", "/admin/forgot-password/send-code", "/admin/forgot-password/reset");
     }
 
     @Override

@@ -17,5 +17,8 @@ public final class AdminConstants {
     /** 邮箱验证码有效期（秒），默认 10 分钟 */
     public static final long EMAIL_CODE_EXPIRE_SECONDS = 10 * 60;
 
+    /** 忘记密码验证码 Redis key 前缀，完整 key: admin:forgot-password:code:{email}，value: adminId:code */
+    public static final String REDIS_FORGOT_PASSWORD_CODE_PREFIX = "admin:forgot-password:code:";
+
     private AdminConstants() {}
 }

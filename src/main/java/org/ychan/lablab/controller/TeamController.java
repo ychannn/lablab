@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.Result;
 import org.ychan.lablab.config.RequiredRole;
+import org.ychan.lablab.config.lock.EntityLock;
 import org.ychan.lablab.dto.req.TeamAddScholarReqDTO;
 import org.ychan.lablab.dto.req.TeamUpdateScholarReqDTO;
 import org.ychan.lablab.dto.resp.team.TeamScholarDetailsRespDTO;
@@ -87,6 +88,7 @@ public class TeamController {
      */
     @PutMapping("/scholar/update")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "scholar", idSpel = "#requestParam.id")
     public Result updateScholar(@RequestBody TeamUpdateScholarReqDTO requestParam){
         scholarService.updateScholar(requestParam);
         return Result.success();
@@ -99,6 +101,7 @@ public class TeamController {
      */
     @DeleteMapping("/scholar/delete/{id}")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "scholar", idSpel = "#id")
     public Result deleteScholarById(@PathVariable int id){
         scholarService.deleteScholarById(id);
         return Result.success();

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.ychan.lablab.common.result.PageResult;
 import org.ychan.lablab.common.result.Result;
 import org.ychan.lablab.config.RequiredRole;
+import org.ychan.lablab.config.lock.EntityLock;
 import org.ychan.lablab.dto.req.ResearchDirectionAddReqDTO;
 import org.ychan.lablab.dto.req.ResearchDirectionUpdateReqDTO;
 import org.ychan.lablab.dto.resp.research.ResearchDirectionRespDTO;
@@ -75,6 +76,7 @@ public class ResearchDirectionController extends BaseController{
      */
     @PutMapping("/direction/update")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "research-direction", idSpel = "#requestParam.id")
     public Result<Void> updateResearchDirection(@RequestBody ResearchDirectionUpdateReqDTO requestParam) {
         researchDirectionService.updateResearchDirection(requestParam);
         return Result.success();
@@ -87,6 +89,7 @@ public class ResearchDirectionController extends BaseController{
      */
     @DeleteMapping("/direction/delete/{id}")
     @RequiredRole({RoleEnum.ADMIN})
+    @EntityLock(prefix = "research-direction", idSpel = "#id")
     public Result<Void> deleteResearchDirectionById(@PathVariable Integer id) {
         researchDirectionService.deleteResearchDirectionById(id);
         return Result.success();

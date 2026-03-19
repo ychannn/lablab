@@ -47,11 +47,12 @@
 </template>
 
 <script>
+import { apiBase } from '../api/config.js'
 export default {
   name: 'Team',
   data() {
     return {
-      apiBase: 'http://localhost:8080',
+      apiBase,
       pageSize: 12,
       pageNum: 1,
       total: 0,

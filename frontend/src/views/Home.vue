@@ -101,11 +101,12 @@
 </template>
 
 <script>
+import { apiBase } from '../api/config.js'
 export default {
   name: 'Home',
   data() {
     return {
-      apiBase: 'http://localhost:8080',
+      apiBase,
       bannerList: [],
       currentIndex: 0,
       autoPlayTimer: null,
@@ -160,7 +161,7 @@ export default {
   methods: {
     async fetchHomeData() {
       try {
-        const response = await fetch('http://localhost:8080/home')
+        const response = await fetch(apiBase + '/home')
         const data = await response.json()
         if (data.code === 200) {
           this.bannerList = data.data.bannerList || []
