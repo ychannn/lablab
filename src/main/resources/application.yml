@@ -2,8 +2,17 @@
 # 上传目录：相对路径表示相对进程工作目录（启动时的项目根），上线时保持一致即可
 app:
   upload-dir: uploads
+  # 邮件发件账号与授权码从该文件读取（不写在此处）。文件格式见 mail-credentials.properties.example
+  mail-credentials-file: ./mail-credentials.properties
 
+# 邮件（可选）：不配置则验证码只打印在后端控制台
+# 真正发邮件时：1) 复制 mail-credentials.properties.example 为 mail-credentials.properties 并填写
+# 2) 取消上面 app.mail-credentials-file 的注释  3) 取消下面 spring.mail 的注释（仅 host/port，无账号密码）
 spring:
+  mail:
+    host: smtp.163.com
+    port: 465
+    properties: { mail.smtp.auth: true, mail.smtp.ssl.enable: true }
   datasource:
     url: jdbc:mysql://localhost:3306/lab?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root # 你的数据库用户名

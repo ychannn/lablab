@@ -30,4 +30,9 @@ public class Admin extends BaseEntity {
      * 角色：admin（超级管理员）、operator（操作员）
      */
     private String role;
+
+    /**
+     * 绑定邮箱（用于验证码修改密码等），每个管理员各自绑定
+     */
+    private String email;
 }

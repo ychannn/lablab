@@ -43,4 +43,19 @@ public interface AdminService {
      * 添加管理员
      */
     void addAdmin(String token, String username, String password, String role);
+
+    /**
+     * 绑定当前管理员的邮箱（用于接收验证码修改密码）
+     */
+    void bindEmail(String token, String email);
+
+    /**
+     * 发送邮箱验证码到当前管理员的绑定邮箱，验证码存入 Redis，有效期 10 分钟
+     */
+    void sendEmailCode(String token);
+
+    /**
+     * 通过绑定邮箱的验证码修改密码
+     */
+    void changePasswordByEmail(String token, String code, String newPassword);
 }

@@ -7,6 +7,7 @@
           <h1 class="logo">后台管理</h1>
           <div class="header-actions">
             <a :href="portalUrl" class="link-portal" target="_blank" rel="noopener">访问门户</a>
+            <button type="button" class="btn-header" @click="openPasswordModal">修改密码</button>
             <button type="button" class="btn-logout" @click="logout">退出</button>
           </div>
         </div>
@@ -34,12 +35,56 @@
           <AreaCrud v-show="currentMenu === 'area'" />
         </main>
       </div>
+
+      <!-- 修改密码弹窗（绑定邮箱 + 验证码发到绑定邮箱） -->
+      <div v-if="showPasswordModal" class="modal-mask" @click.self="showPasswordModal = false">
+        <div class="modal-password">
+          <h3>修改密码</h3>
+          <!-- 未绑定邮箱：先绑定 -->
+          <template v-if="!passwordModalLoading && currentAdmin && !currentAdmin.email">
+            <p class="modal-desc">请先绑定邮箱，验证码将发送到该邮箱。</p>
+            <div class="form-group form-group-code">
+              <label>绑定邮箱</label>
+              <input v-model="bindEmailInput" type="email" placeholder="用于接收验证码的邮箱" class="form-input" />
+              <button type="button" class="btn-code" :disabled="bindEmailSubmitting" @click="bindEmail">
+                {{ bindEmailSubmitting ? '绑定中…' : '绑定' }}
+              </button>
+            </div>
+          </template>
+          <!-- 已绑定：发验证码到绑定邮箱 -->
+          <template v-else-if="!passwordModalLoading && currentAdmin && currentAdmin.email">
+            <p class="modal-desc">验证码将发送到您的绑定邮箱 {{ currentAdmin.email }}，未配置 SMTP 时请查看后端控制台。</p>
+            <form @submit.prevent="submitChangePassword">
+              <div class="form-group form-group-code">
+                <label>验证码</label>
+                <input v-model="passwordForm.code" type="text" placeholder="6位验证码" class="form-input" maxlength="8" required />
+                <button type="button" class="btn-code" :disabled="codeCooldown > 0" @click="sendCode">
+                  {{ codeCooldown > 0 ? codeCooldown + '秒后重发' : '获取验证码' }}
+                </button>
+              </div>
+              <div class="form-group">
+                <label>新密码</label>
+                <input v-model="passwordForm.newPassword" type="password" placeholder="6-32位" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label>确认密码</label>
+                <input v-model="passwordForm.confirmPassword" type="password" placeholder="再次输入新密码" class="form-input" required />
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn-cancel" @click="showPasswordModal = false">取消</button>
+                <button type="submit" class="btn-submit" :disabled="passwordSubmitting">{{ passwordSubmitting ? '提交中…' : '确认修改' }}</button>
+              </div>
+            </form>
+          </template>
+          <p v-else class="modal-desc">{{ passwordModalLoading ? '加载中…' : '获取管理员信息失败，请关闭重试' }}</p>
+        </div>
+      </div>
     </template>
   </div>
 </template>
 
 <script>
-import { isLoggedIn, setToken } from './api/auth'
+import { isLoggedIn, setToken, request } from './api/auth'
 import Login from './views/Login.vue'
 import SiteSettings from './views/SiteSettings.vue'
 import BannerManage from './views/BannerManage.vue'
@@ -78,6 +123,15 @@ export default {
       showLogin: !isLoggedIn(),
       portalUrl: 'http://localhost:5173',
       currentMenu: initialMenu,
+      showPasswordModal: false,
+      passwordModalLoading: false,
+      currentAdmin: null,
+      bindEmailInput: '',
+      bindEmailSubmitting: false,
+      passwordForm: { code: '', newPassword: '', confirmPassword: '' },
+      passwordSubmitting: false,
+      codeCooldown: 0,
+      codeTimer: null,
       menus: [
         { key: 'site', label: '站点设置' },
         { key: 'banner', label: '首页轮播图' },
@@ -103,8 +157,87 @@ export default {
   beforeUnmount() {
     window.removeEventListener('admin-logout', this.onLogout)
     window.removeEventListener('hashchange', this.onHashChange)
+    if (this.codeTimer) clearInterval(this.codeTimer)
   },
   methods: {
+    async openPasswordModal() {
+      this.passwordForm = { code: '', newPassword: '', confirmPassword: '' }
+      this.bindEmailInput = ''
+      this.currentAdmin = null
+      this.codeCooldown = 0
+      if (this.codeTimer) { clearInterval(this.codeTimer); this.codeTimer = null }
+      this.showPasswordModal = true
+      this.passwordModalLoading = true
+      try {
+        const res = await request('/admin/info')
+        const admin = (res && res.data !== undefined) ? res.data : (res && res.result !== undefined) ? res.result : res
+        this.currentAdmin = admin && typeof admin === 'object' ? admin : null
+      } catch (e) {
+        this.currentAdmin = null
+        alert(e.message || '获取管理员信息失败')
+      } finally {
+        this.passwordModalLoading = false
+      }
+    },
+    async bindEmail() {
+      const email = (this.bindEmailInput || '').trim()
+      if (!email) {
+        alert('请填写邮箱')
+        return
+      }
+      this.bindEmailSubmitting = true
+      try {
+        await request('/admin/bind-email', { method: 'POST', body: JSON.stringify({ email }) })
+        alert('绑定成功')
+        this.currentAdmin = { ...this.currentAdmin, email }
+      } catch (e) {
+        alert(e.message || '绑定失败')
+      } finally {
+        this.bindEmailSubmitting = false
+      }
+    },
+    async sendCode() {
+      try {
+        await request('/admin/send-email-code', { method: 'POST', body: JSON.stringify({}) })
+        alert('验证码已发送到绑定邮箱，请查收（未配置 SMTP 时请查看后端控制台）')
+        this.codeCooldown = 60
+        this.codeTimer = setInterval(() => {
+          this.codeCooldown--
+          if (this.codeCooldown <= 0 && this.codeTimer) {
+            clearInterval(this.codeTimer)
+            this.codeTimer = null
+          }
+        }, 1000)
+      } catch (e) {
+        alert(e.message || '发送失败')
+      }
+    },
+    async submitChangePassword() {
+      const { code, newPassword, confirmPassword } = this.passwordForm
+      if (newPassword !== confirmPassword) {
+        alert('两次输入的密码不一致')
+        return
+      }
+      if (newPassword.length < 6 || newPassword.length > 32) {
+        alert('密码长度为6-32位')
+        return
+      }
+      this.passwordSubmitting = true
+      try {
+        await request('/admin/change-password-by-email', {
+          method: 'POST',
+          body: JSON.stringify({ code: code.trim(), newPassword })
+        })
+        alert('密码已修改，请重新登录')
+        this.showPasswordModal = false
+        this.passwordForm = { code: '', newPassword: '', confirmPassword: '' }
+        this.logout()
+      } catch (e) {
+        alert(e.message || '修改失败')
+      } finally {
+        this.passwordSubmitting = false
+      }
+    },
     setMenu(key) {
       this.currentMenu = key
       window.location.hash = key
@@ -171,4 +304,23 @@ export default {
 .sidebar-nav a.active { background: #e6f7ff; color: #1890ff; font-weight: 500; }
 
 .admin-main { flex: 1; padding: 24px; overflow-y: auto; }
+.btn-header { background: transparent; border: 1px solid rgba(255,255,255,0.5); color: #fff; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+.btn-header:hover { background: rgba(255,255,255,0.1); }
+
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal-password { background: #fff; border-radius: 8px; padding: 24px; width: 90%; max-width: 420px; }
+.modal-password h3 { margin: 0 0 8px; font-size: 18px; }
+.modal-desc { margin: 0 0 20px; font-size: 13px; color: #666; }
+.modal-password .form-group { margin-bottom: 16px; }
+.modal-password .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: #333; }
+.modal-password .form-input { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+.form-group-code { display: flex; gap: 8px; align-items: flex-end; }
+.form-group-code .form-input { flex: 1; }
+.btn-code { flex-shrink: 0; padding: 8px 14px; font-size: 13px; border: 1px solid #1890ff; color: #1890ff; background: #fff; border-radius: 6px; cursor: pointer; }
+.btn-code:hover:not(:disabled) { background: #e6f7ff; }
+.btn-code:disabled { opacity: 0.6; cursor: not-allowed; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+.btn-cancel { padding: 8px 16px; font-size: 14px; color: #666; background: #fff; border: 1px solid #d9d9d9; border-radius: 6px; cursor: pointer; }
+.btn-submit { padding: 8px 16px; font-size: 14px; color: #fff; background: #1890ff; border: none; border-radius: 6px; cursor: pointer; }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 </style>

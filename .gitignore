@@ -1,6 +1,9 @@
 # 上传目录（运行时生成，建议不纳入版本控制）
 uploads/
 
+# 邮件账号与授权码（敏感信息，勿提交）
+mail-credentials.properties
+
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar

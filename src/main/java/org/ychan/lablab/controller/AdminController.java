@@ -8,6 +8,8 @@ import org.ychan.lablab.config.RequiredRole;
 import org.ychan.lablab.dto.req.AdminAddReqDTO;
 import org.ychan.lablab.dto.req.AdminLoginReqDTO;
 import org.ychan.lablab.dto.req.AdminResetPasswordReqDTO;
+import org.ychan.lablab.dto.req.BindEmailReqDTO;
+import org.ychan.lablab.dto.req.ChangePasswordByEmailReqDTO;
 import org.ychan.lablab.dto.resp.admin.AdminLoginRespDTO;
 import org.ychan.lablab.entity.admin.Admin;
 import org.ychan.lablab.enums.RoleEnum;
@@ -65,12 +67,42 @@ public class AdminController {
     }
 
     /**
-     * 重置密码
+     * 重置密码（需旧密码）
      */
     @PostMapping("/reset-password")
     public Result<Void> resetPassword(@RequestHeader(value = "Authorization", required = false) String authorization, @Valid @RequestBody AdminResetPasswordReqDTO req) {
         String token = parseToken(authorization);
         adminService.resetPassword(token, req.getOldPassword(), req.getNewPassword());
+        return Result.success();
+    }
+
+    /**
+     * 绑定当前管理员的邮箱（用于接收验证码修改密码）
+     */
+    @PostMapping("/bind-email")
+    public Result<Void> bindEmail(@RequestHeader(value = "Authorization", required = false) String authorization, @Valid @RequestBody BindEmailReqDTO req) {
+        String token = parseToken(authorization);
+        adminService.bindEmail(token, req.getEmail());
+        return Result.success();
+    }
+
+    /**
+     * 发送验证码到当前管理员的绑定邮箱（用于修改密码）
+     */
+    @PostMapping("/send-email-code")
+    public Result<Void> sendEmailCode(@RequestHeader(value = "Authorization", required = false) String authorization) {
+        String token = parseToken(authorization);
+        adminService.sendEmailCode(token);
+        return Result.success();
+    }
+
+    /**
+     * 通过绑定邮箱的验证码修改密码
+     */
+    @PostMapping("/change-password-by-email")
+    public Result<Void> changePasswordByEmail(@RequestHeader(value = "Authorization", required = false) String authorization, @Valid @RequestBody ChangePasswordByEmailReqDTO req) {
+        String token = parseToken(authorization);
+        adminService.changePasswordByEmail(token, req.getCode(), req.getNewPassword());
         return Result.success();
     }
 

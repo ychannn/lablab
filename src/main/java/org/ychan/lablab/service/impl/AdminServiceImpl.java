@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ychan.lablab.common.constant.AdminConstants;
 import org.ychan.lablab.common.constant.CommonConstants;
+
+import java.time.Duration;
 import org.ychan.lablab.common.utils.JwtUtils;
 import org.ychan.lablab.dto.req.AdminLoginReqDTO;
 import org.ychan.lablab.dto.resp.admin.AdminLoginRespDTO;
@@ -12,12 +14,14 @@ import org.ychan.lablab.eception.BusinessException;
 import org.ychan.lablab.entity.admin.Admin;
 import org.ychan.lablab.mapper.AdminMapper;
 import org.ychan.lablab.service.AdminService;
+import org.ychan.lablab.service.EmailService;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,7 @@ public class AdminServiceImpl implements AdminService {
 
     private final AdminMapper adminMapper;
     private final RedissonClient redissonClient;
+    private final EmailService emailService;
 
     private static final BCryptPasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
@@ -190,5 +195,59 @@ public class AdminServiceImpl implements AdminService {
         admin.setPassword(PASSWORD_ENCODER.encode(password));
         admin.setRole(role);
         adminMapper.insert(admin);
+    }
+
+    @Override
+    public void bindEmail(String token, String email) {
+        Admin admin = getAdminByToken(token);
+        if (admin == null) {
+            throw new BusinessException("登录已过期，请重新登录");
+        }
+        admin.setEmail(email.trim());
+        adminMapper.updateById(admin);
+    }
+
+    @Override
+    public void sendEmailCode(String token) {
+        Admin admin = getAdminByToken(token);
+        if (admin == null) {
+            throw new BusinessException("登录已过期，请重新登录");
+        }
+        String email = admin.getEmail();
+        if (email == null || email.isBlank()) {
+            throw new BusinessException("请先绑定邮箱");
+        }
+        email = email.trim();
+        String code = String.format("%06d", ThreadLocalRandom.current().nextInt(1000000));
+        String key = AdminConstants.REDIS_EMAIL_CODE_PREFIX + email.toLowerCase();
+        String value = admin.getId() + ":" + code;
+        RBucket<String> bucket = redissonClient.getBucket(key);
+        bucket.set(value, Duration.ofSeconds(AdminConstants.EMAIL_CODE_EXPIRE_SECONDS));
+        emailService.sendVerificationCode(email, code);
+    }
+
+    @Override
+    public void changePasswordByEmail(String token, String code, String newPassword) {
+        Admin admin = getAdminByToken(token);
+        if (admin == null) {
+            throw new BusinessException("登录已过期，请重新登录");
+        }
+        String email = admin.getEmail();
+        if (email == null || email.isBlank()) {
+            throw new BusinessException("请先绑定邮箱");
+        }
+        String key = AdminConstants.REDIS_EMAIL_CODE_PREFIX + email.trim().toLowerCase();
+        RBucket<String> bucket = redissonClient.getBucket(key);
+        String stored = bucket.get();
+        if (stored == null) {
+            throw new BusinessException("验证码已过期或未发送，请重新获取");
+        }
+        String[] parts = stored.split(":", 2);
+        if (parts.length != 2 || !parts[0].equals(String.valueOf(admin.getId())) || !parts[1].equals(code.trim())) {
+            throw new BusinessException("验证码错误");
+        }
+        bucket.delete();
+        admin.setPassword(PASSWORD_ENCODER.encode(newPassword));
+        adminMapper.updateById(admin);
     }
 }
