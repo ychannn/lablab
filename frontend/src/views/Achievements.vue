@@ -20,7 +20,7 @@
       <div v-if="activeTab === 'paper'" class="achievement-section">
         <h3 class="section-title">论文发表</h3>
         <div class="filter-wrap">
-          <div class="filter-row">
+          <form class="filter-row" @submit.prevent="onSearchPaper">
             <label class="filter-label">关键词</label>
             <input v-model="filterPaper.keyword" type="text" placeholder="内容" class="filter-input filter-input-text" />
             <span class="filter-label time-label">发表时间</span>
@@ -55,9 +55,9 @@
                 </div>
               </div>
             </div>
-            <button type="button" class="filter-btn filter-btn-query" @click="onSearchPaper">查询</button>
+            <button type="submit" class="filter-btn filter-btn-query">查询</button>
             <button type="button" class="filter-btn filter-btn-clear" @click="onResetFilterPaper" title="清空筛选">清空</button>
-          </div>
+          </form>
         </div>
         <div class="achievement-list">
           <div v-for="paper in papers" :key="paper.id" class="achievement-item" @click="goToDetail('paper', paper.id)">
@@ -78,7 +78,7 @@
       <div v-if="activeTab === 'project'" class="achievement-section">
         <h3 class="section-title">课题项目</h3>
         <div class="filter-wrap">
-          <div class="filter-row">
+          <form class="filter-row" @submit.prevent="onSearchProject">
             <label class="filter-label">关键词</label>
             <input v-model="filterProject.keyword" type="text" placeholder="内容" class="filter-input filter-input-text" />
             <span class="filter-label time-label">开始</span>
@@ -133,9 +133,9 @@
                 </div>
               </div>
             </div>
-            <button type="button" class="filter-btn filter-btn-query" @click="onSearchProject">查询</button>
+            <button type="submit" class="filter-btn filter-btn-query">查询</button>
             <button type="button" class="filter-btn filter-btn-clear" @click="onResetFilterProject" title="清空筛选">清空</button>
-          </div>
+          </form>
         </div>
         <div class="achievement-list">
           <div v-for="project in projects" :key="project.id" class="achievement-item" @click="goToDetail('project', project.id)">
@@ -156,12 +156,12 @@
       <div v-if="activeTab === 'award'" class="achievement-section">
         <h3 class="section-title">成果奖项</h3>
         <div class="filter-wrap">
-          <div class="filter-row">
+          <form class="filter-row" @submit.prevent="onSearchAward">
             <label class="filter-label">关键词</label>
             <input v-model="filterAward.keyword" type="text" placeholder="内容" class="filter-input filter-input-text" />
-            <button type="button" class="filter-btn filter-btn-query" @click="onSearchAward">查询</button>
+            <button type="submit" class="filter-btn filter-btn-query">查询</button>
             <button type="button" class="filter-btn filter-btn-clear" @click="onResetFilterAward" title="清空筛选">清空</button>
-          </div>
+          </form>
         </div>
         <div class="achievement-list">
           <div v-for="award in awards" :key="award.id" class="achievement-item" @click="goToDetail('award', award.id)">
@@ -182,12 +182,12 @@
       <div v-if="activeTab === 'direction'" class="achievement-section">
         <h3 class="section-title">研究方向</h3>
         <div class="filter-wrap">
-          <div class="filter-row">
+          <form class="filter-row" @submit.prevent="onSearchDirection">
             <label class="filter-label">关键词</label>
             <input v-model="filterDirection.keyword" type="text" placeholder="标题/内容" class="filter-input filter-input-text" />
-            <button type="button" class="filter-btn filter-btn-query" @click="onSearchDirection">查询</button>
+            <button type="submit" class="filter-btn filter-btn-query">查询</button>
             <button type="button" class="filter-btn filter-btn-clear" @click="onResetFilterDirection" title="清空筛选">清空</button>
-          </div>
+          </form>
         </div>
         <div class="achievement-list">
           <div v-for="direction in directions" :key="direction.id" class="achievement-item" @click="goToDetail('direction', direction.id)">
@@ -501,6 +501,7 @@ export default {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
+  margin: 0;
 }
 .filter-label { font-size: 14px; color: #5a6c7d; }
 .filter-label.time-label { margin-left: 4px; }

@@ -3,7 +3,7 @@
     <h2 class="page-title">论文发表</h2>
     <div class="toolbar">
       <div class="filter-wrap">
-        <div class="filter-row">
+        <form class="filter-row" @submit.prevent="onSearch">
           <label class="filter-label">关键词</label>
           <input v-model="filter.keyword" type="text" placeholder="内容" class="filter-input filter-input-text" />
           <span class="filter-label time-label">发表时间</span>
@@ -38,9 +38,9 @@
               </div>
             </div>
           </div>
-          <button type="button" class="btn btn-query" @click="onSearch">查询</button>
+          <button type="submit" class="btn btn-query">查询</button>
           <button type="button" class="btn btn-clear" @click="onResetFilter" title="清空筛选">清空</button>
-        </div>
+        </form>
       </div>
       <button type="button" class="btn btn-primary" @click="openAdd">新增</button>
     </div>
@@ -195,7 +195,7 @@ export default {
 .page-title { font-size: 24px; margin-bottom: 20px; color: #333; }
 .toolbar { margin-bottom: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .filter-wrap { flex: 1; background: #fafafa; border: 1px solid #e8e8e8; border-radius: 8px; padding: 12px 16px; }
-.filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0; }
 .filter-label { font-size: 13px; color: #666; }
 .filter-label.time-label { margin-left: 8px; }
 .filter-input { padding: 8px 10px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; }

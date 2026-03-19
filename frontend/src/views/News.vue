@@ -3,7 +3,7 @@
     <div class="container">
       <h2 class="page-title">新闻公告</h2>
       <div class="filter-wrap">
-        <div class="filter-row">
+        <form class="filter-row" @submit.prevent="onSearch">
           <label class="filter-label">关键词</label>
           <input v-model="filter.keyword" type="text" placeholder="标题/内容" class="filter-input filter-input-text" />
           <span class="filter-label time-label">时间</span>
@@ -38,9 +38,9 @@
               </div>
             </div>
           </div>
-          <button type="button" class="filter-btn filter-btn-query" @click="onSearch">查询</button>
+          <button type="submit" class="filter-btn filter-btn-query">查询</button>
           <button type="button" class="filter-btn filter-btn-clear" @click="onResetFilter" title="清空筛选">清空</button>
-        </div>
+        </form>
       </div>
       <!-- 新闻列表 -->
       <div class="news-list">
@@ -197,6 +197,7 @@ export default {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
+  margin: 0;
 }
 .filter-label { font-size: 14px; color: #5a6c7d; }
 .filter-label.time-label { margin-left: 4px; }

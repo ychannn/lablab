@@ -3,7 +3,7 @@
     <div class="container">
       <h2 class="page-title">师资队伍</h2>
       <div class="filter-wrap">
-        <div class="filter-row">
+        <form class="filter-row" @submit.prevent="onSearch">
           <label class="filter-label">关键词</label>
           <input v-model="filter.keyword" type="text" placeholder="姓名/邮箱" class="filter-input filter-input-text" />
           <label class="filter-label">领域</label>
@@ -16,9 +16,9 @@
             <option :value="0">全部职级</option>
             <option v-for="r in rankOptions" :key="r.value" :value="r.value">{{ r.label }}</option>
           </select>
-          <button type="button" class="filter-btn filter-btn-query" @click="onSearch">查询</button>
+          <button type="submit" class="filter-btn filter-btn-query">查询</button>
           <button type="button" class="filter-btn filter-btn-clear" @click="onResetFilter" title="清空筛选">清空</button>
-        </div>
+        </form>
       </div>
       <!-- 团队成员列表 -->
       <div class="team-list">
@@ -153,6 +153,7 @@ export default {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
+  margin: 0;
 }
 .filter-label { font-size: 14px; color: #5a6c7d; }
 .filter-input {
