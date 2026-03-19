@@ -1,7 +1,7 @@
 <template>
   <div class="news">
     <div class="container">
-      <h2 class="page-title">新闻公告</h2>
+      <h2 class="page-title">新闻</h2>
       <div class="filter-wrap">
         <form class="filter-row" @submit.prevent="onSearch">
           <label class="filter-label">关键词</label>
@@ -50,6 +50,9 @@
           class="news-item"
           @click="goToDetail(news.id)"
         >
+          <div v-if="news.imageUrl" class="news-thumb">
+            <img :src="newsImageUrl(news.imageUrl)" alt="" />
+          </div>
           <div class="news-date">{{ formatDate(news.time) }}</div>
           <div class="news-content">
             <h3 class="news-title">{{ news.title }}</h3>
@@ -155,6 +158,10 @@ export default {
     },
     goToDetail(id) {
       this.$parent.navigate('detail', { type: 'news', id })
+    },
+    newsImageUrl(url) {
+      if (!url) return ''
+      return url.startsWith('http') ? url : this.apiBase + (url.startsWith('/') ? '' : '/') + url
     },
     formatDate(dateString) {
       if (!dateString) return ''
@@ -273,6 +280,22 @@ export default {
 
 .news-item:hover {
   background-color: #f0f7f4;
+}
+
+.news-thumb {
+  flex-shrink: 0;
+  width: 120px;
+  height: 80px;
+  margin-right: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.news-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .news-date {

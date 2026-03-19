@@ -89,7 +89,7 @@ public class ConfigController extends BaseController {
         if (originalFilename == null || !originalFilename.contains(".")) {
             return Result.fail("无法识别文件类型");
         }
-        String subDir = "scholar".equalsIgnoreCase(type) ? "scholar" : "banner";
+        String subDir = "scholar".equalsIgnoreCase(type) ? "scholar" : "news".equalsIgnoreCase(type) ? "news" : "banner";
         String ext = originalFilename.substring(originalFilename.lastIndexOf('.'));
         String filename = UUID.randomUUID().toString().replace("-", "") + ext;
         try {

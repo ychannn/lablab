@@ -187,7 +187,7 @@ export default {
         { key: 'lab-intro', label: '实验室介绍' }
       ],
       crudMenus: [
-        { key: 'lab-news', label: '新闻公告' },
+        { key: 'lab-news', label: '新闻' },
         { key: 'notice', label: '公告' },
         { key: 'publication', label: '论文发表' },
         { key: 'topic-project', label: '课题项目' },

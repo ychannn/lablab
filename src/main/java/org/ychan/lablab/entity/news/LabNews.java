@@ -31,6 +31,11 @@ public class LabNews extends BaseEntity {
      * 时间
      */
     private LocalDateTime time;
+
+    /**
+     * 封面图 URL（单张），如 /uploads/news/xx.jpg
+     */
+    private String images;
 }
 
 

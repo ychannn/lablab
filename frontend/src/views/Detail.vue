@@ -12,8 +12,10 @@
           <p v-if="meta" class="detail-meta">{{ meta }}</p>
         </div>
         <div class="detail-body">
-          <!-- 新闻 -->
-          <div v-if="type === 'news'" class="detail-content">{{ data.content }}</div>
+          <!-- 新闻（详情暂不展示图片） -->
+          <div v-if="type === 'news'">
+            <div class="detail-content">{{ data.content }}</div>
+          </div>
           <!-- 公告 -->
           <div v-else-if="type === 'notice'" class="detail-content">{{ data.content }}</div>
           <!-- 师资 -->
@@ -145,6 +147,10 @@ export default {
       if (!v) return ''
       return new Date(v).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
     },
+    detailImageUrl(url) {
+      if (!url) return ''
+      return url.startsWith('http') ? url : this.apiBase + (url.startsWith('/') ? '' : '/') + url
+    },
     goBack() {
       this.$emit('back', this.type)
     }
@@ -194,6 +200,22 @@ export default {
   border-radius: 12px;
   padding: 32px;
   margin-bottom: 24px;
+}
+
+.detail-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.detail-images img {
+  max-width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
 }
 
 .detail-content {

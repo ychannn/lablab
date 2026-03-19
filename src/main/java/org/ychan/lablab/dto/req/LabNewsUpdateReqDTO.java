@@ -3,6 +3,7 @@ package org.ychan.lablab.dto.req;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class LabNewsUpdateReqDTO {
@@ -26,6 +27,11 @@ public class LabNewsUpdateReqDTO {
      * 时间
      */
     private LocalDateTime time;
+
+    /**
+     * 封面图 URL（单张）
+     */
+    private String imageUrl;
 }
 
 

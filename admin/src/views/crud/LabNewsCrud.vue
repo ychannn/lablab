@@ -1,6 +1,6 @@
 <template>
   <div class="crud-page">
-    <h2 class="page-title">新闻公告</h2>
+    <h2 class="page-title">新闻</h2>
     <div class="toolbar">
       <div class="filter-wrap">
         <form class="filter-row" @submit.prevent="onSearch">
@@ -85,6 +85,19 @@
           <textarea v-model="form.content" class="form-input content-field" rows="8"></textarea>
         </div>
         <div class="form-group">
+          <label>封面图（仅一张）</label>
+          <div class="images-upload">
+            <div v-if="form.imageUrl" class="image-item">
+              <img :src="imageFullUrl(form.imageUrl)" alt="" />
+              <button type="button" class="image-remove" @click="form.imageUrl = ''">删除</button>
+            </div>
+            <label class="image-add">
+              <input ref="fileInput" type="file" accept="image/*" @change="onImageSelect" style="display:none" />
+              <span>{{ form.imageUrl ? '更换图片' : '+ 上传图片' }}</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
           <label>时间</label>
           <input v-model="form.time" type="datetime-local" class="form-input" />
         </div>
@@ -112,7 +125,7 @@ export default {
       showModal: false,
       editId: null,
       saving: false,
-      form: { title: '', content: '', time: '' },
+      form: { title: '', content: '', time: '', imageUrl: '' },
       filter: { keyword: '', timeStartDate: '', timeStartTime: '', timeEndDate: '', timeEndTime: '' },
       dtpOpen: null
     }
@@ -191,7 +204,7 @@ export default {
     },
     openAdd() {
       this.editId = null
-      this.form = { title: '', content: '', time: new Date().toISOString().slice(0, 16) }
+      this.form = { title: '', content: '', time: new Date().toISOString().slice(0, 16), imageUrl: '' }
       this.showModal = true
     },
     openEdit(row) {
@@ -199,9 +212,32 @@ export default {
       this.form = {
         title: row.title || '',
         content: row.content || '',
-        time: (row.time || '').slice(0, 16)
+        time: (row.time || '').slice(0, 16),
+        imageUrl: row.imageUrl || ''
       }
       this.showModal = true
+    },
+    imageFullUrl(url) {
+      if (!url) return ''
+      const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : 'http://localhost:8080'
+      return url.startsWith('http') ? url : base + (url.startsWith('/') ? '' : '') + url
+    },
+    async onImageSelect(e) {
+      const file = e.target && e.target.files && e.target.files[0]
+      if (!file) return
+      const fd = new FormData()
+      fd.append('file', file)
+      try {
+        const res = await request('/api/config/admin/upload?type=news', { method: 'POST', body: fd })
+        if (res.code === 200 && res.data) {
+          this.form.imageUrl = res.data
+        } else {
+          alert(res.message || '上传失败')
+        }
+      } catch (err) {
+        alert(err.message || '上传失败')
+      }
+      e.target.value = ''
     },
     async submit() {
       this.saving = true
@@ -209,7 +245,8 @@ export default {
         const payload = {
           title: this.form.title,
           content: this.form.content,
-          time: this.form.time ? this.form.time + ':00' : null
+          time: this.form.time ? this.form.time + ':00' : null,
+          imageUrl: this.form.imageUrl && this.form.imageUrl.trim() ? this.form.imageUrl.trim() : null
         }
         if (this.editId) {
           payload.id = this.editId
@@ -297,6 +334,12 @@ export default {
 .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
 .form-input { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; }
 .content-group .content-field { width: 65%; min-width: 300px; resize: vertical; min-height: 120px; }
+.images-upload { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.image-item { position: relative; width: 100px; height: 100px; border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden; }
+.image-item img { width: 100%; height: 100%; object-fit: cover; }
+.image-remove { position: absolute; bottom: 0; left: 0; right: 0; padding: 4px; font-size: 12px; background: rgba(0,0,0,0.6); color: #fff; border: none; cursor: pointer; }
+.image-add { width: 100px; height: 100px; border: 1px dashed #d9d9d9; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #666; font-size: 13px; }
+.image-add:hover { border-color: #1890ff; color: #1890ff; }
 .content-cell { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .modal-footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
 .btn { padding: 10px 20px; border-radius: 4px; border: none; cursor: pointer; font-size: 14px; }

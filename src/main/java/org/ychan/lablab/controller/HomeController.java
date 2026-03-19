@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.ychan.lablab.dto.resp.config.BannerItemDTO;
 import org.ychan.lablab.dto.resp.config.ContactRespDTO;
 import org.ychan.lablab.dto.resp.config.LabIntroRespDTO;
+import org.ychan.lablab.dto.resp.news.LabNewsRespDTO;
 import org.ychan.lablab.dto.resp.news.NoticeRespDTO;
 import org.ychan.lablab.dto.resp.research.*;
 import org.ychan.lablab.service.*;
@@ -81,7 +82,22 @@ public class HomeController {
 
         resp.setLatestAchievements(achievementList);
 
-        // 最新 5 条公告
+        // 首页左侧：最新 5 条新闻（轮播，含标题、时间、内容开头）
+        IPage<LabNewsRespDTO> newsPage = labNewsService.pageLabNews(1, 5, null, null, null);
+        List<HomeNewsItemDTO> latestNews = new ArrayList<>();
+        for (LabNewsRespDTO n : newsPage.getRecords()) {
+            HomeNewsItemDTO dto = new HomeNewsItemDTO();
+            dto.setId(n.getId());
+            dto.setTitle(n.getTitle());
+            dto.setTime(n.getTime());
+            dto.setImageUrl(n.getImageUrl());
+            String content = n.getContent() != null ? n.getContent() : "";
+            dto.setContentSnippet(content.length() > 80 ? content.substring(0, 80) + "…" : content);
+            latestNews.add(dto);
+        }
+        resp.setLatestNews(latestNews);
+
+        // 最新 5 条公告（首页右侧）
         IPage<NoticeRespDTO> noticePage = noticeService.pageNotice(1, 5, null, null, null);
         resp.setLatestNotices(noticePage.getRecords());
 
@@ -105,7 +121,9 @@ public class HomeController {
         /** 首页轮播图列表（config 配置，仅展示图片） */
         private List<BannerItemDTO> bannerList;
         private List<HomeAchievementDTO> latestAchievements;
-        /** 最新 5 条公告 */
+        /** 最新 5 条新闻（首页左侧轮播） */
+        private List<HomeNewsItemDTO> latestNews;
+        /** 最新 5 条公告（首页右侧） */
         private List<NoticeRespDTO> latestNotices;
         private LabIntroRespDTO labIntro;
         private ContactRespDTO contact;
@@ -132,6 +150,14 @@ public class HomeController {
 
         public void setLatestAchievements(List<HomeAchievementDTO> latestAchievements) {
             this.latestAchievements = latestAchievements;
+        }
+
+        public List<HomeNewsItemDTO> getLatestNews() {
+            return latestNews;
+        }
+
+        public void setLatestNews(List<HomeNewsItemDTO> latestNews) {
+            this.latestNews = latestNews;
         }
 
         public List<NoticeRespDTO> getLatestNotices() {
@@ -199,5 +225,27 @@ public class HomeController {
         public void setTime(java.time.LocalDateTime time) {
             this.time = time;
         }
+    }
+
+    /**
+     * 首页新闻项（左侧轮播）
+     */
+    public static class HomeNewsItemDTO {
+        private Integer id;
+        private String title;
+        private java.time.LocalDateTime time;
+        private String imageUrl;
+        private String contentSnippet;
+
+        public Integer getId() { return id; }
+        public void setId(Integer id) { this.id = id; }
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+        public java.time.LocalDateTime getTime() { return time; }
+        public void setTime(java.time.LocalDateTime time) { this.time = time; }
+        public String getImageUrl() { return imageUrl; }
+        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+        public String getContentSnippet() { return contentSnippet; }
+        public void setContentSnippet(String contentSnippet) { this.contentSnippet = contentSnippet; }
     }
 }

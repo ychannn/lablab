@@ -36,13 +36,7 @@ public class LabNewsServiceImpl extends ServiceImpl<LabNewsMapper, LabNews> impl
                 .eq(LabNews::getDeleted, CommonConstants.FALSE)
                 .orderByDesc(LabNews::getCreateTime)
                 .list();
-        return newsList.stream()
-                .map(news -> {
-                    LabNewsRespDTO respDTO = new LabNewsRespDTO();
-                    BeanUtils.copyProperties(news, respDTO);
-                    return respDTO;
-                })
-                .collect(Collectors.toList());
+        return newsList.stream().map(LabNewsRespDTO::from).collect(Collectors.toList());
     }
 
     @Override
@@ -71,9 +65,7 @@ public class LabNewsServiceImpl extends ServiceImpl<LabNewsMapper, LabNews> impl
         if (news == null || news.getDeleted() == CommonConstants.TRUE) {
             throw new BusinessException("实验室新闻不存在");
         }
-        LabNewsRespDTO respDTO = new LabNewsRespDTO();
-        BeanUtils.copyProperties(news, respDTO);
-        return respDTO;
+        return LabNewsRespDTO.from(news);
     }
 
     /**
@@ -85,6 +77,7 @@ public class LabNewsServiceImpl extends ServiceImpl<LabNewsMapper, LabNews> impl
     public void addLabNews(LabNewsAddReqDTO requestParam) {
         LabNews news = new LabNews();
         BeanUtils.copyProperties(requestParam, news);
+        news.setImages(requestParam.getImageUrl() != null && !requestParam.getImageUrl().isBlank() ? requestParam.getImageUrl().trim() : null);
         int insert = labNewsMapper.insert(news);
         if (insert < 1) {
             throw new BusinessException("新增实验室新闻失败");
@@ -104,6 +97,7 @@ public class LabNewsServiceImpl extends ServiceImpl<LabNewsMapper, LabNews> impl
         }
 
         BeanUtils.copyProperties(requestParam, news);
+        news.setImages(requestParam.getImageUrl() != null && !requestParam.getImageUrl().isBlank() ? requestParam.getImageUrl().trim() : null);
         int update = labNewsMapper.updateById(news);
         if (update < 1) {
             throw new BusinessException("修改实验室新闻失败");

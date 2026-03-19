@@ -1,50 +1,47 @@
 package org.ychan.lablab.dto.resp.news;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.ychan.lablab.entity.news.LabNews;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class LabNewsRespDTO {
 
-    /**
-     * 主键id
-     */
     private Integer id;
-
-    /**
-     * 标题
-     */
     private String title;
-
-    /**
-     * 内容
-     */
     private String content;
-
-    /**
-     * 时间
-     */
     private LocalDateTime time;
 
     /**
-     * 创建时间
+     * 封面图 URL（单张）
      */
-    private LocalDateTime createTime;
+    private String imageUrl;
 
-    /**
-     * 修改时间
-     */
+    private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
-    /**
-     * 从实体类转换为DTO
-     */
     public static LabNewsRespDTO from(LabNews labNews) {
         LabNewsRespDTO respDTO = new LabNewsRespDTO();
         BeanUtils.copyProperties(labNews, respDTO);
+        String img = labNews.getImages();
+        if (img != null && !img.isBlank()) {
+            if (img.trim().startsWith("[")) {
+                try {
+                    List<String> arr = JSON.parseArray(img, String.class);
+                    respDTO.setImageUrl(arr != null && !arr.isEmpty() ? arr.get(0) : null);
+                } catch (Exception e) {
+                    respDTO.setImageUrl(null);
+                }
+            } else {
+                respDTO.setImageUrl(img.trim());
+            }
+        } else {
+            respDTO.setImageUrl(null);
+        }
         return respDTO;
     }
 }

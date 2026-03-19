@@ -16,7 +16,7 @@
           <ul class="nav-links">
             <li><a href="#" @click.prevent="navigate('home')">首页</a></li>
             <li><a href="#" @click.prevent="navigate('about')">实验室介绍</a></li>
-            <li><a href="#" @click.prevent="navigate('news')">新闻公告</a></li>
+            <li><a href="#" @click.prevent="navigate('news')">新闻</a></li>
             <li><a href="#" @click.prevent="navigate('notice')">公告</a></li>
             <li><a href="#" @click.prevent="navigate('team')">师资队伍</a></li>
             <li><a href="#" @click.prevent="navigate('achievements')">科研成果</a></li>

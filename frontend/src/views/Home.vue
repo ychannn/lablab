@@ -32,24 +32,60 @@
       </div>
     </div>
 
-    <!-- 最新公告 -->
-    <div v-if="latestNotices.length" class="notices-section">
+    <!-- 新闻轮播 + 公告（左新闻右公告） -->
+    <div v-if="latestNews.length || latestNotices.length" class="news-notice-section">
       <div class="container">
-        <div class="section-head">
-          <h2 class="section-title">最新公告</h2>
-          <button type="button" class="section-more" @click="navigate('notice')">更多</button>
+        <div class="news-notice-row">
+          <!-- 左侧：新闻轮播 -->
+          <div class="news-carousel-col">
+            <div class="section-head">
+              <h2 class="section-title">新闻</h2>
+              <button type="button" class="section-more" @click="navigate('news')">更多</button>
+            </div>
+            <div v-if="latestNews.length" class="news-carousel" @mouseenter="stopNewsAuto" @mouseleave="startNewsAuto">
+              <div class="news-track" :style="{ transform: 'translateX(-' + newsIndex * 100 + '%)' }">
+                <div
+                  v-for="(item, idx) in latestNews"
+                  :key="item.id"
+                  class="news-slide"
+                  @click="goToNews(item.id)"
+                >
+                  <div class="news-slide-img" :style="{ backgroundImage: item.imageUrl ? 'url(' + newsImageUrl(item.imageUrl) + ')' : 'none' }"></div>
+                  <div class="news-slide-body">
+                    <h3 class="news-slide-title">{{ item.title }}</h3>
+                    <p class="news-slide-meta">{{ formatTime(item.time) }}</p>
+                    <p class="news-slide-snippet">{{ item.contentSnippet }}</p>
+                  </div>
+                </div>
+              </div>
+              <button v-if="latestNews.length > 1" type="button" class="news-arrow news-prev" @click="newsPrev">‹</button>
+              <button v-if="latestNews.length > 1" type="button" class="news-arrow news-next" @click="newsNext">›</button>
+              <div v-if="latestNews.length > 1" class="news-dots">
+                <button v-for="(item, idx) in latestNews" :key="idx" type="button" :class="{ active: newsIndex === idx }" @click="newsIndex = idx"></button>
+              </div>
+            </div>
+            <p v-else class="empty-tip">暂无新闻</p>
+          </div>
+          <!-- 右侧：公告 -->
+          <div class="notices-col">
+            <div class="section-head">
+              <h2 class="section-title">公告</h2>
+              <button type="button" class="section-more" @click="navigate('notice')">更多</button>
+            </div>
+            <ul v-if="latestNotices.length" class="notices-list">
+              <li
+                v-for="item in latestNotices"
+                :key="item.id"
+                class="notices-item"
+                @click="goToNotice(item.id)"
+              >
+                <span class="notices-date">{{ formatTime(item.time || item.createTime) }}</span>
+                <span class="notices-title">{{ item.title }}</span>
+              </li>
+            </ul>
+            <p v-else class="empty-tip">暂无公告</p>
+          </div>
         </div>
-        <ul class="notices-list">
-          <li
-            v-for="item in latestNotices"
-            :key="item.id"
-            class="notices-item"
-            @click="goToNotice(item.id)"
-          >
-            <span class="notices-date">{{ formatTime(item.time || item.createTime) }}</span>
-            <span class="notices-title">{{ item.title }}</span>
-          </li>
-        </ul>
       </div>
     </div>
 
@@ -132,7 +168,10 @@ export default {
       currentIndex: 0,
       autoPlayTimer: null,
       latestAchievements: [],
+      latestNews: [],
       latestNotices: [],
+      newsIndex: 0,
+      newsAutoTimer: null,
       labIntro: {
         introduction: '实验室致力于科学研究，追求卓越，为社会做出贡献。'
       },
@@ -179,6 +218,7 @@ export default {
   },
   beforeUnmount() {
     this.stopAutoPlay()
+    this.stopNewsAuto()
   },
   methods: {
     async fetchHomeData() {
@@ -188,8 +228,11 @@ export default {
         if (data.code === 200) {
           this.bannerList = data.data.bannerList || []
           this.latestAchievements = data.data.latestAchievements || []
+          this.latestNews = data.data.latestNews || []
           this.latestNotices = data.data.latestNotices || []
           this.labIntro = data.data.labIntro || this.labIntro
+          this.newsIndex = 0
+          this.startNewsAuto()
           this.contact = data.data.contact || this.contact
         }
       } catch (error) {
@@ -249,6 +292,32 @@ export default {
     },
     goToNotice(id) {
       if (id != null) this.navigate('detail', { type: 'notice', id })
+    },
+    goToNews(id) {
+      if (id != null) this.navigate('detail', { type: 'news', id })
+    },
+    newsImageUrl(url) {
+      if (!url) return ''
+      return url.startsWith('http') ? url : this.apiBase + (url.startsWith('/') ? '' : '') + url
+    },
+    newsPrev() {
+      if (this.latestNews.length <= 1) return
+      this.newsIndex = this.newsIndex <= 0 ? this.latestNews.length - 1 : this.newsIndex - 1
+    },
+    newsNext() {
+      if (this.latestNews.length <= 1) return
+      this.newsIndex = this.newsIndex >= this.latestNews.length - 1 ? 0 : this.newsIndex + 1
+    },
+    startNewsAuto() {
+      this.stopNewsAuto()
+      if (this.latestNews.length <= 1) return
+      this.newsAutoTimer = setInterval(() => this.newsNext(), 4500)
+    },
+    stopNewsAuto() {
+      if (this.newsAutoTimer) {
+        clearInterval(this.newsAutoTimer)
+        this.newsAutoTimer = null
+      }
     }
   }
 }
@@ -455,10 +524,159 @@ export default {
   color: #5a6c7d;
 }
 
-/* 最新公告 */
-.notices-section {
+/* 新闻轮播 + 公告（左新闻右公告） */
+.news-notice-section {
   padding: 48px 0 72px;
   background-color: #f6faf8;
+}
+
+.news-notice-row {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  align-items: start;
+}
+
+.news-carousel-col .section-head,
+.notices-col .section-head {
+  margin-bottom: 20px;
+}
+
+.news-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #dde8e4;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.news-track {
+  display: flex;
+  transition: transform 0.35s ease;
+}
+
+.news-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.2s;
+}
+
+.news-slide:hover {
+  background-color: #fafcfb;
+}
+
+.news-slide-img {
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  background-color: #e8f0ed;
+}
+
+.news-slide-body {
+  padding: 20px 24px;
+}
+
+.news-slide-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 8px 0;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.news-slide-meta {
+  font-size: 13px;
+  color: #5a6c7d;
+  margin: 0 0 10px 0;
+}
+
+.news-slide-snippet {
+  font-size: 14px;
+  color: #5a6c7d;
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.news-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.news-arrow:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.news-prev { left: 12px; }
+.news-next { right: 12px; }
+
+.news-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.news-dots button {
+  width: 8px;
+  height: 8px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.news-dots button:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.news-dots button.active {
+  background: #fff;
+  transform: scale(1.15);
+}
+
+.notices-col {
+  min-width: 0;
+}
+
+.empty-tip {
+  color: #5a6c7d;
+  font-size: 14px;
+  margin: 0;
+  padding: 16px 0;
 }
 
 .notices-list {
@@ -587,11 +805,19 @@ export default {
   .banner-caption {
     font-size: 16px;
   }
-  
+
+  .news-notice-row {
+    grid-template-columns: 1fr;
+  }
+
+  .news-slide-img {
+    height: 160px;
+  }
+
   .intro-content {
     flex-direction: column;
   }
-  
+
   .intro-img {
     width: 100%;
   }
