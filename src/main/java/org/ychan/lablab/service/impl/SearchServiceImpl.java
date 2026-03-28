@@ -2,7 +2,7 @@ package org.ychan.lablab.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.ychan.lablab.document.SearchDocument;
+// import org.ychan.lablab.document.SearchDocument;
 import org.ychan.lablab.dto.resp.search.SearchRespDTO;
 import org.ychan.lablab.entity.news.LabNews;
 import org.ychan.lablab.entity.news.Notice;
@@ -227,7 +227,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public void addDocument(SearchDocument document) {
+    public void addDocument(Object document) {
         // 数据库搜索不需要添加文档
     }
 
@@ -237,7 +237,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public void addDocuments(List<SearchDocument> documents) {
+    public void addDocuments(Object documents) {
         // 数据库搜索不需要批量添加文档
     }
 }

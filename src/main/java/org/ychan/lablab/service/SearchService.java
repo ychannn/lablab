@@ -1,12 +1,12 @@
 package org.ychan.lablab.service;
 
-import org.ychan.lablab.document.SearchDocument;
+// import org.ychan.lablab.document.SearchDocument;
 import org.ychan.lablab.dto.resp.search.SearchRespDTO;
 
-import java.util.List;
+// import java.util.List;
 
 /**
- * 搜索服务
+ * 搜索服务（Elasticsearch 已禁用，使用数据库搜索）
  */
 public interface SearchService {
 
@@ -16,22 +16,30 @@ public interface SearchService {
     SearchRespDTO search(String keyword, int page, int size);
 
     /**
-     * 同步数据到Elasticsearch
+     * 同步数据到Elasticsearch（已禁用）
      */
-    void syncData();
+    default void syncData() {
+        // Elasticsearch 已禁用
+    }
 
     /**
-     * 添加单个文档
+     * 添加单个文档（已禁用）
      */
-    void addDocument(SearchDocument document);
+    default void addDocument(Object document) {
+        // Elasticsearch 已禁用
+    }
 
     /**
-     * 删除单个文档
+     * 删除单个文档（已禁用）
      */
-    void deleteDocument(String id);
+    default void deleteDocument(String id) {
+        // Elasticsearch 已禁用
+    }
 
     /**
-     * 批量添加文档
+     * 批量添加文档（已禁用）
      */
-    void addDocuments(List<SearchDocument> documents);
+    default void addDocuments(Object documents) {
+        // Elasticsearch 已禁用
+    }
 }
