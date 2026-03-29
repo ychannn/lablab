@@ -16,11 +16,11 @@
         <aside class="admin-sidebar">
           <nav class="sidebar-nav">
             <div class="nav-group">站点配置</div>
-            <a v-for="item in menus" :key="item.key" :href="'#' + item.key" :class="{ active: currentMenu === item.key }" @click.prevent="setMenu(item.key)">{{ item.label }}</a>
+            <a v-for="item in menus" :key="item.key" :href="'/admin/' + item.key" :class="{ active: currentMenu === item.key }" @click.prevent="setMenu(item.key)">{{ item.label }}</a>
             <div class="nav-group">业务管理</div>
-            <a v-for="item in crudMenus" :key="item.key" :href="'#' + item.key" :class="{ active: currentMenu === item.key }" @click.prevent="setMenu(item.key)">{{ item.label }}</a>
+            <a v-for="item in crudMenus" :key="item.key" :href="'/admin/' + item.key" :class="{ active: currentMenu === item.key }" @click.prevent="setMenu(item.key)">{{ item.label }}</a>
             <div v-if="currentUser && currentUser.role === 'admin'" class="nav-group">系统</div>
-            <a v-if="currentUser && currentUser.role === 'admin'" :href="'#admins'" :class="{ active: currentMenu === 'admins' }" @click.prevent="setMenu('admins')">管理员管理</a>
+            <a v-if="currentUser && currentUser.role === 'admin'" :href="'/admin/admins'" :class="{ active: currentMenu === 'admins' }" @click.prevent="setMenu('admins')">管理员管理</a>
           </nav>
         </aside>
         <main class="admin-main">
@@ -160,8 +160,8 @@ export default {
     AdminManage
   },
   data() {
-    const hash = typeof window !== 'undefined' ? (window.location.hash || '').replace(/^#/, '') : ''
-    const initialMenu = MENU_KEYS.includes(hash) ? hash : 'site'
+    const path = typeof window !== 'undefined' ? (window.location.pathname || '').replace(/^\/admin\/?/, '') : ''
+    const initialMenu = MENU_KEYS.includes(path) ? path : 'site'
     return {
       showLogin: !isLoggedIn(),
       portalUrl: 'http://localhost:5173',
@@ -200,8 +200,8 @@ export default {
   },
   mounted() {
     window.addEventListener('admin-logout', this.onLogout)
-    window.addEventListener('hashchange', this.onHashChange)
-    this.syncHashToMenu()
+    window.addEventListener('popstate', this.onPopState)
+    this.syncPathToMenu()
     if (!this.showLogin) this.fetchCurrentUser()
   },
   watch: {
@@ -211,7 +211,7 @@ export default {
   },
   beforeUnmount() {
     window.removeEventListener('admin-logout', this.onLogout)
-    window.removeEventListener('hashchange', this.onHashChange)
+    window.removeEventListener('popstate', this.onPopState)
     if (this.codeTimer) clearInterval(this.codeTimer)
     if (this.bindCodeTimer) clearInterval(this.bindCodeTimer)
   },
@@ -336,14 +336,14 @@ export default {
     },
     setMenu(key) {
       this.currentMenu = key
-      window.location.hash = key
+      window.history.pushState({}, '', '/admin/' + key)
     },
-    onHashChange() {
-      this.syncHashToMenu()
+    onPopState() {
+      this.syncPathToMenu()
     },
-    syncHashToMenu() {
-      const hash = (window.location.hash || '').replace(/^#/, '')
-      if (MENU_KEYS.includes(hash)) this.currentMenu = hash
+    syncPathToMenu() {
+      const path = (window.location.pathname || '').replace(/^\/admin\/?/, '')
+      if (MENU_KEYS.includes(path)) this.currentMenu = path
     },
     logout() {
       setToken(null)
