@@ -16,7 +16,7 @@ import org.ychan.lablab.service.ResearchDirectionService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/research")
+@RequestMapping("/api/research")
 @RequiredArgsConstructor
 public class ResearchDirectionController extends BaseController{
 

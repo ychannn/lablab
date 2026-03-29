@@ -18,7 +18,7 @@ import java.util.List;
  * 公告（通知）接口
  */
 @RestController
-@RequestMapping("/notice")
+@RequestMapping("/api/notice")
 @RequiredArgsConstructor
 public class NoticeController extends BaseController {
 

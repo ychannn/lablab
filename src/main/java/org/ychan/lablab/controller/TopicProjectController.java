@@ -15,7 +15,7 @@ import org.ychan.lablab.service.TopicProjectService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/topic-project")
+@RequestMapping("/api/topic-project")
 @RequiredArgsConstructor
 public class TopicProjectController extends BaseController {
 

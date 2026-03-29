@@ -73,7 +73,7 @@ export default {
     },
     async fetchList() {
       try {
-        const data = await request('/api/config/admin/banner')
+        const data = await request('/config/admin/banner')
         if (data.code === 200 && Array.isArray(data.data)) this.list = data.data
       } catch (e) {
         console.error(e)
@@ -88,7 +88,7 @@ export default {
       try {
         const form = new FormData()
         form.append('file', file)
-        const data = await request('/api/config/admin/upload', { method: 'POST', body: form })
+        const data = await request('/config/admin/upload', { method: 'POST', body: form })
         if (data.code === 200 && data.data) {
           this.list.unshift({ imageUrl: data.data, title: '', link: '', sort: 0 })
           await this.persistBannerList()
@@ -124,7 +124,7 @@ export default {
     },
     async persistBannerList() {
       try {
-        const data = await request('/api/config/admin/banner', {
+        const data = await request('/config/admin/banner', {
           method: 'PUT',
           body: JSON.stringify(this.list)
         })
@@ -138,7 +138,7 @@ export default {
     async save() {
       this.saving = true
       try {
-        const data = await request('/api/config/admin/banner', {
+        const data = await request('/config/admin/banner', {
           method: 'PUT',
           body: JSON.stringify(this.list)
         })

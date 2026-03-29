@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/team")
+@RequestMapping("/api/team")
 @RequiredArgsConstructor
 public class TeamController {
 

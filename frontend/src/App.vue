@@ -94,7 +94,7 @@ export default {
     }
   },
   created() {
-    const h = this.readHashFromLocation()
+    const h = this.readPathFromLocation()
     this.currentPage = h.page
     if (h.searchKeyword != null) {
       this.searchKeyword = h.searchKeyword
@@ -105,10 +105,10 @@ export default {
   },
   mounted() {
     this.fetchSiteTitle()
-    window.addEventListener('hashchange', this.onHashChange)
+    window.addEventListener('popstate', this.onPopState)
   },
   beforeUnmount() {
-    window.removeEventListener('hashchange', this.onHashChange)
+    window.removeEventListener('popstate', this.onPopState)
   },
   watch: {
     siteTitle(title) {
@@ -116,23 +116,28 @@ export default {
     }
   },
   methods: {
-    readHashFromLocation() {
-      const hash = (typeof window !== 'undefined' ? window.location.hash : '').replace(/^#/, '') || 'home'
-      const parts = hash.split('/').map(p => decodeURIComponent(p))
-      const page = parts[0] || 'home'
+    readPathFromLocation() {
+      const path = (typeof window !== 'undefined' ? window.location.pathname : '').replace(/^\//, '') || 'home'
+      const parts = path.split('/').map(p => decodeURIComponent(p))
+      let page = parts[0] || 'home'
+      let remainingParts = parts
+      if (page === 'home' && parts.length > 1) {
+        page = parts[1]
+        remainingParts = parts.slice(1)
+      }
       const validPages = ['home', 'about', 'news', 'notice', 'team', 'achievements', 'contact', 'search', 'detail']
       const res = { page: validPages.includes(page) ? page : 'home', searchKeyword: null, achievementsTab: null, detailType: '', detailId: null }
-      if (page === 'search' && parts[1]) res.searchKeyword = parts[1]
-      if (page === 'achievements' && parts[1]) res.achievementsTab = parts[1]
-      if (page === 'detail' && parts[1] && parts[2]) {
-        res.detailType = parts[1]
-        const n = parseInt(parts[2], 10)
+      if (page === 'search' && remainingParts[1]) res.searchKeyword = remainingParts[1]
+      if (page === 'achievements' && remainingParts[1]) res.achievementsTab = remainingParts[1]
+      if (page === 'detail' && remainingParts[1] && remainingParts[2]) {
+        res.detailType = remainingParts[1]
+        const n = parseInt(remainingParts[2], 10)
         res.detailId = isNaN(n) ? null : n
       }
       return res
     },
-    onHashChange() {
-      const h = this.readHashFromLocation()
+    onPopState() {
+      const h = this.readPathFromLocation()
       this.currentPage = h.page
       if (h.searchKeyword != null) {
         this.searchKeyword = h.searchKeyword
@@ -141,17 +146,17 @@ export default {
       if (h.achievementsTab != null) this.initialParams = { achievementsTab: h.achievementsTab }
       if (h.detailType) this.detailParams = { type: h.detailType, id: h.detailId }
     },
-    writeHash(page, params) {
+    writePath(page, params) {
       if (typeof window === 'undefined') return
-      let hash = page || 'home'
-      if (page === 'search' && params && params.q) hash += '/' + encodeURIComponent(params.q)
-      if (page === 'achievements' && params && params.tab) hash += '/' + encodeURIComponent(params.tab)
-      if (page === 'detail' && params && params.type != null && params.id != null) hash += '/' + encodeURIComponent(params.type) + '/' + params.id
-      window.location.hash = hash
+      let path = 'home/' + (page || 'home')
+      if (page === 'search' && params && params.q) path += '/' + encodeURIComponent(params.q)
+      if (page === 'achievements' && params && params.tab) path += '/' + encodeURIComponent(params.tab)
+      if (page === 'detail' && params && params.type != null && params.id != null) path += '/' + encodeURIComponent(params.type) + '/' + params.id
+      window.history.pushState({}, '', '/' + path)
     },
     async fetchSiteTitle() {
       try {
-        const res = await fetch(apiBase + '/api/config/site-title')
+        const res = await fetch(apiBase + '/config/site-title')
         const data = await res.json()
         if (data.code === 200 && data.data) {
           this.siteTitle = data.data
@@ -165,7 +170,7 @@ export default {
       if (page === 'detail' && params && (params.type != null && params.id != null)) {
         this.currentPage = 'detail'
         this.detailParams = { type: params.type, id: params.id }
-        this.writeHash('detail', { type: params.type, id: params.id })
+        this.writePath('detail', { type: params.type, id: params.id })
         return
       }
       this.currentPage = page
@@ -173,10 +178,10 @@ export default {
         this.initialParams = {
           achievementsTab: params.tab ?? params.achievementsTab ?? null
         }
-        this.writeHash(page, { tab: this.initialParams.achievementsTab })
+        this.writePath(page, { tab: this.initialParams.achievementsTab })
       } else {
         this.initialParams = { achievementsTab: null }
-        this.writeHash(page)
+        this.writePath(page)
       }
     },
     onSearchSubmit() {
@@ -184,39 +189,39 @@ export default {
       if (!q) return
       this.searchKeyword = q
       this.currentPage = 'search'
-      this.writeHash('search', { q })
+      this.writePath('search', { q })
     },
     onSearchKeyword(keyword) {
       this.searchKeyword = keyword
       this.searchQuery = keyword
       this.currentPage = 'search'
-      this.writeHash('search', { q: keyword })
+      this.writePath('search', { q: keyword })
     },
     onSearchGo(payload) {
       if (payload.page === 'detail' && payload.type != null && payload.id != null) {
         this.detailParams = { type: payload.type, id: payload.id }
         this.currentPage = 'detail'
-        this.writeHash('detail', { type: payload.type, id: payload.id })
+        this.writePath('detail', { type: payload.type, id: payload.id })
         return
       }
       this.initialParams = { achievementsTab: payload.tab ?? null }
       this.currentPage = payload.page
-      this.writeHash(payload.page, { tab: payload.tab })
+      this.writePath(payload.page, { tab: payload.tab })
     },
     onDetailBack(detailType) {
       if (detailType === 'news') {
         this.currentPage = 'news'
-        this.writeHash('news')
+        this.writePath('news')
       } else if (detailType === 'scholar') {
         this.currentPage = 'team'
-        this.writeHash('team')
+        this.writePath('team')
       } else if (['paper', 'project', 'award', 'direction'].includes(detailType)) {
         this.initialParams = { achievementsTab: detailType === 'award' ? 'award' : detailType }
         this.currentPage = 'achievements'
-        this.writeHash('achievements', { tab: this.initialParams.achievementsTab })
+        this.writePath('achievements', { tab: this.initialParams.achievementsTab })
       } else {
         this.currentPage = 'home'
-        this.writeHash('home')
+        this.writePath('home')
       }
     }
   }

@@ -15,7 +15,7 @@ import org.ychan.lablab.service.PaperPublicationService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/publication")
+@RequestMapping("/api/publication")
 @RequiredArgsConstructor
 public class PaperPublicationController extends BaseController {
 

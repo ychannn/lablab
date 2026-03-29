@@ -24,7 +24,7 @@ import java.util.List;
  * 管理员登录等
  */
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class AdminController {
 

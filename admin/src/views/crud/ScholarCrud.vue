@@ -234,7 +234,7 @@ export default {
         const token = (typeof localStorage !== "undefined" && localStorage.getItem("admin_token")) || ""
         const headers = {}
         if (token) headers["Authorization"] = "Bearer " + token
-        const res = await fetch(API_BASE + "/api/config/admin/upload", {
+        const res = await fetch(API_BASE + "/config/admin/upload", {
           method: "POST",
           headers,
           body: formData

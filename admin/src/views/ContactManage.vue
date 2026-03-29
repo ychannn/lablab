@@ -79,7 +79,7 @@ export default {
   methods: {
     async fetchContact() {
       try {
-        const data = await request('/api/config/contact')
+        const data = await request('/config/contact')
         if (data.code === 200 && data.data) Object.assign(this.form, data.data)
       } catch (e) {
         console.error(e)
@@ -88,7 +88,7 @@ export default {
     async save() {
       this.saving = true
       try {
-        const data = await request('/api/config/admin/contact', {
+        const data = await request('/config/admin/contact', {
           method: 'PUT',
           body: JSON.stringify(this.form)
         })

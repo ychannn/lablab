@@ -33,7 +33,7 @@ export default {
   methods: {
     async fetchTitle() {
       try {
-        const data = await request('/api/config/admin/site-title')
+        const data = await request('/config/admin/site-title')
         if (data.code === 200 && data.data != null) this.title = data.data
       } catch (e) {
         console.error(e)
@@ -42,7 +42,7 @@ export default {
     async save() {
       this.saving = true
       try {
-        const data = await request('/api/config/admin/site-title', {
+        const data = await request('/config/admin/site-title', {
           method: 'PUT',
           body: JSON.stringify({ title: this.title || '实验室网站' })
         })

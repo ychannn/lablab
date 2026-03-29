@@ -228,7 +228,7 @@ export default {
       const fd = new FormData()
       fd.append('file', file)
       try {
-        const res = await request('/api/config/admin/upload?type=news', { method: 'POST', body: fd })
+        const res = await request('/config/admin/upload?type=news', { method: 'POST', body: fd })
         if (res.code === 200 && res.data) {
           this.form.imageUrl = res.data
         } else {

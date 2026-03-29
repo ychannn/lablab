@@ -15,7 +15,7 @@ import org.ychan.lablab.service.LabNewsService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/lab-news")
+@RequestMapping("/api/lab-news")
 @RequiredArgsConstructor
 public class LabNewsController extends BaseController {
 

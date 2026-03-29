@@ -117,7 +117,7 @@ export default {
       try {
         const formData = new FormData()
         formData.append('file', file)
-        const data = await request('/api/config/admin/upload', { method: 'POST', body: formData })
+        const data = await request('/config/admin/upload', { method: 'POST', body: formData })
         if (data.code === 200 && data.data) this.form[field] = data.data
         else alert(data.message || '上传失败')
       } catch (err) {
@@ -134,7 +134,7 @@ export default {
       try {
         const formData = new FormData()
         formData.append('file', file)
-        const data = await request('/api/config/admin/upload', { method: 'POST', body: formData })
+        const data = await request('/config/admin/upload', { method: 'POST', body: formData })
         if (data.code === 200 && data.data) {
           const lines = this.photosText.trim() ? this.photosText.split('\n').map(s => s.trim()).filter(Boolean) : []
           lines.push(data.data)
@@ -148,7 +148,7 @@ export default {
     },
     async fetchIntro() {
       try {
-        const data = await request('/api/config/lab-intro')
+        const data = await request('/config/lab-intro')
         if (data.code === 200 && data.data) {
           Object.assign(this.form, data.data)
           this.researchAreasText = (this.form.researchAreas || []).join('\n')
@@ -165,7 +165,7 @@ export default {
       this.form.photos = this.photosText.split(/\n/).map(s => s.trim()).filter(Boolean)
       this.saving = true
       try {
-        const data = await request('/api/config/admin/lab-intro', {
+        const data = await request('/config/admin/lab-intro', {
           method: 'PUT',
           body: JSON.stringify(this.form)
         })

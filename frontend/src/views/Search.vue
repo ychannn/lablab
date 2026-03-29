@@ -109,7 +109,7 @@ export default {
       this.searched = true
       this.loading = true
       try {
-        const url = `${this.apiBase}/api/search/query?keyword=${encodeURIComponent(q)}&page=${this.result.page}&size=${this.result.size}`
+        const url = `${this.apiBase}/search/query?keyword=${encodeURIComponent(q)}&page=${this.result.page}&size=${this.result.size}`
         const res = await fetch(url)
         const data = await res.json()
         if (data.code === 200 && data.data) {

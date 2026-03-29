@@ -15,7 +15,7 @@ import org.ychan.lablab.service.AchievementService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/achievement")
+@RequestMapping("/api/achievement")
 @RequiredArgsConstructor
 public class AchievementController extends BaseController {
 

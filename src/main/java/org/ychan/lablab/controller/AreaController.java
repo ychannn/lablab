@@ -15,7 +15,7 @@ import org.ychan.lablab.service.AreaService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/area")
+@RequestMapping("/api/area")
 @RequiredArgsConstructor
 public class AreaController {
 

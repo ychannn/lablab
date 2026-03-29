@@ -94,7 +94,7 @@ export default {
     },
     async fetchLabIntro() {
       try {
-        const response = await fetch(apiBase + '/api/config/lab-intro')
+        const response = await fetch(apiBase + '/config/lab-intro')
         const data = await response.json()
         if (data.code === 200) {
           this.labIntro = data.data || {}
