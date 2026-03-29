@@ -254,7 +254,7 @@ export default {
     },
     bannerImageUrl(url) {
       if (!url) return ''
-      return url.startsWith('http') ? url : this.apiBase + url
+      return url.startsWith('http') ? url : url
     },
     prev() {
       if (this.bannerList.length <= 1) return
@@ -298,7 +298,7 @@ export default {
     },
     newsImageUrl(url) {
       if (!url) return ''
-      return url.startsWith('http') ? url : this.apiBase + (url.startsWith('/') ? '' : '') + url
+      return url.startsWith('http') ? url : url
     },
     newsPrev() {
       if (this.latestNews.length <= 1) return

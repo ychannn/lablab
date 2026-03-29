@@ -149,7 +149,7 @@ export default {
     },
     detailImageUrl(url) {
       if (!url) return ''
-      return url.startsWith('http') ? url : this.apiBase + (url.startsWith('/') ? '' : '/') + url
+      return url.startsWith('http') ? url : url
     },
     goBack() {
       this.$emit('back', this.type)

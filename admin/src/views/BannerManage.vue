@@ -69,7 +69,7 @@ export default {
   methods: {
     imageUrl(url) {
       if (!url) return ''
-      return url.startsWith('http') ? url : API_BASE + url
+      return url.startsWith('http') ? url : url
     },
     async fetchList() {
       try {

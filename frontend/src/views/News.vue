@@ -161,7 +161,7 @@ export default {
     },
     newsImageUrl(url) {
       if (!url) return ''
-      return url.startsWith('http') ? url : this.apiBase + (url.startsWith('/') ? '' : '/') + url
+      return url.startsWith('http') ? url : url
     },
     formatDate(dateString) {
       if (!dateString) return ''

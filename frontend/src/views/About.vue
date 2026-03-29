@@ -90,7 +90,7 @@ export default {
   methods: {
     imageUrl(url) {
       if (!url) return ''
-      return url.startsWith('http') ? url : apiBase + (url.startsWith('/') ? '' : '/') + url
+      return url.startsWith('http') ? url : url
     },
     async fetchLabIntro() {
       try {

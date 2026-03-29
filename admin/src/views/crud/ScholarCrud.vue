@@ -151,7 +151,7 @@ export default {
   methods: {
     imageUrl(url) {
       if (!url) return ""
-      return url.startsWith("http") ? url : API_BASE + url
+      return url.startsWith("http") ? url : url
     },
     areaName(id) { return this.areaList.find((a) => a.id === id)?.title ?? "领域" + (id || "") },
     async loadAreas() {

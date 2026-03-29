@@ -75,7 +75,7 @@ export default {
   methods: {
     imageUrl(url) {
       if (!url) return ''
-      return url.startsWith('http') ? url : this.apiBase + url
+      return url.startsWith('http') ? url : url
     },
     async loadAreas() {
       try {
