@@ -70,6 +70,10 @@
           </select>
         </div>
         <div class="form-group">
+          <label>邮箱</label>
+          <input v-model="form.email" type="email" class="form-input" placeholder="请输入邮箱地址" />
+        </div>
+        <div class="form-group">
           <label>照片</label>
           <div class="photo-upload">
             <input ref="photoInput" type="file" accept="image/*" class="hidden" @change="onPhotoChange" />
@@ -140,7 +144,7 @@ export default {
       areaList: [],
       rankOptions: [],
       filter: { keyword: "", areaId: 0, rank: 0 },
-      form: { name: "", areaId: 0, rank: 1, photo: "", introList: [], paperList: [], projectList: [] }
+      form: { name: "", areaId: 0, rank: 1, email: "", photo: "", introList: [], paperList: [], projectList: [] }
     }
   },
   mounted() {
@@ -191,7 +195,7 @@ export default {
     onResetFilter() { this.filter = { keyword: "", areaId: 0, rank: 0 }; this.load(1) },
     openAdd() {
       this.editId = null
-      this.form = { name: "", areaId: 0, rank: 1, photo: "", introList: [], paperList: [], projectList: [] }
+      this.form = { name: "", areaId: 0, rank: 1, email: "", photo: "", introList: [], paperList: [], projectList: [] }
       this.showModal = true
     },
     async openEdit(row) {
@@ -200,6 +204,7 @@ export default {
         name: row.name || "",
         areaId: row.area ?? row.areaId ?? 0,
         rank: row.rank ?? 0,
+        email: row.email || "",
         photo: row.photo || "",
         introList: [],
         paperList: [],
@@ -213,6 +218,7 @@ export default {
           this.form.name = d.name || this.form.name
           this.form.areaId = d.area ?? this.form.areaId
           this.form.rank = d.rank ?? this.form.rank
+          this.form.email = d.email || this.form.email
           this.form.photo = d.photo || this.form.photo
           this.form.introList = (d.intro || []).map(i => ({ content: i.content || "" }))
           this.form.paperList = (d.paperList || []).map(p => ({ content: p.content || "" }))
@@ -258,6 +264,7 @@ export default {
           name: this.form.name,
           areaId: this.form.areaId,
           rank: this.form.rank,
+          email: this.form.email || "",
           photo: this.form.photo || "",
           introList: (this.form.introList || []).filter(i => (i.content || "").trim() !== "").map(i => ({ content: (i.content || "").trim() })),
           paperList: (this.form.paperList || []).filter(p => (p.content || "").trim() !== "").map(p => ({ content: (p.content || "").trim() })),

@@ -20,8 +20,17 @@
           <div v-else-if="type === 'notice'" class="detail-content">{{ data.content }}</div>
           <!-- 师资 -->
           <template v-else-if="type === 'scholar'">
-            <div v-if="data.photo" class="scholar-photo">
-              <img :src="scholarPhotoUrl" alt="">
+            <div class="scholar-header">
+              <div v-if="data.photo" class="scholar-photo">
+                <img :src="scholarPhotoUrl" alt="">
+              </div>
+              <div class="scholar-info">
+                <h2 class="scholar-name">{{ data.name }}</h2>
+                <p v-if="data.rankLabel" class="scholar-title">{{ data.rankLabel }}</p>
+                <p v-if="getScholarEmail()" class="scholar-email">
+                  <span class="label">邮箱：</span>{{ getScholarEmail() }}
+                </p>
+              </div>
             </div>
             <div class="scholar-intro" v-if="data.intro && data.intro.length">
               <h4>个人简介</h4>
@@ -66,18 +75,19 @@ export default {
     scholarPhotoUrl() {
       if (this.type !== 'scholar' || !this.data || !this.data.photo) return ''
       const url = this.data.photo
-      return url.startsWith('http') ? url : this.apiBase + url
+      return url.startsWith('http') ? url : url
     },
     title() {
       if (!this.data) return ''
       if (this.type === 'news') return this.data.title || '新闻'
       if (this.type === 'notice') return this.data.title || '公告'
-      if (this.type === 'scholar') return this.data.name || '师资'
+      if (this.type === 'scholar') return ''
       if (this.type === 'direction') return this.data.title || '研究方向'
       return this.data.content || this.data.title || '详情'
     },
     meta() {
       if (!this.data) return ''
+      if (this.type === 'scholar') return ''
       if (this.type === 'news' && this.data.time) return this.formatDate(this.data.time)
       if (this.type === 'notice' && (this.data.time || this.data.createTime)) return this.formatDate(this.data.time || this.data.createTime)
       if (this.type === 'paper' && this.data.publishTime) return '发布时间：' + this.formatDate(this.data.publishTime)
@@ -150,6 +160,22 @@ export default {
     detailImageUrl(url) {
       if (!url) return ''
       return url.startsWith('http') ? url : url
+    },
+    getScholarEmail() {
+      if (!this.data) return ''
+      // 优先使用data.email字段
+      if (this.data.email && this.data.email.trim()) {
+        return this.data.email.trim()
+      }
+      // 兼容旧数据，从intro数组中提取邮箱
+      if (this.data.intro && this.data.intro.length) {
+        for (const item of this.data.intro) {
+          if (item.content && item.content.includes('邮箱：')) {
+            return item.content.replace('邮箱：', '').trim()
+          }
+        }
+      }
+      return ''
     },
     goBack() {
       this.$emit('back', this.type)
@@ -225,8 +251,15 @@ export default {
   white-space: pre-wrap;
 }
 
+.scholar-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
 .scholar-photo {
-  margin-bottom: 20px;
+  flex-shrink: 0;
 }
 
 .scholar-photo img {
@@ -235,6 +268,35 @@ export default {
   border-radius: 50%;
   object-fit: cover;
   background: #f5f5f5;
+}
+
+.scholar-info {
+  flex: 1;
+  padding-top: 8px;
+}
+
+.scholar-name {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+}
+
+.scholar-title {
+  font-size: 16px;
+  color: #2d9d78;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.scholar-email {
+  font-size: 14px;
+  color: #6b6b6b;
+  margin: 0;
+}
+
+.scholar-email .label {
+  color: #999;
 }
 
 .scholar-intro,
