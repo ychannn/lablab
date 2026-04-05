@@ -12,12 +12,12 @@
           <p v-if="meta" class="detail-meta">{{ meta }}</p>
         </div>
         <div class="detail-body">
-          <!-- 新闻（详情暂不展示图片） -->
+          <!-- 新闻 -->
           <div v-if="type === 'news'">
-            <div class="detail-content">{{ data.content }}</div>
+            <div class="detail-content" v-html="data.content"></div>
           </div>
           <!-- 公告 -->
-          <div v-else-if="type === 'notice'" class="detail-content">{{ data.content }}</div>
+          <div v-else-if="type === 'notice'" class="detail-content" v-html="data.content"></div>
           <!-- 师资 -->
           <template v-else-if="type === 'scholar'">
             <div class="scholar-header">
@@ -236,16 +236,24 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 24px;
+  margin: 0 auto 24px;
+  max-width: 800px;
+  justify-content: center;
 }
 
 .detail-images img {
   max-width: 100%;
   height: auto;
   max-height: 400px;
-  object-fit: contain;
-  border-radius: 8px;
-  border: 1px solid #e8e8e8;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.detail-images img:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .detail-content {
@@ -253,6 +261,104 @@ export default {
   line-height: 1.75;
   color: #2c3e50;
   white-space: pre-wrap;
+}
+
+.detail-content h1,
+.detail-content h2,
+.detail-content h3,
+.detail-content h4,
+.detail-content h5,
+.detail-content h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  font-weight: 600;
+  color: #1D2129;
+}
+
+.detail-content h1 {
+  font-size: 24px;
+}
+
+.detail-content h2 {
+  font-size: 20px;
+}
+
+.detail-content h3 {
+  font-size: 18px;
+}
+
+.detail-content h4 {
+  font-size: 16px;
+}
+
+.detail-content h5 {
+  font-size: 14px;
+}
+
+.detail-content h6 {
+  font-size: 12px;
+}
+
+.detail-content p {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+.detail-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.detail-content ul,
+.detail-content ol {
+  margin-top: 0;
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.detail-content li {
+  margin-bottom: 0.5em;
+}
+
+.detail-content a {
+  color: #165DFF;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.detail-content a:hover {
+  color: #0E46C3;
+  text-decoration: underline;
+}
+
+.detail-content blockquote {
+  border-left: 4px solid #165DFF;
+  padding-left: 1em;
+  margin: 1em 0;
+  color: #4E5969;
+  font-style: italic;
+}
+
+.detail-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.detail-content th,
+.detail-content td {
+  padding: 8px 12px;
+  border: 1px solid #E8EEFF;
+  text-align: left;
+}
+
+.detail-content th {
+  background-color: #F5F7FF;
+  font-weight: 600;
+  color: #1D2129;
 }
 
 .scholar-header {

@@ -82,7 +82,7 @@
         </div>
         <div class="form-group content-group">
           <label>内容</label>
-          <textarea v-model="form.content" class="form-input content-field" rows="8"></textarea>
+          <div class="form-input content-field" style="height: 400px;"></div>
         </div>
         <div class="form-group">
           <label>封面图（仅一张）</label>
@@ -112,6 +112,7 @@
 
 <script>
 import { request } from '../../api/auth'
+import Editor from 'wangeditor'
 
 export default {
   name: 'LabNewsCrud',
@@ -127,7 +128,8 @@ export default {
       saving: false,
       form: { title: '', content: '', time: '', imageUrl: '' },
       filter: { keyword: '', timeStartDate: '', timeStartTime: '', timeEndDate: '', timeEndTime: '' },
-      dtpOpen: null
+      dtpOpen: null,
+      editor: null
     }
   },
   computed: {
@@ -142,6 +144,17 @@ export default {
       return this.dateLabel(d)
     }
   },
+  watch: {
+    showModal(val) {
+      if (val) {
+        this.$nextTick(() => {
+          this.initEditor()
+        })
+      } else {
+        this.destroyEditor()
+      }
+    }
+  },
   mounted() {
     this.load(1)
     this.clickOutside = (e) => {
@@ -151,6 +164,7 @@ export default {
   },
   beforeDestroy() {
     document.removeEventListener('click', this.clickOutside)
+    this.destroyEditor()
   },
   methods: {
     openDatePicker(e) {
@@ -239,7 +253,97 @@ export default {
       }
       e.target.value = ''
     },
+    initEditor() {
+      const editorEl = document.querySelector('.content-field')
+      if (!editorEl) return
+      
+      this.editor = new Editor(editorEl)
+      
+      // 配置图片上传
+      this.editor.config.uploadImgServer = '/api/config/admin/upload?type=news'
+      this.editor.config.uploadFileName = 'file'
+      // 添加认证token
+      const token = localStorage.getItem('admin_token')
+      if (token) {
+        this.editor.config.uploadImgHeaders = {
+          'Authorization': 'Bearer ' + token
+        }
+      }
+      this.editor.config.uploadImgMaxSize = 5 * 1024 * 1024 // 5MB
+      this.editor.config.uploadImgMaxLength = 10 // 最多上传10张
+      // 自定义上传方法，适配后端响应格式
+      this.editor.config.customUploadImg = function (resultFiles, insertImgFn) {
+        const token = localStorage.getItem('admin_token')
+        resultFiles.forEach(file => {
+          const formData = new FormData()
+          formData.append('file', file)
+          
+          fetch('/api/config/admin/upload?type=news', {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + token
+            },
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.code === 200 && data.data) {
+              // 上传成功，调用 insertImgFn 插入图片
+              insertImgFn(data.data)
+            } else {
+              alert('上传失败：' + (data.message || '未知错误'))
+            }
+          })
+          .catch(error => {
+            console.error('上传失败:', error)
+            alert('上传失败：网络错误')
+          })
+        })
+      }
+      
+      // 配置菜单
+      this.editor.config.menus = [
+        'head', // 标题
+        'bold', // 粗体
+        'fontSize', // 字号
+        'fontName', // 字体
+        'italic', // 斜体
+        'underline', // 下划线
+        'strikeThrough', // 删除线
+        'foreColor', // 文字颜色
+        'backColor', // 背景颜色
+        'link', // 插入链接
+        'list', // 列表
+        'justify', // 对齐方式
+        'quote', // 引用
+        'emoticon', // 表情
+        'image', // 插入图片
+        'table', // 表格
+        'code', // 代码
+        'undo', // 撤销
+        'redo' // 重做
+      ]
+      
+      // 初始化编辑器
+      this.editor.create()
+      
+      // 设置内容
+      if (this.form.content) {
+        this.editor.txt.html(this.form.content)
+      }
+    },
+    destroyEditor() {
+      if (this.editor) {
+        this.editor.destroy()
+        this.editor = null
+      }
+    },
     async submit() {
+      // 获取编辑器内容
+      if (this.editor) {
+        this.form.content = this.editor.txt.html()
+      }
+      
       this.saving = true
       try {
         const payload = {

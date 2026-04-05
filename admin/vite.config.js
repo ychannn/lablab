@@ -7,6 +7,18 @@ export default defineConfig({
   base: '/admin/',
   server: {
     port: 5174,
-    host: true
+    host: true,
+    proxy: {
+      // 代理 API 请求
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      // 代理上传文件请求
+      '/uploads': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      }
+    }
   }
 })
