@@ -23,10 +23,10 @@ public class EmailServiceImpl implements EmailService {
     private String from;
 
     @Override
-    public void sendVerificationCode(String to, String code) {
+    public boolean sendVerificationCode(String to, String code) {
         if (mailSender == null || from == null || from.isBlank()) {
-            log.info("[邮件模拟] 验证码已“发送”到 {}，验证码：{}（未配置 SMTP，仅打印到控制台）", to, code);
-            return;
+            log.info("[邮件模拟] 验证码已'发送'到 {}，验证码：{}（未配置 SMTP，仅打印到控制台）", to, code);
+            return false;
         }
         try {
             SimpleMailMessage message = new SimpleMailMessage();
@@ -36,9 +36,11 @@ public class EmailServiceImpl implements EmailService {
             message.setText("您的验证码是：" + code + "，10分钟内有效。如非本人操作请忽略。");
             mailSender.send(message);
             log.info("[SMTP 已发] 验证码邮件已发送至 {}（发件人：{}）", to, from);
+            return true;
         } catch (Exception e) {
             log.warn("发送验证码邮件失败，改为打印到控制台。to={}, code={}, 错误: {}", to, code, e.getMessage(), e);
             log.info("[邮件模拟] 验证码：{}（原因：{}）", code, e.getMessage());
+            return false;
         }
     }
 }

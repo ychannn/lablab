@@ -62,7 +62,13 @@
           <button type="button" class="btn btn-secondary" @click="$refs.photosInput.click()">上传图片（可多张）</button>
           <span v-if="uploadingPhotos" class="upload-status">上传中…</span>
         </div>
-        <textarea v-model="photosText" class="form-textarea photos-list" rows="3" placeholder="上传后图片地址会显示在此，每行一张"></textarea>
+        <div v-if="form.photos && form.photos.length" class="photos-preview">
+          <div v-for="(photo, index) in form.photos" :key="index" class="photo-preview-item">
+            <img :src="imageUrl(photo)" alt="实验室图片" class="photo-preview-img" />
+            <button type="button" class="btn btn-remove" @click="removePhoto(index)">删除</button>
+          </div>
+        </div>
+        <p v-else class="empty-photos">暂无实验室图片，请点击上传按钮添加</p>
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn-primary" :disabled="saving" @click="save">{{ saving ? '保存中…' : '保存' }}</button>
@@ -93,7 +99,6 @@ export default {
       },
       researchAreasText: '',
       honorsText: '',
-      photosText: '',
       saving: false,
       uploadingLogo: false,
       uploadingLeader: false,
@@ -136,9 +141,10 @@ export default {
         formData.append('file', file)
         const data = await request('/config/admin/upload', { method: 'POST', body: formData })
         if (data.code === 200 && data.data) {
-          const lines = this.photosText.trim() ? this.photosText.split('\n').map(s => s.trim()).filter(Boolean) : []
-          lines.push(data.data)
-          this.photosText = lines.join('\n')
+          if (!this.form.photos) {
+            this.form.photos = []
+          }
+          this.form.photos.push(data.data)
         } else alert(data.message || '上传失败')
       } catch (err) {
         alert(err.message || '上传失败')
@@ -153,16 +159,23 @@ export default {
           Object.assign(this.form, data.data)
           this.researchAreasText = (this.form.researchAreas || []).join('\n')
           this.honorsText = (this.form.honors || []).join('\n')
-          this.photosText = (this.form.photos || []).join('\n')
         }
       } catch (e) {
         console.error(e)
       }
     },
+    removePhoto(index) {
+      if (confirm('确定要删除这张图片吗？')) {
+        this.form.photos.splice(index, 1)
+      }
+    },
     async save() {
       this.form.researchAreas = this.researchAreasText.split(/\n/).map(s => s.trim()).filter(Boolean)
       this.form.honors = this.honorsText.split(/\n/).map(s => s.trim()).filter(Boolean)
-      this.form.photos = this.photosText.split(/\n/).map(s => s.trim()).filter(Boolean)
+      // 确保photos是数组
+      if (!this.form.photos) {
+        this.form.photos = []
+      }
       this.saving = true
       try {
         const data = await request('/config/admin/lab-intro', {
@@ -218,4 +231,45 @@ export default {
 .upload-status { font-size: 14px; color: #666; }
 .thumb-wrap .thumb-img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #e8e8e8; }
 .photos-list { margin-top: 8px; }
+.photos-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0;
+}
+.photo-preview-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.photo-preview-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+}
+.btn-remove {
+  padding: 4px 12px;
+  background: #f5222d;
+  color: #fff;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-remove:hover {
+  background: #ff4d4f;
+}
+.empty-photos {
+  color: #666;
+  font-size: 14px;
+  margin: 12px 0;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  text-align: center;
+}
 </style>

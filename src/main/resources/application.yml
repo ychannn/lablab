@@ -9,14 +9,18 @@ app:
 # 真正发邮件时：1) 复制 mail-credentials.properties.example 为 mail-credentials.properties 并填写
 # 2) 取消上面 app.mail-credentials-file 的注释  3) 取消下面 spring.mail 的注释（仅 host/port，无账号密码）
 spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
   mail:
-    host: smtp.163.com
+    host: smtp.126.com
     port: 465
     properties: { mail.smtp.auth: true, mail.smtp.ssl.enable: true }
   datasource:
-    url: jdbc:mysql://localhost:4406/lab?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/lab?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root # 你的数据库用户名
-    password: edraqwq1 # 你的数据库密码
+    password: GW@gdufs60 # 你的数据库密码
     driver-class-name: com.mysql.cj.jdbc.Driver
   # Elasticsearch 配置（已禁用）
   # elasticsearch:

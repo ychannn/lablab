@@ -2,6 +2,7 @@ package org.ychan.lablab.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.ychan.lablab.common.constant.AdminConstants;
 import org.ychan.lablab.common.constant.CommonConstants;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminServiceImpl implements AdminService {
 
     private final AdminMapper adminMapper;
@@ -260,7 +262,10 @@ public class AdminServiceImpl implements AdminService {
         String value = admin.getId() + ":" + code;
         RBucket<String> bucket = redissonClient.getBucket(key);
         bucket.set(value, Duration.ofSeconds(AdminConstants.EMAIL_CODE_EXPIRE_SECONDS));
-        emailService.sendVerificationCode(email, code);
+        boolean sent = emailService.sendVerificationCode(email, code);
+        if (!sent) {
+            log.info("验证码已生成但邮件发送失败，验证码：{}（请查看控制台日志获取验证码）", code);
+        }
     }
 
     @Override
@@ -298,7 +303,10 @@ public class AdminServiceImpl implements AdminService {
         String value = admin.getId() + ":" + code;
         RBucket<String> bucket = redissonClient.getBucket(key);
         bucket.set(value, Duration.ofSeconds(AdminConstants.EMAIL_CODE_EXPIRE_SECONDS));
-        emailService.sendVerificationCode(email, code);
+        boolean sent = emailService.sendVerificationCode(email, code);
+        if (!sent) {
+            log.info("验证码已生成但邮件发送失败，验证码：{}（请查看控制台日志获取验证码）", code);
+        }
     }
 
     @Override
@@ -339,7 +347,10 @@ public class AdminServiceImpl implements AdminService {
         String value = admin.getId() + ":" + code;
         RBucket<String> bucket = redissonClient.getBucket(key);
         bucket.set(value, Duration.ofSeconds(AdminConstants.EMAIL_CODE_EXPIRE_SECONDS));
-        emailService.sendVerificationCode(email, code);
+        boolean sent = emailService.sendVerificationCode(email, code);
+        if (!sent) {
+            log.info("验证码已生成但邮件发送失败，验证码：{}（请查看控制台日志获取验证码）", code);
+        }
     }
 
     @Override

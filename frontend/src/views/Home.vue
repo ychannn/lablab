@@ -5,11 +5,11 @@
       <div class="banner-track" :style="trackStyle">
         <div v-for="(item, index) in bannerList" :key="index" class="banner-item">
           <a v-if="item.link" :href="item.link" class="banner-link" target="_blank" rel="noopener">
-            <div class="banner-bg" :style="{ backgroundImage: 'url(' + bannerImageUrl(item.imageUrl) + ')' }"></div>
+            <img :src="bannerImageUrl(item.imageUrl)" class="banner-img" alt="">
             <div v-if="item.title" class="banner-caption">{{ item.title }}</div>
           </a>
           <template v-else>
-            <div class="banner-bg" :style="{ backgroundImage: 'url(' + bannerImageUrl(item.imageUrl) + ')' }"></div>
+            <img :src="bannerImageUrl(item.imageUrl)" class="banner-img" alt="">
             <div v-if="item.title" class="banner-caption">{{ item.title }}</div>
           </template>
         </div>
@@ -191,15 +191,14 @@ export default {
       }
     },
     labIntroImageUrl() {
-      const base = this.apiBase
       const photos = this.labIntro.photos
       if (photos && photos.length) {
         const url = photos[0]
-        return url && (url.startsWith('http') ? url : base + (url.startsWith('/') ? '' : '/') + url)
+        return url && (url.startsWith('http') ? url : url)
       }
       if (this.labIntro.logo) {
         const url = this.labIntro.logo
-        return url.startsWith('http') ? url : base + (url.startsWith('/') ? '' : '/') + url
+        return url.startsWith('http') ? url : url
       }
       return ''
     }
@@ -372,15 +371,14 @@ export default {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.banner-bg {
+.banner-img {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-size: cover;
-  background-position: center;
-  filter: brightness(0.7);
+  object-fit: cover;
+  filter: brightness(0.9);
 }
 
 .banner-arrow {
