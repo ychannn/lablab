@@ -86,7 +86,7 @@
         </div>
         <div class="form-group">
           <label>时间</label>
-          <input v-model="form.time" type="datetime-local" class="form-input" />
+          <input v-model="form.time" type="date" class="form-input" />
         </div>
         <div class="modal-footer">
           <button type="button" class="btn" @click="showModal = false">取消</button>
@@ -191,7 +191,7 @@ export default {
     },
     openAdd() {
       this.editId = null
-      this.form = { title: '', content: '', time: new Date().toISOString().slice(0, 16) }
+      this.form = { title: '', content: '', time: new Date().toISOString().slice(0, 10) }
       this.showModal = true
     },
     openEdit(row) {
@@ -200,7 +200,7 @@ export default {
       this.form = {
         title: row.title || '',
         content: row.content || '',
-        time: timeStr ? String(timeStr).slice(0, 16) : ''
+        time: timeStr ? String(timeStr).slice(0, 10) : ''
       }
       this.showModal = true
     },
@@ -210,7 +210,7 @@ export default {
         const payload = {
           title: this.form.title,
           content: this.form.content,
-          time: this.form.time ? this.form.time + ':00' : null
+          time: this.form.time || null
         }
         if (this.editId) {
           payload.id = this.editId

@@ -74,7 +74,7 @@
         </div>
         <div class="form-group">
           <label>发表时间</label>
-          <input v-model="form.publishTime" type="datetime-local" class="form-input" />
+          <input v-model="form.publishTime" type="date" class="form-input" />
         </div>
         <div class="modal-footer">
           <button type="button" class="btn" @click="showModal = false">取消</button>
@@ -156,18 +156,18 @@ export default {
     },
     openAdd() {
       this.editId = null
-      this.form = { content: '', publishTime: new Date().toISOString().slice(0, 16) }
+      this.form = { content: '', publishTime: new Date().toISOString().slice(0, 10) }
       this.showModal = true
     },
     openEdit(row) {
       this.editId = row.id
-      this.form = { content: row.content || '', publishTime: (row.publishTime || '').slice(0, 16) }
+      this.form = { content: row.content || '', publishTime: (row.publishTime || '').slice(0, 10) }
       this.showModal = true
     },
     async submit() {
       this.saving = true
       try {
-        const payload = { content: this.form.content, publishTime: this.form.publishTime ? this.form.publishTime + ':00' : null }
+        const payload = { content: this.form.content, publishTime: this.form.publishTime || null }
         if (this.editId) {
           payload.id = this.editId
           await request('/publication/update', { method: 'PUT', body: JSON.stringify(payload) })

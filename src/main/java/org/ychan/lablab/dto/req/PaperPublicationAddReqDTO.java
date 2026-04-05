@@ -2,7 +2,7 @@ package org.ychan.lablab.dto.req;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 public class PaperPublicationAddReqDTO {
@@ -10,7 +10,7 @@ public class PaperPublicationAddReqDTO {
     /**
      * 发表时间
      */
-    private LocalDateTime publishTime;
+    private LocalDate publishTime;
 
     /**
      * 内容

@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.ychan.lablab.entity.news.LabNews;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class LabNewsRespDTO {
     private Integer id;
     private String title;
     private String content;
-    private LocalDateTime time;
+    private LocalDate time;
 
     /**
      * 封面图 URL（单张）

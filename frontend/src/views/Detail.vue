@@ -155,7 +155,11 @@ export default {
     },
     formatDate(v) {
       if (!v) return ''
-      return new Date(v).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+      const date = new Date(v)
+      const year = date.getFullYear()
+      const month = date.getMonth() + 1
+      const day = date.getDate()
+      return `${year}年${month}月${day}日`
     },
     detailImageUrl(url) {
       if (!url) return ''

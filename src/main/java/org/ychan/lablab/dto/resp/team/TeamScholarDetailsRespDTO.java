@@ -59,5 +59,10 @@ public class TeamScholarDetailsRespDTO {
      */
     private String photo;
 
+    /**
+     * 邮箱
+     */
+    private String email;
+
 
 }

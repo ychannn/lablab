@@ -102,8 +102,8 @@
       <div class="modal">
         <h3>{{ editId ? "编辑" : "新增" }}课题项目</h3>
         <div class="form-group content-group"><label>内容</label><textarea v-model="form.content" class="form-input content-field" rows="8"></textarea></div>
-        <div class="form-group"><label>开始时间</label><input v-model="form.startTime" type="datetime-local" class="form-input" /></div>
-        <div class="form-group"><label>结束时间</label><input v-model="form.endTime" type="datetime-local" class="form-input" /></div>
+        <div class="form-group"><label>开始时间</label><input v-model="form.startTime" type="date" class="form-input" /></div>
+        <div class="form-group"><label>结束时间</label><input v-model="form.endTime" type="date" class="form-input" /></div>
         <div class="modal-footer">
           <button type="button" class="btn" @click="showModal = false">取消</button>
           <button type="button" class="btn btn-primary" :disabled="saving" @click="submit">{{ saving ? "保存中…" : "保存" }}</button>
@@ -182,19 +182,19 @@ export default {
     },
     openAdd() {
       this.editId = null
-      const now = new Date().toISOString().slice(0, 16)
+      const now = new Date().toISOString().slice(0, 10)
       this.form = { content: "", startTime: now, endTime: now }
       this.showModal = true
     },
     openEdit(row) {
       this.editId = row.id
-      this.form = { content: row.content || "", startTime: (row.startTime || "").slice(0, 16), endTime: (row.endTime || "").slice(0, 16) }
+      this.form = { content: row.content || "", startTime: (row.startTime || "").slice(0, 10), endTime: (row.endTime || "").slice(0, 10) }
       this.showModal = true
     },
     async submit() {
       this.saving = true
       try {
-        const payload = { content: this.form.content, startTime: this.form.startTime ? this.form.startTime + ":00" : null, endTime: this.form.endTime ? this.form.endTime + ":00" : null }
+        const payload = { content: this.form.content, startTime: this.form.startTime || null, endTime: this.form.endTime || null }
         if (this.editId) { payload.id = this.editId; await request("/topic-project/update", { method: "PUT", body: JSON.stringify(payload) }) }
         else { await request("/topic-project/add", { method: "POST", body: JSON.stringify(payload) }) }
         this.showModal = false

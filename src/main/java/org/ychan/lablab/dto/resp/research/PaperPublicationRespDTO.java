@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.ychan.lablab.entity.science.PaperPublication;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,7 +18,7 @@ public class PaperPublicationRespDTO {
     /**
      * 发表时间
      */
-    private LocalDateTime publishTime;
+    private LocalDate publishTime;
 
     /**
      * 内容

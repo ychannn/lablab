@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.ychan.lablab.entity.science.TopicProject;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -22,12 +23,12 @@ public class TopicProjectRespDTO {
     /**
      * 开始时间
      */
-    private LocalDateTime startTime;
+    private LocalDate startTime;
 
     /**
      * 结束时间
      */
-    private LocalDateTime endTime;
+    private LocalDate endTime;
 
     /**
      * 创建时间

@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import org.ychan.lablab.entity.team.BaseEntity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @TableName("t_paper_publication")
@@ -20,7 +20,7 @@ public class PaperPublication extends BaseEntity {
     /**
      * 发表时间
      */
-    private LocalDateTime publishTime;
+    private LocalDate publishTime;
 
     /**
      * 内容

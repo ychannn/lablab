@@ -165,11 +165,10 @@ export default {
     formatDate(dateString) {
       if (!dateString) return ''
       const date = new Date(dateString)
-      return date.toLocaleDateString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      })
+      const year = date.getFullYear()
+      const month = date.getMonth() + 1
+      const day = date.getDate()
+      return `${year}年${month}月${day}日`
     }
   }
 }

@@ -2,7 +2,7 @@ package org.ychan.lablab.dto.req;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 public class TopicProjectAddReqDTO {
@@ -15,11 +15,11 @@ public class TopicProjectAddReqDTO {
     /**
      * 开始时间
      */
-    private LocalDateTime startTime;
+    private LocalDate startTime;
 
     /**
      * 结束时间
      */
-    private LocalDateTime endTime;
+    private LocalDate endTime;
 }
 

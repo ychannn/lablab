@@ -2,6 +2,7 @@ package org.ychan.lablab.dto.resp.news;
 
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -25,7 +26,7 @@ public class NoticeRespDTO {
     /**
      * 时间
      */
-    private LocalDateTime time;
+    private LocalDate time;
 
     /**
      * 创建时间

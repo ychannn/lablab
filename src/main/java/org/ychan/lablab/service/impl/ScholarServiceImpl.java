@@ -120,6 +120,7 @@ public class ScholarServiceImpl extends ServiceImpl<ScholarMapper, Scholar> impl
         resp.setRank(scholar.getTitle());
         resp.setRankLabel(ScholarRankEnum.getLabelByCode(scholar.getTitle()));
         resp.setPhoto(scholar.getPhoto());
+        resp.setEmail(scholar.getEmail());
         List<Intro> introList = introMapper.selectList(new LambdaQueryWrapper<>(Intro.class)
                 .eq(Intro::getScholarId, id));
         List<Paper> paperList = paperMapper.selectList(new LambdaQueryWrapper<>(Paper.class)

@@ -76,7 +76,8 @@ public class HomeController {
             dto.setId(award.getId());
             dto.setType("award");
             dto.setTitle(award.getContent());
-            dto.setTime(award.getCreateTime());
+            // 将LocalDateTime转换为LocalDate
+            dto.setTime(award.getCreateTime() != null ? award.getCreateTime().toLocalDate() : null);
             achievementList.add(dto);
         }
 
@@ -192,7 +193,7 @@ public class HomeController {
         private Integer id;
         private String type; // paper, project, award
         private String title;
-        private java.time.LocalDateTime time;
+        private java.time.LocalDate time;
 
         public Integer getId() {
             return id;
@@ -218,11 +219,11 @@ public class HomeController {
             this.title = title;
         }
 
-        public java.time.LocalDateTime getTime() {
+        public java.time.LocalDate getTime() {
             return time;
         }
 
-        public void setTime(java.time.LocalDateTime time) {
+        public void setTime(java.time.LocalDate time) {
             this.time = time;
         }
     }
@@ -233,7 +234,7 @@ public class HomeController {
     public static class HomeNewsItemDTO {
         private Integer id;
         private String title;
-        private java.time.LocalDateTime time;
+        private java.time.LocalDate time;
         private String imageUrl;
         private String contentSnippet;
 
@@ -241,8 +242,8 @@ public class HomeController {
         public void setId(Integer id) { this.id = id; }
         public String getTitle() { return title; }
         public void setTitle(String title) { this.title = title; }
-        public java.time.LocalDateTime getTime() { return time; }
-        public void setTime(java.time.LocalDateTime time) { this.time = time; }
+        public java.time.LocalDate getTime() { return time; }
+        public void setTime(java.time.LocalDate time) { this.time = time; }
         public String getImageUrl() { return imageUrl; }
         public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
         public String getContentSnippet() { return contentSnippet; }

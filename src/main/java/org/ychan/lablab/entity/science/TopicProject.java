@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import org.ychan.lablab.entity.team.BaseEntity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @TableName("t_topic_project")
@@ -25,11 +25,11 @@ public class TopicProject extends BaseEntity {
     /**
      * 开始时间
      */
-    private LocalDateTime startTime;
+    private LocalDate startTime;
 
     /**
      * 结束时间
      */
-    private LocalDateTime endTime;
+    private LocalDate endTime;
 }
 

@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import org.ychan.lablab.entity.team.BaseEntity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @TableName("t_lab_news")
@@ -30,7 +30,7 @@ public class LabNews extends BaseEntity {
     /**
      * 时间
      */
-    private LocalDateTime time;
+    private LocalDate time;
 
     /**
      * 封面图 URL（单张），如 /uploads/news/xx.jpg
