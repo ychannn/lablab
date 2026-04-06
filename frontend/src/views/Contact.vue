@@ -82,7 +82,7 @@ export default {
 .contact {
   min-height: 80vh;
   padding: 64px 0 80px;
-  background-color: #f6faf8;
+  background-color: #f5f7ff;
 }
 
 .page-title {
@@ -103,8 +103,9 @@ export default {
 .contact-info {
   background-color: #fff;
   border-radius: 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   padding: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .section-title {
@@ -112,13 +113,24 @@ export default {
   font-weight: 600;
   margin-bottom: 28px;
   color: #2c3e50;
-  border-bottom: 1px solid #dde8e4;
+  border-bottom: 2px solid #d6e0f0;
   padding-bottom: 12px;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #d6e0f0, transparent);
 }
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 24px;
 }
 
@@ -126,30 +138,60 @@ export default {
   display: flex;
   align-items: flex-start;
   gap: 16px;
+  padding: 20px;
+  background-color: #f9faff;
+  border-radius: 8px;
+  border: 1px solid #e8eeff;
+  transition: all 0.3s ease;
+}
+
+.info-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .info-icon {
-  font-size: 22px;
+  font-size: 24px;
   flex-shrink: 0;
   margin-top: 2px;
+  color: #5a6c7d;
 }
 
 .info-details h4 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   margin-bottom: 6px;
   color: #2c3e50;
+  display: flex;
+  align-items: center;
+}
+
+.info-details h4::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, #d6e0f0, transparent);
+  margin-left: 12px;
 }
 
 .info-details p {
   font-size: 14px;
   color: #5a6c7d;
   margin: 0;
+  line-height: 1.5;
 }
 
 @media (max-width: 768px) {
   .info-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .contact-info {
+    padding: 24px;
+  }
+  
+  .info-details h4::after {
+    display: none;
   }
 }
 </style>

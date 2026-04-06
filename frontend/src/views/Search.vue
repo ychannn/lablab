@@ -187,7 +187,7 @@ export default {
 .search-page {
   min-height: 80vh;
   padding: 48px 0 80px;
-  background-color: #f6faf8;
+  background-color: #f5f7ff;
 }
 
 .search-header {
@@ -213,7 +213,7 @@ export default {
 .search-input {
   flex: 1;
   padding: 14px 18px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e8eeff;
   border-radius: 8px;
   font-size: 15px;
   outline: none;
@@ -221,30 +221,32 @@ export default {
 }
 
 .search-input:focus {
-  border-color: #2d9d78;
+  border-color: #165DFF;
 }
 
 .search-btn {
   padding: 14px 28px;
-  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
-  color: #fff;
-  border: none;
+  background: #f5f7ff;
+  color: #2c3e50;
+  border: 1px solid #d6e0f0;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
 }
 
 .search-btn:hover {
-  opacity: 0.9;
+  background: #e8eeff;
+  border-color: #b8c6d9;
 }
 
 .search-result {
   background-color: #fff;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   border-radius: 12px;
   padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .no-result,
@@ -280,22 +282,24 @@ export default {
 }
 
 .result-item:hover {
-  background-color: #f0f7f4;
+  background-color: #f0f7ff;
   margin: 0 -16px;
   padding-left: 16px;
   padding-right: 16px;
+  border-radius: 8px;
 }
 
 .item-type {
   flex-shrink: 0;
-  width: 56px;
-  padding: 4px 8px;
-  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
-  color: #fff;
+  padding: 2px 8px;
   font-size: 12px;
   font-weight: 500;
-  border-radius: 4px;
+  color: #5a6c7d;
   text-align: center;
+  border-right: 1px solid #e8eeff;
+  margin-right: 12px;
+  padding-right: 12px;
+  min-width: 40px;
 }
 
 .item-body {
@@ -324,11 +328,12 @@ export default {
 
 .item-title :deep(.search-highlight),
 .item-content :deep(.search-highlight) {
-  background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+  background: linear-gradient(135deg, #e8f0ff 0%, #d6e4ff 100%);
   padding: 0 2px;
   border-radius: 2px;
   font-style: normal;
   font-weight: 600;
+  color: #165DFF;
 }
 
 .item-time {
@@ -343,12 +348,12 @@ export default {
   gap: 16px;
   margin-top: 28px;
   padding-top: 24px;
-  border-top: 1px solid #dde8e4;
+  border-top: 1px solid #e8eeff;
 }
 
 .pagination button {
   padding: 10px 18px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   background: #fff;
   border-radius: 6px;
   cursor: pointer;
@@ -358,8 +363,8 @@ export default {
 }
 
 .pagination button:hover:not(:disabled) {
-  border-color: #2d9d78;
-  color: #2d9d78;
+  border-color: #165DFF;
+  color: #165DFF;
 }
 
 .pagination button:disabled {

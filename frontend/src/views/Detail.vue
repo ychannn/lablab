@@ -192,7 +192,7 @@ export default {
 .detail-page {
   min-height: 80vh;
   padding: 48px 0 80px;
-  background-color: #f6faf8;
+  background-color: #f5f7ff;
 }
 
 .loading,
@@ -226,7 +226,7 @@ export default {
 
 .detail-body {
   background: #fff;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   border-radius: 12px;
   padding: 32px;
   margin-bottom: 24px;
@@ -324,18 +324,18 @@ export default {
 }
 
 .detail-content a {
-  color: #165DFF;
+  color: #5a6c7d;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .detail-content a:hover {
-  color: #0E46C3;
+  color: #2c3e50;
   text-decoration: underline;
 }
 
 .detail-content blockquote {
-  border-left: 4px solid #165DFF;
+  border-left: 4px solid #d6e0f0;
   padding-left: 1em;
   margin: 1em 0;
   color: #4E5969;
@@ -394,7 +394,7 @@ export default {
 
 .scholar-title {
   font-size: 16px;
-  color: #2d9d78;
+  color: #5a6c7d;
   margin: 0 0 8px 0;
   font-weight: 500;
 }
@@ -440,17 +440,18 @@ export default {
 
 .back-btn {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
-  color: #fff;
-  border: none;
+  background: #fff;
+  color: #5a6c7d;
+  border: 1px solid #e8eeff;
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: border-color 0.2s, color 0.2s;
 }
 
 .back-btn:hover {
-  opacity: 0.9;
+  border-color: #d6e0f0;
+  color: #2c3e50;
 }
 </style>

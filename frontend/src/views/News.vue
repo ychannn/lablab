@@ -50,14 +50,16 @@
           class="news-item"
           @click="goToDetail(news.id)"
         >
-          <div v-if="news.imageUrl" class="news-thumb">
-            <img :src="newsImageUrl(news.imageUrl)" alt="" />
+          <div class="news-content-wrapper">
+            <div v-if="news.imageUrl" class="news-thumb">
+              <img :src="newsImageUrl(news.imageUrl)" alt="" />
+            </div>
+            <div class="news-content">
+              <h3 class="news-title">{{ news.title }}</h3>
+              <p class="news-summary">{{ getPlainTextSummary(news.content) }}</p>
+            </div>
           </div>
           <div class="news-date">{{ formatDate(news.time) }}</div>
-          <div class="news-content">
-            <h3 class="news-title">{{ news.title }}</h3>
-            <p class="news-summary">{{ (news.content || '').substring(0, 150) }}{{ (news.content || '').length > 150 ? '...' : '' }}</p>
-          </div>
         </div>
       </div>
       <div class="pagination" v-if="newsTotal > 0">
@@ -170,6 +172,18 @@ export default {
       const month = date.getMonth() + 1
       const day = date.getDate()
       return `${year}年${month}月${day}日`
+    },
+    getPlainTextSummary(html) {
+      if (!html) return ''
+      // 创建一个临时元素来解析HTML
+      const tempElement = document.createElement('div')
+      tempElement.innerHTML = html
+      // 提取纯文本
+      const plainText = tempElement.textContent || tempElement.innerText || ''
+      // 去除多余的空白字符
+      const cleanText = plainText.replace(/\s+/g, ' ').trim()
+      // 截取前150个字符作为摘要
+      return cleanText.substring(0, 150) + (cleanText.length > 150 ? '...' : '')
     }
   }
 }
@@ -179,7 +193,7 @@ export default {
 .news {
   min-height: 80vh;
   padding: 64px 0 80px;
-  background-color: #f6faf8;
+  background-color: #f5f7ff;
 }
 
 .page-title {
@@ -196,7 +210,7 @@ export default {
   padding: 16px 20px;
   background: #fff;
   border-radius: 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 .filter-row {
@@ -210,31 +224,31 @@ export default {
 .filter-label.time-label { margin-left: 4px; }
 .filter-input {
   padding: 10px 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   border-radius: 8px;
   font-size: 14px;
 }
 .filter-input:focus {
   outline: none;
-  border-color: #2d9d78;
+  border-color: #d6e0f0;
 }
 .filter-input-text { min-width: 160px; }
 .filter-time-group { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .filter-sep { font-size: 13px; color: #8a9ba8; }
-.date-only-wrap { position: relative; padding: 8px 12px; border: 1px solid #dde8e4; border-radius: 8px; height: 42px; display: flex; align-items: center; cursor: pointer; margin-bottom: 12px; }
+.date-only-wrap { position: relative; padding: 8px 12px; border: 1px solid #e8eeff; border-radius: 8px; height: 42px; display: flex; align-items: center; cursor: pointer; margin-bottom: 12px; }
 .date-only-text { color: #2c3e50; font-size: 14px; pointer-events: none; }
 .date-only-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1; font-size: 16px; }
 .dt-wrap { position: relative; display: inline-block; }
-.dt-trigger { display: inline-flex; align-items: center; gap: 4px; padding: 8px 12px; min-width: 76px; max-width: 106px; border: 1px solid #dde8e4; border-radius: 8px; background: #fff; color: #5a6c7d; font-size: 13px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
-.dt-trigger:hover { border-color: #2d9d78; color: #2d9d78; }
-.dt-trigger.filled { color: #2d9d78; border-color: #2d9d78; background: #e8f5f0; }
+.dt-trigger { display: inline-flex; align-items: center; gap: 4px; padding: 8px 12px; min-width: 76px; max-width: 106px; border: 1px solid #e8eeff; border-radius: 8px; background: #fff; color: #5a6c7d; font-size: 13px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+.dt-trigger:hover { border-color: #d6e0f0; color: #2c3e50; }
+.dt-trigger.filled { color: #2c3e50; border-color: #d6e0f0; background: #f5f7ff; }
 .dt-icon { flex-shrink: 0; display: inline-flex; }
 .dt-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dt-popover { position: absolute; left: 0; top: calc(100% + 6px); z-index: 1000; min-width: 200px; padding: 14px; background: #fff; border: 1px solid #dde8e4; border-radius: 10px; box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+.dt-popover { position: absolute; left: 0; top: calc(100% + 6px); z-index: 1000; min-width: 200px; padding: 14px; background: #fff; border: 1px solid #e8eeff; border-radius: 10px; box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
 .dt-popover-title { font-size: 13px; color: #5a6c7d; margin-bottom: 10px; }
 .dt-popover-actions { display: flex; justify-content: flex-end; gap: 10px; }
-.dt-btn-clear { padding: 6px 12px; font-size: 13px; color: #5a6c7d; background: #fff; border: 1px solid #dde8e4; border-radius: 6px; cursor: pointer; }
-.dt-btn-ok { padding: 6px 14px; font-size: 13px; color: #fff; background: #2d9d78; border: none; border-radius: 6px; cursor: pointer; }
+.dt-btn-clear { padding: 6px 12px; font-size: 13px; color: #5a6c7d; background: #fff; border: 1px solid #e8eeff; border-radius: 6px; cursor: pointer; }
+.dt-btn-ok { padding: 6px 14px; font-size: 13px; color: #5a6c7d; background: #fff; border: 1px solid #e8eeff; border-radius: 6px; cursor: pointer; }
 .filter-btn {
   padding: 10px 18px;
   border-radius: 8px;
@@ -243,13 +257,16 @@ export default {
   font-weight: 500;
 }
 .filter-btn-query {
-  border: 1px solid #2d9d78;
-  background: #2d9d78;
-  color: #fff;
+  border: 1px solid #e8eeff;
+  background: #fff;
+  color: #5a6c7d;
 }
-.filter-btn-query:hover { opacity: 0.9; }
+.filter-btn-query:hover { 
+  border-color: #d6e0f0;
+  color: #2c3e50;
+}
 .filter-btn-clear {
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   background: #fff;
   color: #5a6c7d;
 }
@@ -261,12 +278,13 @@ export default {
 .news-list {
   background-color: #fff;
   border-radius: 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   overflow: hidden;
 }
 
 .news-item {
   display: flex;
+  flex-direction: column;
   padding: 24px;
   border-bottom: 1px solid #f0f0f0;
   transition: background-color 0.2s;
@@ -278,7 +296,12 @@ export default {
 }
 
 .news-item:hover {
-  background-color: #f0f7f4;
+  background-color: #f0f7ff;
+}
+
+.news-content-wrapper {
+  display: flex;
+  margin-bottom: 12px;
 }
 
 .news-thumb {
@@ -295,19 +318,6 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.news-date {
-  flex-shrink: 0;
-  width: 90px;
-  text-align: center;
-  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
-  color: #fff;
-  padding: 10px 12px;
-  border-radius: 6px;
-  margin-right: 24px;
-  font-size: 13px;
-  font-weight: 500;
 }
 
 .news-content {
@@ -328,6 +338,15 @@ export default {
   line-height: 1.6;
 }
 
+.news-date {
+  text-align: left;
+  color: #5a6c7d;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
 .pagination {
   display: flex;
   align-items: center;
@@ -338,7 +357,7 @@ export default {
 }
 .pagination button {
   padding: 10px 18px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   background: #fff;
   border-radius: 6px;
   cursor: pointer;
@@ -347,8 +366,8 @@ export default {
   transition: border-color 0.2s, color 0.2s;
 }
 .pagination button:hover:not(:disabled) {
-  border-color: #2d9d78;
-  color: #2d9d78;
+  border-color: #165DFF;
+  color: #165DFF;
 }
 .pagination button:disabled {
   cursor: not-allowed;

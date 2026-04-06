@@ -1,159 +1,125 @@
 <template>
   <div class="home">
-    <!-- 轮播图：后台配置，丝滑切换 + 指示点 + 左右按钮 -->
-    <div class="banner" v-if="bannerList.length" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
-      <div class="banner-track" :style="trackStyle">
-        <div v-for="(item, index) in bannerList" :key="index" class="banner-item">
-          <a v-if="item.link" :href="item.link" class="banner-link" target="_blank" rel="noopener">
-            <img :src="bannerImageUrl(item.imageUrl)" class="banner-img" alt="">
-            <div v-if="item.title" class="banner-caption">{{ item.title }}</div>
-          </a>
-          <template v-else>
-            <img :src="bannerImageUrl(item.imageUrl)" class="banner-img" alt="">
-            <div v-if="item.title" class="banner-caption">{{ item.title }}</div>
-          </template>
-        </div>
-      </div>
-      <button type="button" class="banner-arrow banner-prev" aria-label="上一张" @click="prev">
-        <span>‹</span>
-      </button>
-      <button type="button" class="banner-arrow banner-next" aria-label="下一张" @click="next">
-        <span>›</span>
-      </button>
-      <div class="banner-dots">
-        <button
-          v-for="(item, index) in bannerList"
-          :key="index"
-          type="button"
-          :class="{ active: currentIndex === index }"
-          :aria-label="'第' + (index + 1) + '张'"
-          @click="goTo(index)"
-        ></button>
-      </div>
-    </div>
-
-    <!-- 新闻轮播 + 公告（左新闻右公告） -->
-    <div v-if="latestNews.length || latestNotices.length" class="news-notice-section">
+    <!-- 主体内容 -->
+    <div class="main-content">
       <div class="container">
-        <div class="news-notice-row">
-          <!-- 左侧：新闻轮播 -->
-          <div class="news-carousel-col">
-            <div class="section-head">
-              <h2 class="section-title">新闻</h2>
-              <button type="button" class="section-more" @click="navigate('news')">更多</button>
-            </div>
-            <div v-if="latestNews.length" class="news-carousel" @mouseenter="stopNewsAuto" @mouseleave="startNewsAuto">
-              <div class="news-track" :style="{ transform: 'translateX(-' + newsIndex * 100 + '%)' }">
-                <div
-                  v-for="(item, idx) in latestNews"
-                  :key="item.id"
-                  class="news-slide"
-                  @click="goToNews(item.id)"
-                >
-                  <div class="news-slide-img" :style="{ backgroundImage: item.imageUrl ? 'url(' + newsImageUrl(item.imageUrl) + ')' : 'none' }"></div>
-                  <div class="news-slide-body">
-                    <h3 class="news-slide-title">{{ item.title }}</h3>
-                    <p class="news-slide-meta">{{ formatTime(item.time) }}</p>
-                    <p class="news-slide-snippet">{{ item.contentSnippet }}</p>
+        <div class="content-row">
+          <!-- 左侧内容 -->
+          <div class="left-content">
+            <!-- 新闻轮播 -->
+            <div class="news-carousel-section">
+              <h3 class="section-title">新闻动态</h3>
+              <div v-if="latestNews.length" class="news-carousel" @mouseenter="stopNewsAuto" @mouseleave="startNewsAuto">
+                <div class="news-track" :style="{ transform: 'translateX(-' + newsIndex * 100 + '%)' }">
+                  <div
+                    v-for="(item, idx) in latestNews"
+                    :key="item.id"
+                    class="news-slide"
+                    @click="goToNews(item.id)"
+                  >
+                    <div class="news-slide-img" :style="{ backgroundImage: item.imageUrl ? 'url(' + newsImageUrl(item.imageUrl) + ')' : 'none' }"></div>
+                    <div class="news-slide-body">
+                      <h4 class="news-slide-title">{{ item.title }}</h4>
+                      <p class="news-slide-meta">{{ formatTime(item.time) }}</p>
+                      <p class="news-slide-snippet">{{ getPlainTextSummary(item.contentSnippet || item.content) }}</p>
+                    </div>
                   </div>
                 </div>
+                <button v-if="latestNews.length > 1" type="button" class="news-arrow news-prev" @click="newsPrev">‹</button>
+                <button v-if="latestNews.length > 1" type="button" class="news-arrow news-next" @click="newsNext">›</button>
+                <div v-if="latestNews.length > 1" class="news-dots">
+                  <button v-for="(item, idx) in latestNews" :key="idx" type="button" :class="{ active: newsIndex === idx }" @click="newsIndex = idx"></button>
+                </div>
               </div>
-              <button v-if="latestNews.length > 1" type="button" class="news-arrow news-prev" @click="newsPrev">‹</button>
-              <button v-if="latestNews.length > 1" type="button" class="news-arrow news-next" @click="newsNext">›</button>
-              <div v-if="latestNews.length > 1" class="news-dots">
-                <button v-for="(item, idx) in latestNews" :key="idx" type="button" :class="{ active: newsIndex === idx }" @click="newsIndex = idx"></button>
+              <p v-else class="empty-tip">暂无新闻</p>
+              <a href="/home/news" class="more-link">更多 &gt;</a>
+            </div>
+            
+            <!-- 校园风景展示 -->
+            <div class="campus-carousel-section">
+              <h3 class="section-title">校园风景</h3>
+              <div class="main-image">
+                <div v-if="bannerList.length" class="campus-carousel" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
+                  <div class="campus-track" :style="{ transform: 'translateX(-' + currentIndex * 100 + '%)' }">
+                    <div
+                      v-for="(item, idx) in bannerList"
+                      :key="idx"
+                      class="campus-slide"
+                    >
+                      <img :src="bannerImageUrl(item.imageUrl)" alt="校园风景" />
+                    </div>
+                  </div>
+                  <button v-if="bannerList.length > 1" type="button" class="campus-arrow campus-prev" @click="prev">‹</button>
+                  <button v-if="bannerList.length > 1" type="button" class="campus-arrow campus-next" @click="next">›</button>
+                  <div v-if="bannerList.length > 1" class="campus-dots">
+                    <button v-for="(item, idx) in bannerList" :key="idx" type="button" :class="{ active: currentIndex === idx }" @click="goTo(idx)"></button>
+                  </div>
+                </div>
+                <div v-else class="campus-placeholder">
+                  <img src="https://via.placeholder.com/800x450" alt="校园风景" />
+                </div>
               </div>
             </div>
-            <p v-else class="empty-tip">暂无新闻</p>
           </div>
-          <!-- 右侧：公告 -->
-          <div class="notices-col">
-            <div class="section-head">
-              <h2 class="section-title">公告</h2>
-              <button type="button" class="section-more" @click="navigate('notice')">更多</button>
+
+          <!-- 右侧信息栏 -->
+          <div class="right-content">
+            <!-- 实验室动态 -->
+            <div class="info-section">
+              <h3 class="section-title">实验室动态</h3>
+              <ul class="info-list">
+                <li 
+                  v-for="item in latestNews" 
+                  :key="item.id" 
+                  class="info-item"
+                  @click="goToNews(item.id)"
+                >
+                  <span class="info-date">{{ formatTime(item.time) }}</span>
+                  <span class="info-title">{{ item.title }}</span>
+                </li>
+                <li v-if="latestNews.length === 0" class="info-item empty">
+                  <span class="empty-tip">暂无动态</span>
+                </li>
+              </ul>
+              <a href="/home/news" class="more-link">更多 &gt;</a>
             </div>
-            <ul v-if="latestNotices.length" class="notices-list">
-              <li
-                v-for="item in latestNotices"
-                :key="item.id"
-                class="notices-item"
-                @click="goToNotice(item.id)"
-              >
-                <span class="notices-date">{{ formatTime(item.time || item.createTime) }}</span>
-                <span class="notices-title">{{ item.title }}</span>
-              </li>
-            </ul>
-            <p v-else class="empty-tip">暂无公告</p>
+
+            <!-- 公告通知 -->
+            <div class="info-section">
+              <h3 class="section-title">公告通知</h3>
+              <ul class="info-list">
+                <li 
+                  v-for="item in latestNotices" 
+                  :key="item.id" 
+                  class="info-item"
+                  @click="goToNotice(item.id)"
+                >
+                  <span class="info-date">{{ formatTime(item.time || item.createTime) }}</span>
+                  <span class="info-title">{{ item.title }}</span>
+                </li>
+                <li v-if="latestNotices.length === 0" class="info-item empty">
+                  <span class="empty-tip">暂无公告</span>
+                </li>
+              </ul>
+              <a href="/home/news?type=notice" class="more-link">更多 &gt;</a>
+            </div>
+
+            <!-- 友情链接 -->
+            <div class="info-section">
+              <h3 class="section-title">友情链接</h3>
+              <ul class="link-list">
+                <li><a href="#" class="friend-link">广东外语外贸大学</a></li>
+                <li><a href="#" class="friend-link">信息科学与技术学院</a></li>
+                <li><a href="#" class="friend-link">教育部</a></li>
+                <li><a href="#" class="friend-link">广东省教育厅</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 最新成果 -->
-    <div class="achievements">
-      <div class="container">
-        <div class="section-head">
-          <h2 class="section-title">最新成果</h2>
-          <button type="button" class="section-more" @click="navigate('achievements')">更多</button>
-        </div>
-        <div class="achievements-grid">
-          <div
-            v-for="(achievement, index) in latestAchievements"
-            :key="index"
-            class="achievement-card"
-            @click="goToAchievement(achievement)"
-          >
-            <div class="achievement-type">{{ getAchievementType(achievement.type) }}</div>
-            <h3 class="achievement-title">{{ achievement.title }}</h3>
-            <p class="achievement-time">{{ formatTime(achievement.time) }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- 实验室简介 -->
-    <div class="lab-intro">
-      <div class="container">
-        <h2 class="section-title">实验室简介</h2>
-        <div class="intro-content">
-          <div class="intro-text">
-            <p>{{ labIntro.introduction }}</p>
-            <button class="intro-btn" @click="navigate('about')">了解更多</button>
-          </div>
-          <div class="intro-img">
-            <img :src="labIntroImageUrl || 'https://via.placeholder.com/500x300'" alt="实验室图片">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 联系方式 -->
-    <div class="contact-info">
-      <div class="container">
-        <h2 class="section-title">联系我们</h2>
-        <div class="contact-grid">
-          <div class="contact-item">
-            <h3>地址</h3>
-            <p>{{ contact.address }}</p>
-          </div>
-          <div class="contact-item">
-            <h3>电话</h3>
-            <p>{{ contact.phone }}</p>
-          </div>
-          <div class="contact-item">
-            <h3>邮箱</h3>
-            <p>{{ contact.email }}</p>
-          </div>
-          <div class="contact-item">
-            <h3>工作时间</h3>
-            <p>{{ contact.workTime }}</p>
-          </div>
-        </div>
-        <div class="contact-more">
-          <button type="button" class="intro-btn" @click="navigate('contact')">查看更多</button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -213,7 +179,8 @@ export default {
         this.currentIndex = Math.max(0, (list && list.length) - 1)
       }
       this.startAutoPlay()
-    }
+    },
+
   },
   beforeUnmount() {
     this.stopAutoPlay()
@@ -302,6 +269,10 @@ export default {
       if (!url) return ''
       return url.startsWith('http') ? url : url
     },
+    imageUrl(url) {
+      if (!url) return ''
+      return url.startsWith('http') ? url : url
+    },
     newsPrev() {
       if (this.latestNews.length <= 1) return
       this.newsIndex = this.newsIndex <= 0 ? this.latestNews.length - 1 : this.newsIndex - 1
@@ -320,6 +291,18 @@ export default {
         clearInterval(this.newsAutoTimer)
         this.newsAutoTimer = null
       }
+    },
+    getPlainTextSummary(html) {
+      if (!html) return ''
+      // 创建一个临时元素来解析HTML
+      const tempElement = document.createElement('div')
+      tempElement.innerHTML = html
+      // 提取纯文本
+      const plainText = tempElement.textContent || tempElement.innerText || ''
+      // 去除多余的空白字符
+      const cleanText = plainText.replace(/\s+/g, ' ').trim()
+      // 截取前150个字符作为摘要
+      return cleanText.substring(0, 150) + (cleanText.length > 150 ? '...' : '')
     }
   }
 }
@@ -328,228 +311,249 @@ export default {
 <style>
 .home {
   min-height: 100vh;
+  font-family: Arial, sans-serif;
 }
 
-/* 轮播图 */
-.banner {
-  position: relative;
-  height: 480px;
-  overflow: hidden;
+/* 顶部导航栏 */
+.header {
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 15px 0;
 }
 
-.banner-track {
+.header-content {
   display: flex;
-  height: 100%;
-  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
-.banner-item {
-  flex: 0 0 100%;
-  width: 100%;
-  position: relative;
-  height: 100%;
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo img {
+  width: 60px;
+  height: 60px;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.lab-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+.lab-english {
+  font-size: 12px;
+  color: #666;
+  margin: 5px 0 0 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.search-box {
   display: flex;
   align-items: center;
 }
 
-.banner-link {
-  display: block;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-decoration: none;
-  color: inherit;
+.search-box input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+  font-size: 14px;
 }
 
-.banner-caption {
-  position: absolute;
-  bottom: 20px;
-  left: 10%;
-  z-index: 2;
+.search-btn {
+  padding: 8px 12px;
+  border: 1px solid #165DFF;
+  background-color: #165DFF;
   color: #fff;
-  font-size: 20px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  font-size: 14px;
 }
 
-.banner-img {
-  position: absolute;
-  top: 0;
-  left: 0;
+.admin-link {
+  font-size: 14px;
+  color: #333;
+  text-decoration: none;
+}
+
+.main-nav {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 15px;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 30px;
+}
+
+.nav-link {
+  color: #333;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 5px 0;
+  position: relative;
+}
+
+.nav-link.active {
+  color: #2c3e50;
+  border-bottom: 2px solid #d6e0f0;
+  font-weight: 600;
+}
+
+.nav-link:hover {
+  color: #2c3e50;
+  border-bottom: 2px solid #d6e0f0;
+}
+
+/* 主体内容 */
+.main-content {
+  padding: 20px 0;
+}
+
+.content-row {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 30px;
+  align-items: start;
+}
+
+/* 左侧内容 */
+.left-content {
+  min-width: 0;
+}
+
+.main-image {
+  position: relative;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+}
+
+.main-image img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(0.9);
+  height: auto;
+  display: block;
 }
 
-.banner-arrow {
+.campus-carousel {
+  position: relative;
+  overflow: hidden;
+}
+
+.campus-track {
+  display: flex;
+  transition: transform 0.35s ease;
+}
+
+.campus-slide {
+  flex: 0 0 100%;
+  width: 100%;
+}
+
+.campus-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 3;
-  width: 44px;
-  height: 44px;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
   border: none;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.2);
   color: #fff;
-  font-size: 24px;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
-}
-.banner-arrow:hover {
-  background: rgba(0, 0, 0, 0.45);
-}
-.banner-prev {
-  left: 20px;
-}
-.banner-next {
-  right: 20px;
 }
 
-.banner-dots {
+.campus-prev { left: 10px; }
+.campus-next { right: 10px; }
+
+.campus-dots {
   position: absolute;
-  bottom: 24px;
+  bottom: 40px;
   left: 0;
   right: 0;
-  z-index: 3;
+  z-index: 2;
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 5px;
 }
-.banner-dots button {
+
+.campus-dots button {
   width: 8px;
   height: 8px;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   padding: 0;
-  transition: background 0.2s, transform 0.2s;
-}
-.banner-dots button:hover {
-  background: rgba(255, 255, 255, 0.7);
-}
-.banner-dots button.active {
-  background: #fff;
-  transform: scale(1.15);
 }
 
-/* 最新成果 */
-.achievements {
-  padding: 72px 0;
+.campus-dots button.active {
+  background: #d6e0f0;
+}
+
+.campus-placeholder {
+  width: 100%;
+}
+
+.campus-carousel-section {
+  border: 1px solid #e0e0e0;
+  padding: 20px;
   background-color: #fff;
-  border-radius: 0;
+  margin-bottom: 30px;
 }
 
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 48px;
+.campus-carousel-section .section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 15px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.section-title {
-  text-align: center;
-  font-size: 28px;
-  font-weight: 600;
-  margin-bottom: 48px;
-  color: #2c3e50;
-  letter-spacing: 0.02em;
+.news-carousel-section {
+  border: 1px solid #e0e0e0;
+  padding: 20px;
+  background-color: #fff;
 }
 
-.section-head .section-title {
-  margin-bottom: 0;
-}
-
-.section-more {
-  padding: 6px 14px;
-  background: transparent;
-  border: 1px solid #2d9d78;
-  color: #2d9d78;
-  font-size: 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.section-more:hover {
-  background: #2d9d78;
-  color: #fff;
-}
-
-.achievements-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-}
-
-.achievement-card {
-  background-color: #f6faf8;
-  border: 1px solid #dde8e4;
-  padding: 24px;
-  border-radius: 12px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-}
-
-.achievement-card:hover {
-  border-color: #2d9d78;
-  box-shadow: 0 4px 20px rgba(45, 157, 120, 0.15);
-}
-
-.achievement-type {
-  display: inline-block;
-  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 12px;
-}
-
-.achievement-title {
-  font-size: 17px;
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: #2c3e50;
-}
-
-.achievement-time {
-  font-size: 14px;
-  color: #5a6c7d;
-}
-
-/* 新闻轮播 + 公告（左新闻右公告） */
-.news-notice-section {
-  padding: 48px 0 72px;
-  background-color: #f6faf8;
-}
-
-.news-notice-row {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 32px;
-  align-items: start;
-}
-
-.news-carousel-col .section-head,
-.notices-col .section-head {
-  margin-bottom: 20px;
+.news-carousel-section .section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 15px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .news-carousel {
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
-  background: #fff;
-  border: 1px solid #dde8e4;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  margin-bottom: 15px;
 }
 
 .news-track {
@@ -561,13 +565,6 @@ export default {
   flex: 0 0 100%;
   width: 100%;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  transition: background-color 0.2s;
-}
-
-.news-slide:hover {
-  background-color: #fafcfb;
 }
 
 .news-slide-img {
@@ -575,40 +572,32 @@ export default {
   height: 200px;
   background-size: cover;
   background-position: center;
-  background-color: #e8f0ed;
+  background-color: #f0f0f0;
 }
 
 .news-slide-body {
-  padding: 20px 24px;
+  padding: 15px;
+  background-color: #f9f9f9;
 }
 
 .news-slide-title {
-  font-size: 17px;
-  font-weight: 600;
-  color: #2c3e50;
-  margin: 0 0 8px 0;
-  line-height: 1.35;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 10px 0;
 }
 
 .news-slide-meta {
-  font-size: 13px;
-  color: #5a6c7d;
+  font-size: 12px;
+  color: #999;
   margin: 0 0 10px 0;
 }
 
 .news-slide-snippet {
   font-size: 14px;
-  color: #5a6c7d;
+  color: #666;
   line-height: 1.5;
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .news-arrow {
@@ -616,37 +605,32 @@ export default {
   top: 50%;
   transform: translateY(-50%);
   z-index: 2;
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   border: none;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.2);
   color: #fff;
-  font-size: 22px;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
 }
 
-.news-arrow:hover {
-  background: rgba(0, 0, 0, 0.4);
-}
-
-.news-prev { left: 12px; }
-.news-next { right: 12px; }
+.news-prev { left: 10px; }
+.news-next { right: 10px; }
 
 .news-dots {
   position: absolute;
-  bottom: 12px;
+  bottom: 10px;
   left: 0;
   right: 0;
   z-index: 2;
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 5px;
 }
 
 .news-dots button {
@@ -654,173 +638,151 @@ export default {
   height: 8px;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   padding: 0;
-  transition: background 0.2s, transform 0.2s;
-}
-
-.news-dots button:hover {
-  background: rgba(255, 255, 255, 0.8);
 }
 
 .news-dots button.active {
-  background: #fff;
-  transform: scale(1.15);
+  background: #d6e0f0;
 }
 
-.notices-col {
+.more-link {
+  display: block;
+  text-align: right;
+  font-size: 14px;
+  color: #5a6c7d;
+  text-decoration: none;
+  margin-top: 10px;
+  transition: color 0.2s;
+}
+
+.more-link:hover {
+  color: #2c3e50;
+  text-decoration: underline;
+}
+
+/* 右侧信息栏 */
+.right-content {
   min-width: 0;
 }
 
-.empty-tip {
-  color: #5a6c7d;
-  font-size: 14px;
-  margin: 0;
-  padding: 16px 0;
+.info-section {
+  border: 1px solid #e0e0e0;
+  padding: 20px;
+  background-color: #fff;
+  margin-bottom: 20px;
 }
 
-.notices-list {
+.info-section .section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 15px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.info-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid #dde8e4;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
-.notices-item {
+.info-item {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 16px 24px;
-  border-bottom: 1px solid #e8f0ed;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
-  transition: background-color 0.2s;
 }
 
-.notices-item:last-child {
+.info-item:last-child {
   border-bottom: none;
 }
 
-.notices-item:hover {
-  background-color: #f0f7f4;
+.info-item:hover {
+  background-color: #f9f9f9;
 }
 
-.notices-date {
-  flex-shrink: 0;
-  font-size: 13px;
-  color: #5a6c7d;
+.info-date {
+  font-size: 12px;
+  color: #999;
 }
 
-.notices-title {
-  flex: 1;
-  font-size: 15px;
-  font-weight: 500;
-  color: #2c3e50;
-}
-
-/* 实验室简介 */
-.lab-intro {
-  padding: 72px 0;
-  background-color: #f6faf8;
-}
-
-.intro-content {
-  display: flex;
-  align-items: center;
-  gap: 48px;
-}
-
-.intro-text {
-  flex: 1;
-}
-
-.intro-text p {
-  font-size: 16px;
-  line-height: 1.7;
-  margin-bottom: 24px;
-  color: #2c3e50;
-}
-
-.intro-btn {
-  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
-  color: #fff;
-  border: none;
-  padding: 12px 24px;
+.info-title {
   font-size: 14px;
-  font-weight: 500;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: opacity 0.2s;
+  color: #333;
+  line-height: 1.4;
 }
 
-.intro-btn:hover {
-  opacity: 0.9;
+.link-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.intro-img {
-  flex: 1;
+.link-list li {
+  margin-bottom: 10px;
 }
 
-.intro-img img {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
+.friend-link {
+  font-size: 14px;
+  color: #333;
+  text-decoration: none;
 }
 
-/* 联系方式 */
-.contact-info {
-  padding: 72px 0;
-  background-color: #fff;
+.friend-link:hover {
+  color: #165DFF;
+  text-decoration: underline;
 }
 
-.contact-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 32px;
+.empty-tip {
+  color: #999;
+  font-size: 14px;
+  margin: 0;
+  padding: 10px 0;
+}
+
+/* 页脚 */
+.footer {
+  background-color: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+  padding: 20px 0;
+  margin-top: 30px;
+}
+
+.footer p {
   text-align: center;
-}
-
-.contact-item h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #2c3e50;
-}
-
-.contact-item p {
-  font-size: 15px;
-  color: #5a6c7d;
-}
-
-.contact-more {
-  margin-top: 28px;
-  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin: 0;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .banner-caption {
-    font-size: 16px;
-  }
-
-  .news-notice-row {
+  .content-row {
     grid-template-columns: 1fr;
   }
 
-  .news-slide-img {
-    height: 160px;
-  }
-
-  .intro-content {
+  .header-content {
     flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 
-  .intro-img {
-    width: 100%;
+  .nav-links {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .main-image img {
+    height: auto;
+  }
+
+  .news-slide-img {
+    height: 150px;
   }
 }
 </style>

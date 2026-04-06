@@ -429,7 +429,7 @@ export default {
 .achievements {
   min-height: 80vh;
   padding: 64px 0 80px;
-  background-color: #f6faf8;
+  background-color: #f5f7ff;
 }
 
 .page-title {
@@ -452,7 +452,7 @@ export default {
 
 .tab-btn {
   padding: 12px 24px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   background: #fff;
   color: #5a6c7d;
   font-size: 14px;
@@ -463,20 +463,21 @@ export default {
 }
 
 .tab-btn:hover {
-  border-color: #2d9d78;
-  color: #2d9d78;
+  border-color: #d6e0f0;
+  color: #2c3e50;
 }
 
 .tab-btn.active {
-  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
-  border-color: #2d9d78;
-  color: #fff;
+  background: #f5f7ff;
+  border-color: #d6e0f0;
+  color: #2c3e50;
+  font-weight: 600;
 }
 
 .achievement-section {
   background-color: #fff;
   border-radius: 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   padding: 40px;
 }
 
@@ -485,15 +486,15 @@ export default {
   font-weight: 600;
   margin-bottom: 16px;
   color: #2c3e50;
-  border-bottom: 1px solid #dde8e4;
+  border-bottom: 1px solid #e8eeff;
   padding-bottom: 12px;
 }
 
 .filter-wrap {
   margin-bottom: 24px;
   padding: 14px 18px;
-  background: #f6faf8;
-  border: 1px solid #dde8e4;
+  background: #f5f7ff;
+  border: 1px solid #e8eeff;
   border-radius: 10px;
 }
 .filter-row {
@@ -507,30 +508,30 @@ export default {
 .filter-label.time-label { margin-left: 4px; }
 .filter-input {
   padding: 10px 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   border-radius: 8px;
   font-size: 14px;
 }
-.filter-input:focus { outline: none; border-color: #2d9d78; }
+.filter-input:focus { outline: none; border-color: #d6e0f0; }
 .filter-input-text { min-width: 160px; }
 .filter-date { width: 140px; }
 .filter-time { width: 96px; }
 .filter-time-group { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .filter-sep { font-size: 13px; color: #8a9ba8; }
 .dt-wrap { position: relative; display: inline-block; }
-.dt-trigger { display: inline-flex; align-items: center; gap: 4px; padding: 8px 12px; min-width: 72px; max-width: 100px; border: 1px solid #dde8e4; border-radius: 8px; background: #fff; color: #5a6c7d; font-size: 13px; cursor: pointer; }
-.dt-trigger:hover { border-color: #2d9d78; color: #2d9d78; }
-.dt-trigger.filled { color: #2d9d78; border-color: #2d9d78; background: #e8f5f0; }
+.dt-trigger { display: inline-flex; align-items: center; gap: 4px; padding: 8px 12px; min-width: 72px; max-width: 100px; border: 1px solid #e8eeff; border-radius: 8px; background: #fff; color: #5a6c7d; font-size: 13px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+.dt-trigger:hover { border-color: #d6e0f0; color: #2c3e50; }
+.dt-trigger.filled { color: #2c3e50; border-color: #d6e0f0; background: #f5f7ff; }
 .dt-icon { flex-shrink: 0; display: inline-flex; }
 .dt-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dt-popover { position: absolute; left: 0; top: calc(100% + 6px); z-index: 1000; min-width: 200px; padding: 14px; background: #fff; border: 1px solid #dde8e4; border-radius: 10px; box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+.dt-popover { position: absolute; left: 0; top: calc(100% + 6px); z-index: 1000; min-width: 200px; padding: 14px; background: #fff; border: 1px solid #e8eeff; border-radius: 10px; box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
 .dt-popover-title { font-size: 13px; color: #5a6c7d; margin-bottom: 10px; }
-.date-only-wrap { position: relative; padding: 8px 12px; border: 1px solid #dde8e4; border-radius: 8px; height: 42px; display: flex; align-items: center; cursor: pointer; margin-bottom: 12px; }
+.date-only-wrap { position: relative; padding: 8px 12px; border: 1px solid #e8eeff; border-radius: 8px; height: 42px; display: flex; align-items: center; cursor: pointer; margin-bottom: 12px; }
 .date-only-text { color: #2c3e50; font-size: 14px; pointer-events: none; }
 .date-only-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1; font-size: 16px; }
 .dt-popover-actions { display: flex; justify-content: flex-end; gap: 10px; }
-.dt-btn-clear { padding: 6px 12px; font-size: 13px; color: #5a6c7d; background: #fff; border: 1px solid #dde8e4; border-radius: 6px; cursor: pointer; }
-.dt-btn-ok { padding: 6px 14px; font-size: 13px; color: #fff; background: #2d9d78; border: none; border-radius: 6px; cursor: pointer; }
+.dt-btn-clear { padding: 6px 12px; font-size: 13px; color: #5a6c7d; background: #fff; border: 1px solid #e8eeff; border-radius: 6px; cursor: pointer; }
+.dt-btn-ok { padding: 6px 14px; font-size: 13px; color: #fff; background: #165DFF; border: none; border-radius: 6px; cursor: pointer; }
 .filter-btn {
   padding: 10px 18px;
   border-radius: 8px;
@@ -539,13 +540,16 @@ export default {
   font-weight: 500;
 }
 .filter-btn-query {
-  border: 1px solid #2d9d78;
-  background: #2d9d78;
-  color: #fff;
+  border: 1px solid #e8eeff;
+  background: #fff;
+  color: #5a6c7d;
 }
-.filter-btn-query:hover { opacity: 0.9; }
+.filter-btn-query:hover { 
+  border-color: #d6e0f0;
+  color: #2c3e50;
+}
 .filter-btn-clear {
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   background: #fff;
   color: #5a6c7d;
 }
@@ -559,34 +563,23 @@ export default {
 
 .achievement-item {
   display: flex;
+  flex-direction: column;
   padding: 20px 24px;
-  background-color: #f6faf8;
-  border: 1px solid #dde8e4;
+  background-color: #f5f7ff;
+  border: 1px solid #e8eeff;
   border-radius: 10px;
   transition: border-color 0.2s, box-shadow 0.2s;
   cursor: pointer;
 }
 
 .achievement-item:hover {
-  border-color: #2d9d78;
-  box-shadow: 0 2px 12px rgba(45, 157, 120, 0.12);
-}
-
-.item-date {
-  flex-shrink: 0;
-  width: 140px;
-  text-align: center;
-  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
-  color: #fff;
-  padding: 10px 12px;
-  border-radius: 6px;
-  margin-right: 24px;
-  font-size: 13px;
-  font-weight: 500;
+  border-color: #d6e0f0;
+  box-shadow: 0 2px 12px rgba(0, 97, 160, 0.1);
 }
 
 .item-content {
   flex: 1;
+  margin-bottom: 12px;
 }
 
 .item-title {
@@ -600,6 +593,16 @@ export default {
   font-size: 14px;
   color: #5a6c7d;
   line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.item-date {
+  text-align: left;
+  color: #5a6c7d;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 0;
+  border-top: 1px solid #e8eeff;
 }
 
 .pagination {
@@ -609,11 +612,11 @@ export default {
   gap: 16px;
   margin-top: 28px;
   padding-top: 24px;
-  border-top: 1px solid #dde8e4;
+  border-top: 1px solid #e8eeff;
 }
 .pagination button {
   padding: 10px 18px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   background: #fff;
   border-radius: 6px;
   cursor: pointer;
@@ -622,8 +625,8 @@ export default {
   transition: border-color 0.2s, color 0.2s;
 }
 .pagination button:hover:not(:disabled) {
-  border-color: #2d9d78;
-  color: #2d9d78;
+  border-color: #165DFF;
+  color: #165DFF;
 }
 .pagination button:disabled {
   cursor: not-allowed;

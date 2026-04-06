@@ -129,7 +129,7 @@ export default {
 .team {
   min-height: 80vh;
   padding: 64px 0 80px;
-  background-color: #f6faf8;
+  background-color: #f5f7ff;
 }
 
 .page-title {
@@ -146,7 +146,7 @@ export default {
   padding: 16px 20px;
   background: #fff;
   border-radius: 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 .filter-row {
@@ -159,11 +159,11 @@ export default {
 .filter-label { font-size: 14px; color: #5a6c7d; }
 .filter-input {
   padding: 10px 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   border-radius: 8px;
   font-size: 14px;
 }
-.filter-input:focus { outline: none; border-color: #2d9d78; }
+.filter-input:focus { outline: none; border-color: #d6e0f0; }
 .filter-input-text { min-width: 140px; }
 .filter-select { min-width: 100px; }
 .filter-btn {
@@ -174,13 +174,16 @@ export default {
   font-weight: 500;
 }
 .filter-btn-query {
-  border: 1px solid #2d9d78;
-  background: #2d9d78;
-  color: #fff;
+  border: 1px solid #e8eeff;
+  background: #fff;
+  color: #5a6c7d;
 }
-.filter-btn-query:hover { opacity: 0.9; }
+.filter-btn-query:hover { 
+  border-color: #d6e0f0;
+  color: #2c3e50;
+}
 .filter-btn-clear {
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   background: #fff;
   color: #5a6c7d;
 }
@@ -194,7 +197,7 @@ export default {
 
 .member-card {
   background-color: #fff;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   border-radius: 12px;
   padding: 32px 24px;
   text-align: center;
@@ -203,12 +206,32 @@ export default {
 }
 
 .member-card:hover {
-  border-color: #2d9d78;
-  box-shadow: 0 4px 20px rgba(45, 157, 120, 0.15);
+  border-color: #d6e0f0;
+  box-shadow: 0 4px 20px rgba(0, 97, 160, 0.1);
 }
 
 .member-photo {
   margin-bottom: 20px;
+  position: relative;
+}
+
+.member-photo::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 156px;
+  height: 156px;
+  border: 2px solid #d6e0f0;
+  border-radius: 50%;
+  opacity: 0.3;
+  transition: all 0.3s ease;
+}
+
+.member-card:hover .member-photo::before {
+  opacity: 1;
+  transform: translateX(-50%) scale(1.05);
 }
 
 .member-photo img {
@@ -217,6 +240,8 @@ export default {
   border-radius: 50%;
   object-fit: cover;
   background: #f5f5f5;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .member-name {
@@ -230,6 +255,7 @@ export default {
   font-size: 14px;
   color: #5a6c7d;
   margin-bottom: 0;
+  font-weight: 500;
 }
 
 .pagination {
@@ -243,7 +269,7 @@ export default {
 
 .pagination button {
   padding: 10px 18px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   background: #fff;
   border-radius: 6px;
   cursor: pointer;
@@ -253,8 +279,8 @@ export default {
 }
 
 .pagination button:hover:not(:disabled) {
-  border-color: #2d9d78;
-  color: #2d9d78;
+  border-color: #d6e0f0;
+  color: #2c3e50;
 }
 
 .pagination button:disabled {

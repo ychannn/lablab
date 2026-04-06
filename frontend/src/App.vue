@@ -14,13 +14,13 @@
             >
           </div>
           <ul class="nav-links">
-            <li><a href="#" @click.prevent="navigate('home')">首页</a></li>
-            <li><a href="#" @click.prevent="navigate('about')">实验室介绍</a></li>
-            <li><a href="#" @click.prevent="navigate('news')">新闻</a></li>
-            <li><a href="#" @click.prevent="navigate('notice')">公告</a></li>
-            <li><a href="#" @click.prevent="navigate('team')">师资队伍</a></li>
-            <li><a href="#" @click.prevent="navigate('achievements')">科研成果</a></li>
-            <li><a href="#" @click.prevent="navigate('contact')">联系我们</a></li>
+            <li><a href="#" @click.prevent="navigate('home')" :class="{ active: currentPage === 'home' }">首页</a></li>
+            <li><a href="#" @click.prevent="navigate('about')" :class="{ active: currentPage === 'about' }">实验室介绍</a></li>
+            <li><a href="#" @click.prevent="navigate('news')" :class="{ active: currentPage === 'news' }">新闻</a></li>
+            <li><a href="#" @click.prevent="navigate('notice')" :class="{ active: currentPage === 'notice' }">公告</a></li>
+            <li><a href="#" @click.prevent="navigate('team')" :class="{ active: currentPage === 'team' }">师资队伍</a></li>
+            <li><a href="#" @click.prevent="navigate('achievements')" :class="{ active: currentPage === 'achievements' }">科研成果</a></li>
+            <li><a href="#" @click.prevent="navigate('contact')" :class="{ active: currentPage === 'contact' }">联系我们</a></li>
           </ul>
         </div>
       </div>
@@ -50,7 +50,20 @@
 
     <footer class="footer">
       <div class="container">
-        <p>&copy; 2026 {{ siteTitle }}</p>
+        <div class="footer-content">
+          <div class="footer-links">
+            <h4>联系我们</h4>
+            <ul class="link-list">
+              <li v-if="contact.address" class="contact-info">地址：{{ contact.address }}</li>
+              <li v-if="contact.phone" class="contact-info">电话：{{ contact.phone }}</li>
+              <li v-if="contact.email" class="contact-info">邮箱：{{ contact.email }}</li>
+              <li v-if="contact.workTime" class="contact-info">工作日：{{ contact.workTime }}</li>
+            </ul>
+          </div>
+          <div class="footer-copyright">
+            <p>&copy; 2026 跨文化信息分析与智能决策重点实验室</p>
+          </div>
+        </div>
       </div>
     </footer>
   </div>
@@ -90,7 +103,13 @@ export default {
       initialParams: {
         achievementsTab: null
       },
-      detailParams: { type: '', id: null }
+      detailParams: { type: '', id: null },
+      contact: {
+        address: '',
+        phone: '',
+        email: '',
+        workTime: ''
+      }
     }
   },
   created() {
@@ -105,6 +124,7 @@ export default {
   },
   mounted() {
     this.fetchSiteTitle()
+    this.fetchContact()
     window.addEventListener('popstate', this.onPopState)
   },
   beforeUnmount() {
@@ -166,7 +186,21 @@ export default {
         console.error(e)
       }
     },
+    async fetchContact() {
+      try {
+        const res = await fetch(apiBase + '/home')
+        const data = await res.json()
+        if (data.code === 200 && data.data && data.data.contact) {
+          this.contact = data.data.contact
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    },
     navigate(page, params) {
+      // 滚动到顶部
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      
       if (page === 'detail' && params && (params.type != null && params.id != null)) {
         this.currentPage = 'detail'
         this.detailParams = { type: params.type, id: params.id }
@@ -185,6 +219,9 @@ export default {
       }
     },
     onSearchSubmit() {
+      // 滚动到顶部
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      
       const q = (this.searchQuery || '').trim()
       if (!q) return
       this.searchKeyword = q
@@ -192,12 +229,18 @@ export default {
       this.writePath('search', { q })
     },
     onSearchKeyword(keyword) {
+      // 滚动到顶部
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      
       this.searchKeyword = keyword
       this.searchQuery = keyword
       this.currentPage = 'search'
       this.writePath('search', { q: keyword })
     },
     onSearchGo(payload) {
+      // 滚动到顶部
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      
       if (payload.page === 'detail' && payload.type != null && payload.id != null) {
         this.detailParams = { type: payload.type, id: payload.id }
         this.currentPage = 'detail'
@@ -209,6 +252,9 @@ export default {
       this.writePath(payload.page, { tab: payload.tab })
     },
     onDetailBack(detailType) {
+      // 滚动到顶部
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      
       if (detailType === 'news') {
         this.currentPage = 'news'
         this.writePath('news')
@@ -236,11 +282,12 @@ export default {
 }
 
 .navbar {
-  background-color: #fff;
-  border-bottom: 1px solid var(--border, #dde8e4);
+  background: linear-gradient(135deg, #0061a0 0%, #004a7a 100%);
+  border-bottom: 1px solid var(--border, #d6e0f0);
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 97, 160, 0.2);
 }
 
 .container {
@@ -254,20 +301,25 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 64px;
+  min-height: 72px;
+  padding: 12px 0;
 }
 
 .logo {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--accent, #2d9d78);
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
   letter-spacing: 0.02em;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
 }
 
 .search-wrap {
@@ -275,42 +327,69 @@ export default {
 }
 
 .nav-search {
-  width: 140px;
-  padding: 8px 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 13px;
+  width: 160px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 14px;
   outline: none;
-  transition: border-color 0.2s, width 0.2s;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
 
 .nav-search:focus {
-  border-color: var(--accent, #2d9d78);
-  width: 180px;
+  border-color: rgba(255, 255, 255, 0.8);
+  width: 200px;
+  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
 .nav-search::placeholder {
-  color: #999;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .nav-links {
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .nav-links a {
   display: block;
-  padding: 10px 16px;
-  color: var(--text-muted, #5a6c7d);
-  font-size: 14px;
+  padding: 12px 20px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 15px;
   font-weight: 500;
-  transition: color 0.2s;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  text-decoration: none;
+  position: relative;
 }
 
 .nav-links a:hover {
-  color: var(--accent, #2d9d78);
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-links a.active {
+  color: #fff;
+  font-weight: 600;
+  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-links a.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 3px;
+  background: #fff;
+  border-radius: 3px;
 }
 
 .main-content {
@@ -318,15 +397,86 @@ export default {
 }
 
 .footer {
-  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
+  background: linear-gradient(135deg, #0061a0 0%, #004a7a 100%);
   color: rgba(255,255,255,0.9);
-  text-align: center;
   padding: 32px 24px;
   font-size: 13px;
 }
 
-.footer p {
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.footer-links {
+  text-align: center;
+}
+
+.footer-links h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.link-list {
+  list-style: none;
   margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.friend-link {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-size: 14px;
+}
+
+.friend-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.contact-info {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  text-align: center;
+}
+
+.contact-link {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.contact-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.footer-copyright {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.footer-copyright p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .link-list {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
 }
 
 @media (max-width: 1200px) {

@@ -3,48 +3,11 @@
     <div class="container">
       <h2 class="page-title">实验室介绍</h2>
       
-      <!-- 实验室基本信息 -->
-      <div class="about-section">
-        <h3>基本信息</h3>
-        <div v-if="labIntro.logo" class="intro-logo-wrap">
-          <img :src="imageUrl(labIntro.logo)" alt="实验室Logo" class="intro-logo">
-        </div>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>实验室名称</label>
-            <p>{{ labIntro.labName || 'XX实验室' }}</p>
-          </div>
-          <div class="info-item">
-            <label>英文名称</label>
-            <p>{{ labIntro.englishName || 'XX Laboratory' }}</p>
-          </div>
-          <div class="info-item">
-            <label>成立时间</label>
-            <p>{{ labIntro.establishedDate || '2020年' }}</p>
-          </div>
-          <div class="info-item">
-            <label>负责人</label>
-            <p>{{ labIntro.leaderName || 'XXX教授' }}</p>
-          </div>
-        </div>
-      </div>
-
       <!-- 实验室介绍 -->
       <div class="about-section">
         <h3>实验室简介</h3>
         <div class="intro-content">
           <p>{{ labIntro.introduction || '实验室致力于科学研究，追求卓越，为社会做出贡献。' }}</p>
-        </div>
-      </div>
-
-      <!-- 研究方向 -->
-      <div class="about-section">
-        <h3>研究方向</h3>
-        <div class="research-areas">
-          <div v-for="(area, index) in labIntro.researchAreas || ['研究方向1', '研究方向2', '研究方向3']" :key="index" class="area-item">
-            <span class="area-number">{{ index + 1 }}</span>
-            <span class="area-name">{{ area }}</span>
-          </div>
         </div>
       </div>
 
@@ -63,11 +26,11 @@
       </div>
 
       <!-- 实验室照片 -->
-      <div class="about-section">
+      <div v-if="labIntro.photos && labIntro.photos.length" class="about-section">
         <h3>实验室环境</h3>
         <div class="photo-grid">
-          <div v-for="(photo, index) in labIntro.photos && labIntro.photos.length ? labIntro.photos : Array(4).fill('')" :key="index" class="photo-item">
-            <img :src="imageUrl(photo) || 'https://via.placeholder.com/400x300'" alt="实验室照片">
+          <div v-for="(photo, index) in labIntro.photos" :key="index" class="photo-item">
+            <img :src="imageUrl(photo)" alt="实验室照片">
           </div>
         </div>
       </div>
@@ -111,7 +74,7 @@ export default {
 .about {
   min-height: 80vh;
   padding: 64px 0 80px;
-  background-color: #f6faf8;
+  background-color: #f5f7ff;
 }
 
 .page-title {
@@ -128,7 +91,8 @@ export default {
   padding: 40px;
   margin-bottom: 24px;
   border-radius: 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .about-section h3 {
@@ -136,122 +100,136 @@ export default {
   font-weight: 600;
   margin-bottom: 24px;
   color: #2c3e50;
-  border-bottom: 1px solid #dde8e4;
+  border-bottom: 2px solid #d6e0f0;
   padding-bottom: 12px;
+  position: relative;
 }
 
-.intro-logo-wrap { margin-bottom: 24px; }
-.intro-logo { max-height: 64px; max-width: 200px; object-fit: contain; }
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 24px;
+.about-section h3::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #d6e0f0, transparent);
 }
 
-.info-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.info-item label {
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: #5a6c7d;
-  font-size: 14px;
-}
-
-.info-item p {
-  font-size: 16px;
-  color: #2c3e50;
+.intro-content {
+  padding: 24px;
+  background-color: #f5f7ff;
+  border-radius: 8px;
+  border-left: 4px solid #d6e0f0;
 }
 
 .intro-content p {
   font-size: 16px;
   line-height: 1.7;
   color: #2c3e50;
-}
-
-.research-areas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.area-item {
-  display: flex;
-  align-items: center;
-  background-color: #f0f7f4;
-  padding: 12px 20px;
-  border-radius: 8px;
-  border: 1px solid #dde8e4;
-}
-
-.area-number {
-  display: inline-block;
-  width: 26px;
-  height: 26px;
-  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
-  color: #fff;
-  border-radius: 50%;
-  text-align: center;
-  line-height: 26px;
-  margin-right: 12px;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.area-name {
-  font-size: 15px;
-  color: #2c3e50;
+  margin: 0;
+  text-align: justify;
 }
 
 .leader-info {
   display: flex;
   gap: 40px;
   align-items: flex-start;
+  padding: 24px;
+  background-color: #f5f7ff;
+  border-radius: 8px;
+  border: 1px solid #d6e0f0;
 }
 
 .leader-photo {
   flex-shrink: 0;
+  position: relative;
+}
+
+.leader-photo::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border: 2px solid #d6e0f0;
+  border-radius: 50%;
+  opacity: 0.3;
+  transition: all 0.3s ease;
+}
+
+.leader-photo:hover::before {
+  opacity: 1;
+  transform: scale(1.05);
 }
 
 .leader-photo img {
-  width: 180px;
-  height: 180px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
   object-fit: cover;
-  background: #f0f7f4;
+  background: #f5f7ff;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.leader-details {
+  flex: 1;
 }
 
 .leader-details h4 {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   color: #2c3e50;
+  display: flex;
+  align-items: center;
+}
+
+.leader-details h4::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, #d6e0f0, transparent);
+  margin-left: 20px;
 }
 
 .leader-details p {
   font-size: 16px;
   line-height: 1.7;
   color: #2c3e50;
+  margin: 0;
+  text-align: justify;
 }
 
 .photo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
+}
+
+.photo-item {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.photo-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .photo-item img {
   width: 100%;
-  height: 200px;
+  height: 220px;
   object-fit: cover;
-  border-radius: 12px;
-  transition: opacity 0.2s;
+  transition: all 0.3s ease;
 }
 
-.photo-item img:hover {
-  opacity: 0.92;
+.photo-item:hover img {
+  transform: scale(1.05);
 }
 
 /* 响应式设计 */
@@ -262,8 +240,20 @@ export default {
     text-align: center;
   }
   
+  .leader-details h4::after {
+    display: none;
+  }
+  
   .photo-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  
+  .about-section {
+    padding: 24px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

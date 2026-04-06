@@ -178,7 +178,7 @@ export default {
 .notice {
   min-height: 80vh;
   padding: 64px 0 80px;
-  background-color: #f6faf8;
+  background-color: #f5f7ff;
 }
 
 .page-title {
@@ -195,7 +195,7 @@ export default {
   padding: 16px 20px;
   background: #fff;
   border-radius: 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 .filter-row {
@@ -209,13 +209,13 @@ export default {
 .filter-label.time-label { margin-left: 4px; }
 .filter-input {
   padding: 10px 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   border-radius: 8px;
   font-size: 14px;
 }
 .filter-input:focus {
   outline: none;
-  border-color: #2d9d78;
+  border-color: #d6e0f0;
 }
 .filter-input-text { min-width: 160px; }
 .filter-time-group { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -226,14 +226,24 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   border-radius: 8px;
   background: #fff;
   font-size: 14px;
   color: #5a6c7d;
   cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
 }
-.dt-trigger.filled { color: #2c3e50; }
+.dt-trigger:hover {
+  border-color: #d6e0f0;
+  color: #2c3e50;
+}
+.dt-trigger.filled {
+  color: #2c3e50;
+  border-color: #d6e0f0;
+  background: #f5f7ff;
+}
+
 .dt-popover {
   position: absolute;
   top: 100%;
@@ -241,7 +251,7 @@ export default {
   margin-top: 4px;
   padding: 12px;
   background: #fff;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   z-index: 10;
@@ -251,7 +261,7 @@ export default {
   display: block;
   cursor: pointer;
   padding: 6px 10px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   border-radius: 6px;
   min-height: 36px;
 }
@@ -259,25 +269,25 @@ export default {
 .date-only-input { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
 .dt-popover-actions { margin-top: 10px; display: flex; gap: 8px; justify-content: flex-end; }
 .dt-btn-clear, .dt-btn-ok { padding: 6px 12px; font-size: 13px; border-radius: 6px; cursor: pointer; }
-.dt-btn-clear { background: #f5f5f5; border: 1px solid #ddd; }
-.dt-btn-ok { background: #2d9d78; color: #fff; border: none; }
+.dt-btn-clear { background: #f5f5f5; border: 1px solid #e8eeff; }
+.dt-btn-ok { background: #fff; border: 1px solid #e8eeff; color: #5a6c7d; }
 .filter-btn { padding: 10px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; }
-.filter-btn-query { background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%); color: #fff; border: none; }
-.filter-btn-clear { background: #fff; border: 1px solid #dde8e4; color: #5a6c7d; }
+.filter-btn-query { background: #fff; border: 1px solid #e8eeff; color: #5a6c7d; }
+.filter-btn-clear { background: #fff; border: 1px solid #e8eeff; color: #5a6c7d; }
 
 .notice-list {
   background: #fff;
   border-radius: 12px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .notice-item {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   padding: 20px 24px;
-  border-bottom: 1px solid #e8f0ed;
+  border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -287,24 +297,12 @@ export default {
 }
 
 .notice-item:hover {
-  background-color: #f0f7f4;
-}
-
-.notice-date {
-  flex-shrink: 0;
-  width: 90px;
-  text-align: center;
-  background: linear-gradient(135deg, #2d9d78 0%, #248f6a 100%);
-  color: #fff;
-  padding: 10px 12px;
-  border-radius: 6px;
-  margin-right: 24px;
-  font-size: 13px;
-  font-weight: 500;
+  background-color: #f0f7ff;
 }
 
 .notice-content {
   flex: 1;
+  margin-bottom: 12px;
 }
 
 .notice-title {
@@ -317,8 +315,17 @@ export default {
 .notice-summary {
   font-size: 14px;
   color: #5a6c7d;
-  margin-bottom: 0;
+  margin-bottom: 12px;
   line-height: 1.6;
+}
+
+.notice-date {
+  text-align: left;
+  color: #5a6c7d;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 0;
+  border-top: 1px solid #f0f0f0;
 }
 
 .empty-hint,
@@ -339,7 +346,7 @@ export default {
 }
 .pagination button {
   padding: 10px 18px;
-  border: 1px solid #dde8e4;
+  border: 1px solid #e8eeff;
   background: #fff;
   border-radius: 6px;
   cursor: pointer;
@@ -348,8 +355,8 @@ export default {
   transition: border-color 0.2s, color 0.2s;
 }
 .pagination button:hover:not(:disabled) {
-  border-color: #2d9d78;
-  color: #2d9d78;
+  border-color: #165DFF;
+  color: #165DFF;
 }
 .pagination button:disabled {
   cursor: not-allowed;
