@@ -362,6 +362,7 @@ export default {
         this.load(this.pageNum)
       } catch (e) {
         alert(e.message || '操作失败')
+        this.load(this.pageNum) // 保存失败时也刷新数据
       } finally {
         this.saving = false
       }
