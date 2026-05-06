@@ -1,8 +1,6 @@
 <template>
   <div class="achievements">
     <div class="container">
-      <h2 class="page-title">科研成果</h2>
-      
       <!-- 成果类型切换 -->
       <div class="tab-container">
         <button 

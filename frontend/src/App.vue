@@ -57,7 +57,6 @@
               <li v-if="contact.address" class="contact-info">地址：{{ contact.address }}</li>
               <li v-if="contact.phone" class="contact-info">电话：{{ contact.phone }}</li>
               <li v-if="contact.email" class="contact-info">邮箱：{{ contact.email }}</li>
-              <li v-if="contact.workTime" class="contact-info">工作日：{{ contact.workTime }}</li>
             </ul>
           </div>
           <div class="footer-copyright">
@@ -200,7 +199,7 @@ export default {
     navigate(page, params) {
       // 滚动到顶部
       window.scrollTo({ top: 0, behavior: 'smooth' })
-      
+
       if (page === 'detail' && params && (params.type != null && params.id != null)) {
         this.currentPage = 'detail'
         this.detailParams = { type: params.type, id: params.id }
@@ -216,6 +215,11 @@ export default {
       } else {
         this.initialParams = { achievementsTab: null }
         this.writePath(page)
+      }
+      // 首页时刷新数据以获取最新标题配置
+      if (page === 'home') {
+        this.fetchSiteTitle()
+        this.fetchContact()
       }
     },
     onSearchSubmit() {
@@ -303,10 +307,12 @@ export default {
   justify-content: space-between;
   min-height: 72px;
   padding: 12px 0;
+  gap: 16px;
 }
 
 .logo {
-  font-size: 24px;
+  flex-shrink: 0;
+  font-size: 20px;
   font-weight: 700;
   color: #fff;
   letter-spacing: 0.02em;
@@ -314,12 +320,17 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 400px;
 }
 
 .nav-right {
   display: flex;
   align-items: center;
   gap: 24px;
+  flex-shrink: 0;
 }
 
 .search-wrap {
@@ -491,9 +502,16 @@ export default {
     padding: 16px 0;
     gap: 12px;
   }
+  .logo {
+    font-size: 16px;
+    max-width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
   .nav-right {
     flex-direction: column;
     width: 100%;
+    flex-shrink: 1;
   }
   .search-wrap {
     width: 100%;

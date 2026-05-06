@@ -1,7 +1,6 @@
 <template>
   <div class="team">
     <div class="container">
-      <h2 class="page-title">师资队伍</h2>
       <div class="filter-wrap">
         <form class="filter-row" @submit.prevent="onSearch">
           <label class="filter-label">关键词</label>

@@ -58,7 +58,10 @@ export async function request(url, options = {}) {
   const data = await res.json().catch(() => ({}))
   if (data.code === 401 || res.status === 401) {
     setToken(null)
-    if (typeof window !== 'undefined') window.dispatchEvent(new Event('admin-logout'))
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('admin-logout'))
+      window.location.href = '/admin'
+    }
     throw new Error('登录已过期，请重新登录')
   }
   return data

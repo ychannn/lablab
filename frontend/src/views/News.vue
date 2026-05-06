@@ -1,7 +1,6 @@
 <template>
   <div class="news">
     <div class="container">
-      <h2 class="page-title">新闻</h2>
       <div class="filter-wrap">
         <form class="filter-row" @submit.prevent="onSearch">
           <label class="filter-label">关键词</label>

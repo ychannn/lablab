@@ -17,7 +17,7 @@ import java.util.Properties;
 
 /**
  * 从外部文件加载邮件账号与授权码，注入为 spring.mail.username / spring.mail.password，
- * 避免在 application.yml 中明文填写。文件路径由 app.mail-credentials-file 指定。
+ * 避免在 application-dev.yml 中明文填写。文件路径由 app.mail-credentials-file 指定。
  */
 public class MailCredentialsEnvironmentPostProcessor implements EnvironmentPostProcessor {
 

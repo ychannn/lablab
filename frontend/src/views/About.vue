@@ -1,8 +1,6 @@
 <template>
   <div class="about">
     <div class="container">
-      <h2 class="page-title">实验室介绍</h2>
-      
       <!-- 实验室介绍 -->
       <div class="about-section">
         <h3>实验室简介</h3>
@@ -14,7 +12,20 @@
       <!-- 实验室负责人 -->
       <div class="about-section">
         <h3>实验室负责人</h3>
-        <div class="leader-info">
+        <div v-if="directors && directors.length" class="directors-list">
+          <div v-for="(director, index) in directors" :key="index" class="leader-info">
+            <div class="leader-photo">
+              <img :src="imageUrl(director.photo) || 'https://via.placeholder.com/200x200'" alt="负责人照片">
+            </div>
+            <div class="leader-details">
+              <h4>{{ director.name || 'XXX教授' }}</h4>
+              <p v-if="director.title" class="leader-title">{{ director.title }}</p>
+              <p v-if="director.email" class="leader-email">{{ director.email }}</p>
+              <p>{{ director.intro || '具有丰富的科研经验和深厚的学术造诣。' }}</p>
+            </div>
+          </div>
+        </div>
+        <div v-else class="leader-info">
           <div class="leader-photo">
             <img :src="imageUrl(labIntro.leaderPhoto) || 'https://via.placeholder.com/200x200'" alt="负责人照片">
           </div>
@@ -27,7 +38,7 @@
 
       <!-- 实验室照片 -->
       <div v-if="labIntro.photos && labIntro.photos.length" class="about-section">
-        <h3>实验室环境</h3>
+        <h3>{{ titles.labEnvTitle || '实验室环境' }}</h3>
         <div class="photo-grid">
           <div v-for="(photo, index) in labIntro.photos" :key="index" class="photo-item">
             <img :src="imageUrl(photo)" alt="实验室照片">
@@ -44,11 +55,16 @@ export default {
   name: 'About',
   data() {
     return {
-      labIntro: {}
+      labIntro: {},
+      directors: [],
+      titles: {
+        labEnvTitle: ''
+      }
     }
   },
   mounted() {
     this.fetchLabIntro()
+    this.fetchConfig()
   },
   methods: {
     imageUrl(url) {
@@ -64,6 +80,24 @@ export default {
         }
       } catch (error) {
         console.error('获取实验室介绍失败:', error)
+      }
+    },
+    async fetchConfig() {
+      try {
+        const response = await fetch(apiBase + '/home')
+        const data = await response.json()
+        if (data.code === 200 && data.data) {
+          // 获取标题配置
+          if (data.data.titles) {
+            this.titles = { ...this.titles, ...data.data.titles }
+          }
+          // 获取负责人信息
+          if (data.data.directors) {
+            this.directors = data.data.directors
+          }
+        }
+      } catch (error) {
+        console.error('获取配置失败:', error)
       }
     }
   }
@@ -130,6 +164,12 @@ export default {
   text-align: justify;
 }
 
+.directors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 .leader-info {
   display: flex;
   gap: 40px;
@@ -180,7 +220,7 @@ export default {
 .leader-details h4 {
   font-size: 22px;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   color: #2c3e50;
   display: flex;
   align-items: center;
@@ -192,6 +232,19 @@ export default {
   height: 1px;
   background: linear-gradient(90deg, #d6e0f0, transparent);
   margin-left: 20px;
+}
+
+.leader-title {
+  font-size: 16px;
+  color: #5a6c7d;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.leader-email {
+  font-size: 14px;
+  color: #6b6b6b;
+  margin: 0 0 12px 0;
 }
 
 .leader-details p {

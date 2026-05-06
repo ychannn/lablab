@@ -27,6 +27,7 @@
           <SiteSettings v-show="currentMenu === 'site'" />
           <BannerManage v-show="currentMenu === 'banner'" />
           <ContactManage v-show="currentMenu === 'contact'" />
+          <FriendLinkManage v-show="currentMenu === 'friend-links'" />
           <LabIntroManage v-show="currentMenu === 'lab-intro'" />
           <LabNewsCrud v-show="currentMenu === 'lab-news'" />
           <NoticeCrud v-show="currentMenu === 'notice'" />
@@ -138,8 +139,9 @@ import DirectionCrud from './views/crud/DirectionCrud.vue'
 import ScholarCrud from './views/crud/ScholarCrud.vue'
 import AreaCrud from './views/crud/AreaCrud.vue'
 import AdminManage from './views/AdminManage.vue'
+import FriendLinkManage from './views/FriendLinkManage.vue'
 
-const MENU_KEYS = ['site', 'banner', 'contact', 'lab-intro', 'lab-news', 'notice', 'publication', 'topic-project', 'achievement', 'direction', 'scholar', 'area', 'admins']
+const MENU_KEYS = ['site', 'banner', 'contact', 'friend-links', 'lab-intro', 'lab-news', 'notice', 'publication', 'topic-project', 'achievement', 'direction', 'scholar', 'area', 'admins']
 
 export default {
   name: 'AdminApp',
@@ -148,6 +150,7 @@ export default {
     SiteSettings,
     BannerManage,
     ContactManage,
+    FriendLinkManage,
     LabIntroManage,
     LabNewsCrud,
     NoticeCrud,
@@ -184,6 +187,7 @@ export default {
         { key: 'site', label: '站点设置' },
         { key: 'banner', label: '首页轮播图' },
         { key: 'contact', label: '联系我们' },
+        { key: 'friend-links', label: '友情链接' },
         { key: 'lab-intro', label: '实验室介绍' }
       ],
       crudMenus: [

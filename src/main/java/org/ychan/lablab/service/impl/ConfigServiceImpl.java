@@ -8,7 +8,9 @@ import org.ychan.lablab.dto.resp.config.BannerItemDTO;
 import org.ychan.lablab.dto.resp.config.ContactRespDTO;
 import org.ychan.lablab.dto.resp.config.LabIntroRespDTO;
 import org.ychan.lablab.entity.config.Config;
+import org.ychan.lablab.entity.config.FriendLink;
 import org.ychan.lablab.mapper.ConfigMapper;
+import org.ychan.lablab.mapper.FriendLinkMapper;
 import org.ychan.lablab.service.ConfigService;
 
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.List;
 public class ConfigServiceImpl implements ConfigService {
 
     private final ConfigMapper configMapper;
+    private final FriendLinkMapper friendLinkMapper;
 
     private static final String TYPE_CONTACT = "contact";
     private static final String TYPE_LAB_INTRO = "lab_intro";
@@ -181,9 +184,43 @@ public class ConfigServiceImpl implements ConfigService {
         dto.setLabName("XX实验室");
         dto.setEnglishName("XX Laboratory");
         dto.setIntroduction("本实验室致力于前沿科学研究，拥有优秀的研究团队和先进的实验设备。");
-        dto.setLeaderName("XXX教授");
-        dto.setLeaderIntroduction("XXX教授是实验室负责人，在相关领域有深厚的研究积累。");
         dto.setEstablishedDate("2020年");
         return dto;
+    }
+
+    @Override
+    public String getConfigValue(String key, String defaultValue) {
+        Config config = configMapper.selectByType(key);
+        if (config == null || config.getConfigValue() == null || config.getConfigValue().isBlank()) {
+            return defaultValue;
+        }
+        return config.getConfigValue().trim();
+    }
+
+    @Override
+    public List<FriendLink> getFriendLinks() {
+        try {
+            return friendLinkMapper.selectEnabledLinks();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public void updateConfigValue(String key, String value) {
+        Config config = configMapper.selectByType(key);
+        if (config == null) {
+            config = new Config();
+            config.setConfigType(key);
+            config.setConfigName(key);
+            config.setDescription("页面标题配置");
+            config.setSort(10);
+        }
+        config.setConfigValue(value != null ? value.trim() : "");
+        if (config.getId() == null) {
+            configMapper.insert(config);
+        } else {
+            configMapper.updateById(config);
+        }
     }
 }

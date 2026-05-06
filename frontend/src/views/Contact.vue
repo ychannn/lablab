@@ -1,8 +1,6 @@
 <template>
   <div class="contact">
     <div class="container">
-      <h2 class="page-title">联系我们</h2>
-      
       <div class="contact-content">
         <!-- 联系信息 -->
         <div class="contact-info">
@@ -29,13 +27,6 @@
                 <p>{{ contact.email }}</p>
               </div>
             </div>
-            <div class="info-item">
-              <div class="info-icon">🕒</div>
-              <div class="info-details">
-                <h4>工作时间</h4>
-                <p>{{ contact.workTime }}</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -54,8 +45,7 @@ export default {
         address: '北京市海淀区学院路30号',
         zipCode: '100000',
         phone: '010-12345678',
-        email: 'lab@example.com',
-        workTime: '周一至周五 9:00-17:00'
+        email: 'lab@example.com'
       }
     }
   },

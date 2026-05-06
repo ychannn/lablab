@@ -3,6 +3,7 @@ package org.ychan.lablab.service;
 import org.ychan.lablab.dto.resp.config.BannerItemDTO;
 import org.ychan.lablab.dto.resp.config.ContactRespDTO;
 import org.ychan.lablab.dto.resp.config.LabIntroRespDTO;
+import org.ychan.lablab.entity.config.FriendLink;
 
 import java.util.List;
 
@@ -55,4 +56,19 @@ public interface ConfigService {
      * 更新首页轮播图列表（后台管理）
      */
     void updateBannerList(List<BannerItemDTO> list);
+
+    /**
+     * 获取配置值
+     */
+    String getConfigValue(String key, String defaultValue);
+
+    /**
+     * 获取友情链接列表
+     */
+    List<FriendLink> getFriendLinks();
+
+    /**
+     * 更新配置值
+     */
+    void updateConfigValue(String key, String value);
 }

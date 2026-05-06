@@ -8,7 +8,7 @@
           <div class="left-content">
             <!-- 新闻轮播 -->
             <div class="news-carousel-section">
-              <h3 class="section-title">新闻动态</h3>
+              <h3 class="section-title">{{ titles.homeCarouselTitle || '新闻动态' }}</h3>
               <div v-if="latestNews.length" class="news-carousel" @mouseenter="stopNewsAuto" @mouseleave="startNewsAuto">
                 <div class="news-track" :style="{ transform: 'translateX(-' + newsIndex * 100 + '%)' }">
                   <div
@@ -37,7 +37,7 @@
             
             <!-- 校园风景展示 -->
             <div class="campus-carousel-section">
-              <h3 class="section-title">校园风景</h3>
+              <h3 class="section-title">{{ titles.campusTitle || '校园风景' }}</h3>
               <div class="main-image">
                 <div v-if="bannerList.length" class="campus-carousel" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
                   <div class="campus-track" :style="{ transform: 'translateX(-' + currentIndex * 100 + '%)' }">
@@ -66,7 +66,7 @@
           <div class="right-content">
             <!-- 实验室动态 -->
             <div class="info-section">
-              <h3 class="section-title">实验室动态</h3>
+              <h3 class="section-title">{{ titles.labNewsTitle || '实验室动态' }}</h3>
               <ul class="info-list">
                 <li 
                   v-for="item in latestNews" 
@@ -86,7 +86,7 @@
 
             <!-- 公告通知 -->
             <div class="info-section">
-              <h3 class="section-title">公告通知</h3>
+              <h3 class="section-title">{{ titles.noticeTitle || '公告通知' }}</h3>
               <ul class="info-list">
                 <li 
                   v-for="item in latestNotices" 
@@ -106,13 +106,27 @@
 
             <!-- 友情链接 -->
             <div class="info-section">
-              <h3 class="section-title">友情链接</h3>
+              <h3 class="section-title">{{ titles.friendLinkTitle || '友情链接' }}</h3>
               <ul class="link-list">
-                <li><a href="#" class="friend-link">广东外语外贸大学</a></li>
-                <li><a href="#" class="friend-link">信息科学与技术学院</a></li>
-                <li><a href="#" class="friend-link">教育部</a></li>
-                <li><a href="#" class="friend-link">广东省教育厅</a></li>
+                <li v-for="link in friendLinks" :key="link.id">
+                  <a :href="link.url" class="friend-link" target="_blank">{{ link.name }}</a>
+                </li>
+                <li v-if="friendLinks.length === 0" class="empty">
+                  <span class="empty-tip">暂无友情链接</span>
+                </li>
               </ul>
+            </div>
+
+            <!-- 管理员登录 -->
+            <div class="info-section">
+              <a href="/admin" class="admin-login-link" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                  <circle cx="10 18" r="3"/>
+                  <path d="M2 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H2"/>
+                </svg>
+                <span>管理员登录</span>
+              </a>
             </div>
           </div>
         </div>
@@ -142,11 +156,21 @@ export default {
         introduction: '实验室致力于科学研究，追求卓越，为社会做出贡献。'
       },
       contact: {
-        address: '北京市海淀区学院路30号',
-        phone: '010-12345678',
-        email: 'lab@example.com',
-        workTime: '周一至周五 9:00-17:00'
-      }
+        address: '',
+        phone: '',
+        email: '',
+        workTime: ''
+      },
+      titles: {
+        homeCarouselTitle: '',
+        campusTitle: '',
+        labNewsTitle: '',
+        noticeTitle: '',
+        friendLinkTitle: '',
+        labEnvTitle: ''
+      },
+      directors: [],
+      friendLinks: []
     }
   },
   computed: {
@@ -200,6 +224,18 @@ export default {
           this.newsIndex = 0
           this.startNewsAuto()
           this.contact = data.data.contact || this.contact
+          // 获取标题配置
+          if (data.data.titles) {
+            this.titles = { ...this.titles, ...data.data.titles }
+          }
+          // 获取负责人信息
+          if (data.data.directors) {
+            this.directors = data.data.directors
+          }
+          // 获取友情链接
+          if (data.data.friendLinks) {
+            this.friendLinks = data.data.friendLinks
+          }
         }
       } catch (error) {
         console.error('获取首页数据失败:', error)
@@ -736,6 +772,21 @@ export default {
 .friend-link:hover {
   color: #165DFF;
   text-decoration: underline;
+}
+
+.admin-login-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+  text-decoration: none;
+  padding: 10px 0;
+  transition: color 0.2s;
+}
+
+.admin-login-link:hover {
+  color: #165DFF;
 }
 
 .empty-tip {

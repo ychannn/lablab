@@ -3,47 +3,17 @@
     <h2 class="page-title">联系我们</h2>
     <p class="hint">门户「联系我们」页展示内容，可视化编辑后保存。</p>
     <div class="form-card">
-      <div class="form-row">
-        <div class="form-group">
-          <label>实验室名称</label>
-          <input v-model="form.labName" type="text" class="form-input" />
-        </div>
-        <div class="form-group">
-          <label>邮编</label>
-          <input v-model="form.zipCode" type="text" class="form-input" />
-        </div>
-      </div>
       <div class="form-group">
         <label>地址</label>
-        <input v-model="form.address" type="text" class="form-input" />
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>电话</label>
-          <input v-model="form.phone" type="text" class="form-input" />
-        </div>
-        <div class="form-group">
-          <label>邮箱</label>
-          <input v-model="form.email" type="text" class="form-input" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>传真</label>
-          <input v-model="form.fax" type="text" class="form-input" />
-        </div>
-        <div class="form-group">
-          <label>工作时间</label>
-          <input v-model="form.workTime" type="text" class="form-input" placeholder="如：周一至周五 9:00-17:00" />
-        </div>
+        <input v-model="form.address" type="text" class="form-input" placeholder="请输入实验室地址" />
       </div>
       <div class="form-group">
-        <label>微信公众号</label>
-        <input v-model="form.wechat" type="text" class="form-input" />
+        <label>电话</label>
+        <input v-model="form.phone" type="text" class="form-input" placeholder="请输入联系电话" />
       </div>
       <div class="form-group">
-        <label>简介</label>
-        <textarea v-model="form.introduction" class="form-textarea" rows="3"></textarea>
+        <label>邮箱</label>
+        <input v-model="form.email" type="email" class="form-input" placeholder="请输入邮箱地址" />
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn-primary" :disabled="saving" @click="save">{{ saving ? '保存中…' : '保存' }}</button>
@@ -60,15 +30,9 @@ export default {
   data() {
     return {
       form: {
-        labName: '',
         address: '',
-        zipCode: '',
         phone: '',
-        email: '',
-        fax: '',
-        workTime: '',
-        wechat: '',
-        introduction: ''
+        email: ''
       },
       saving: false
     }

@@ -2,7 +2,10 @@
   <div class="lab-intro-manage">
     <h2 class="page-title">实验室介绍</h2>
     <p class="hint">门户「实验室介绍」页展示内容，可视化编辑后保存。</p>
+    
+    <!-- 基本信息 -->
     <div class="form-card">
+      <h3 class="section-label">基本信息</h3>
       <div class="form-row">
         <div class="form-group">
           <label>实验室名称</label>
@@ -22,14 +25,6 @@
         <textarea v-model="form.introduction" class="form-textarea" rows="5"></textarea>
       </div>
       <div class="form-group">
-        <label>负责人姓名</label>
-        <input v-model="form.leaderName" type="text" class="form-input" />
-      </div>
-      <div class="form-group">
-        <label>负责人简介</label>
-        <textarea v-model="form.leaderIntroduction" class="form-textarea" rows="4"></textarea>
-      </div>
-      <div class="form-group">
         <label>实验室 Logo</label>
         <div class="upload-row">
           <input ref="logoInput" type="file" accept="image/*" class="hidden" @change="e => onImageUpload(e, 'logo')" />
@@ -38,15 +33,54 @@
           <div v-if="form.logo" class="thumb-wrap"><img :src="imageUrl(form.logo)" alt="Logo" class="thumb-img" /></div>
         </div>
       </div>
-      <div class="form-group">
-        <label>负责人照片</label>
-        <div class="upload-row">
-          <input ref="leaderPhotoInput" type="file" accept="image/*" class="hidden" @change="e => onImageUpload(e, 'leaderPhoto')" />
-          <button type="button" class="btn btn-secondary" @click="$refs.leaderPhotoInput.click()">{{ form.leaderPhoto ? '更换图片' : '上传图片' }}</button>
-          <span v-if="uploadingLeader" class="upload-status">上传中…</span>
-          <div v-if="form.leaderPhoto" class="thumb-wrap"><img :src="imageUrl(form.leaderPhoto)" alt="负责人" class="thumb-img" /></div>
+    </div>
+
+    <!-- 实验室负责人 -->
+    <div class="form-card">
+      <div class="section-header">
+        <h3 class="section-label">实验室负责人</h3>
+        <button type="button" class="btn btn-secondary btn-sm" @click="addDirector">+ 添加负责人</button>
+      </div>
+      <div class="directors-list">
+        <div v-for="(director, index) in form.directors" :key="index" class="director-card">
+          <div class="director-header">
+            <span class="director-title">负责人 {{ index + 1 }}</span>
+            <button v-if="form.directors.length > 1" type="button" class="btn btn-remove-sm" @click="removeDirector(index)">删除</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>姓名</label>
+              <input v-model="director.name" type="text" class="form-input" placeholder="姓名" maxlength="20" />
+            </div>
+            <div class="form-group">
+              <label>职称</label>
+              <input v-model="director.title" type="text" class="form-input" placeholder="职称" maxlength="30" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>邮箱</label>
+            <input v-model="director.email" type="email" class="form-input" placeholder="邮箱" maxlength="50" />
+          </div>
+          <div class="form-group">
+            <label>简介</label>
+            <textarea v-model="director.intro" class="form-textarea" rows="3" placeholder="简介" maxlength="200"></textarea>
+          </div>
+          <div class="form-group">
+            <label>照片</label>
+            <div class="upload-row">
+              <input :ref="'photoInput' + index" type="file" accept="image/*" class="hidden" @change="e => onDirectorPhotoUpload(e, index)" />
+              <button type="button" class="btn btn-secondary btn-sm" @click="$refs['photoInput' + index].click()">{{ director.photo ? '更换照片' : '上传照片' }}</button>
+              <span v-if="uploadingPhotos[index]" class="upload-status">上传中…</span>
+              <div v-if="director.photo" class="thumb-wrap"><img :src="imageUrl(director.photo)" alt="照片" class="thumb-img" /></div>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+
+    <!-- 研究方向和荣誉资质 -->
+    <div class="form-card">
+      <h3 class="section-label">研究方向与荣誉资质</h3>
       <div class="form-group">
         <label>研究方向（每行一项）</label>
         <textarea v-model="researchAreasText" class="form-textarea" rows="3" placeholder="方向一&#10;方向二"></textarea>
@@ -55,30 +89,34 @@
         <label>荣誉资质（每行一项）</label>
         <textarea v-model="honorsText" class="form-textarea" rows="3" placeholder="荣誉一&#10;荣誉二"></textarea>
       </div>
-      <div class="form-group">
-        <label>实验室图片</label>
-        <div class="upload-row">
-          <input ref="photosInput" type="file" accept="image/*" class="hidden" @change="onPhotosUpload" />
-          <button type="button" class="btn btn-secondary" @click="$refs.photosInput.click()">上传图片（可多张）</button>
-          <span v-if="uploadingPhotos" class="upload-status">上传中…</span>
-        </div>
-        <div v-if="form.photos && form.photos.length" class="photos-preview">
-          <div v-for="(photo, index) in form.photos" :key="index" class="photo-preview-item">
-            <img :src="imageUrl(photo)" alt="实验室图片" class="photo-preview-img" />
-            <button type="button" class="btn btn-remove" @click="removePhoto(index)">删除</button>
-          </div>
-        </div>
-        <p v-else class="empty-photos">暂无实验室图片，请点击上传按钮添加</p>
+    </div>
+
+    <!-- 实验室环境图片 -->
+    <div class="form-card">
+      <h3 class="section-label">实验室环境图片</h3>
+      <div class="upload-row">
+        <input ref="photosInput" type="file" accept="image/*" class="hidden" @change="onPhotosUpload" />
+        <button type="button" class="btn btn-secondary" @click="$refs.photosInput.click()">上传图片（可多张）</button>
+        <span v-if="uploadingPhotos" class="upload-status">上传中…</span>
       </div>
-      <div class="form-actions">
-        <button type="button" class="btn btn-primary" :disabled="saving" @click="save">{{ saving ? '保存中…' : '保存' }}</button>
+      <div v-if="form.photos && form.photos.length" class="photos-preview">
+        <div v-for="(photo, index) in form.photos" :key="index" class="photo-preview-item">
+          <img :src="imageUrl(photo)" alt="实验室图片" class="photo-preview-img" />
+          <button type="button" class="btn btn-remove" @click="removePhoto(index)">删除</button>
+        </div>
       </div>
+      <p v-else class="empty-photos">暂无实验室图片，请点击上传按钮添加</p>
+    </div>
+
+    <!-- 保存按钮 -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-primary btn-large" :disabled="saving" @click="save">{{ saving ? '保存中…' : '保存' }}</button>
     </div>
   </div>
 </template>
 
 <script>
-import { request, API_BASE } from '../api/auth'
+import { request } from '../api/auth'
 
 export default {
   name: 'LabIntroManage',
@@ -88,11 +126,11 @@ export default {
         labName: '',
         englishName: '',
         introduction: '',
-        leaderName: '',
-        leaderIntroduction: '',
         establishedDate: '',
         logo: '',
-        leaderPhoto: '',
+        directors: [
+          { name: '', title: '', email: '', intro: '', photo: '' }
+        ],
         researchAreas: [],
         honors: [],
         photos: []
@@ -101,8 +139,7 @@ export default {
       honorsText: '',
       saving: false,
       uploadingLogo: false,
-      uploadingLeader: false,
-      uploadingPhotos: false
+      uploadingPhotos: {}
     }
   },
   mounted() {
@@ -117,8 +154,7 @@ export default {
       const file = e.target.files?.[0]
       e.target.value = ''
       if (!file) return
-      const key = field === 'logo' ? 'uploadingLogo' : 'uploadingLeader'
-      this[key] = true
+      this.uploadingLogo = true
       try {
         const formData = new FormData()
         formData.append('file', file)
@@ -128,14 +164,33 @@ export default {
       } catch (err) {
         alert(err.message || '上传失败')
       } finally {
-        this[key] = false
+        this.uploadingLogo = false
+      }
+    },
+    async onDirectorPhotoUpload(e, index) {
+      const file = e.target.files?.[0]
+      e.target.value = ''
+      if (!file) return
+      this.$set(this.uploadingPhotos, index, true)
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        const data = await request('/config/admin/upload', { method: 'POST', body: formData })
+        if (data.code === 200 && data.data) {
+          this.form.directors[index].photo = data.data
+        } else {
+          alert(data.message || '上传失败')
+        }
+      } catch (err) {
+        alert(err.message || '上传失败')
+      } finally {
+        this.$set(this.uploadingPhotos, index, false)
       }
     },
     async onPhotosUpload(e) {
       const file = e.target.files?.[0]
       e.target.value = ''
       if (!file) return
-      this.uploadingPhotos = true
       try {
         const formData = new FormData()
         formData.append('file', file)
@@ -148,8 +203,6 @@ export default {
         } else alert(data.message || '上传失败')
       } catch (err) {
         alert(err.message || '上传失败')
-      } finally {
-        this.uploadingPhotos = false
       }
     },
     async fetchIntro() {
@@ -157,11 +210,25 @@ export default {
         const data = await request('/config/lab-intro')
         if (data.code === 200 && data.data) {
           Object.assign(this.form, data.data)
+          // 确保负责人数组存在
+          if (!this.form.directors || this.form.directors.length === 0) {
+            this.form.directors = [{ name: '', title: '', email: '', intro: '', photo: '' }]
+          }
           this.researchAreasText = (this.form.researchAreas || []).join('\n')
           this.honorsText = (this.form.honors || []).join('\n')
         }
       } catch (e) {
         console.error(e)
+      }
+    },
+    addDirector() {
+      this.form.directors.push({ name: '', title: '', email: '', intro: '', photo: '' })
+    },
+    removeDirector(index) {
+      if (this.form.directors.length > 1) {
+        if (confirm('确定要删除这位负责人吗？')) {
+          this.form.directors.splice(index, 1)
+        }
       }
     },
     removePhoto(index) {
@@ -172,7 +239,6 @@ export default {
     async save() {
       this.form.researchAreas = this.researchAreasText.split(/\n/).map(s => s.trim()).filter(Boolean)
       this.form.honors = this.honorsText.split(/\n/).map(s => s.trim()).filter(Boolean)
-      // 确保photos是数组
       if (!this.form.photos) {
         this.form.photos = []
       }
@@ -201,16 +267,38 @@ export default {
 .lab-intro-manage { padding: 0; }
 .page-title { font-size: 24px; margin-bottom: 8px; color: #333; }
 .hint { color: #666; font-size: 14px; margin-bottom: 24px; }
+
 .form-card {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   padding: 24px;
-  max-width: 720px;
+  margin-bottom: 24px;
 }
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.section-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 16px 0;
+}
+
+.section-header .section-label {
+  margin: 0;
+}
+
 .form-row { display: flex; gap: 20px; flex-wrap: wrap; }
 .form-row .form-group { flex: 1; min-width: 200px; }
-.form-group { margin-bottom: 20px; }
+.form-group { margin-bottom: 16px; }
 .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #333; }
 .form-input, .form-textarea {
   width: 100%;
@@ -221,16 +309,44 @@ export default {
 }
 .form-textarea { resize: vertical; min-height: 60px; }
 .form-input:focus, .form-textarea:focus { border-color: #1890ff; outline: none; }
-.form-actions { margin-top: 24px; }
+
 .btn { padding: 8px 20px; border-radius: 4px; border: none; cursor: pointer; font-size: 14px; }
 .btn-primary { background: #1890ff; color: #fff; }
 .btn-secondary { background: #f0f0f0; color: #333; }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-sm { padding: 4px 12px; font-size: 12px; }
+.btn-large { padding: 12px 32px; font-size: 16px; }
+.btn-remove-sm {
+  padding: 4px 12px;
+  background: #f5222d;
+  color: #fff;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-remove-sm:hover { background: #ff4d4f; }
+
 .hidden { display: none; }
 .upload-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .upload-status { font-size: 14px; color: #666; }
 .thumb-wrap .thumb-img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #e8e8e8; }
-.photos-list { margin-top: 8px; }
+
+.directors-list { margin-top: 16px; }
+.director-card {
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+.director-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.director-title { font-weight: 500; color: #333; }
+
 .photos-preview {
   display: flex;
   flex-wrap: wrap;
@@ -260,9 +376,8 @@ export default {
   border-radius: 4px;
   cursor: pointer;
 }
-.btn-remove:hover {
-  background: #ff4d4f;
-}
+.btn-remove:hover { background: #ff4d4f; }
+
 .empty-photos {
   color: #666;
   font-size: 14px;
@@ -272,4 +387,6 @@ export default {
   border-radius: 4px;
   text-align: center;
 }
+
+.form-actions { margin-top: 32px; padding-top: 24px; border-top: 1px solid #e8e8e8; }
 </style>

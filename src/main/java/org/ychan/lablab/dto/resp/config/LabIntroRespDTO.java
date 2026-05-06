@@ -36,19 +36,9 @@ public class LabIntroRespDTO {
     private List<String> researchAreas;
 
     /**
-     * 负责人姓名
+     * 负责人列表
      */
-    private String leaderName;
-
-    /**
-     * 负责人照片
-     */
-    private String leaderPhoto;
-
-    /**
-     * 负责人简介
-     */
-    private String leaderIntroduction;
+    private List<DirectorDTO> directors;
 
     /**
      * 成立时间
@@ -64,4 +54,16 @@ public class LabIntroRespDTO {
      * 荣誉资质
      */
     private List<String> honors;
+
+    /**
+     * 负责人DTO
+     */
+    @Data
+    public static class DirectorDTO {
+        private String name;
+        private String title;
+        private String email;
+        private String intro;
+        private String photo;
+    }
 }

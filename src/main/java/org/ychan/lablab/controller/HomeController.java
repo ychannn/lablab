@@ -110,6 +110,27 @@ public class HomeController {
         ContactRespDTO contact = configService.getContactInfo();
         resp.setContact(contact);
 
+        // 获取标题配置
+        TitlesDTO titles = new TitlesDTO();
+        titles.setHomeCarouselTitle(configService.getConfigValue("homeCarouselTitle", "新闻动态"));
+        titles.setCampusTitle(configService.getConfigValue("campusTitle", "校园风景"));
+        titles.setLabNewsTitle(configService.getConfigValue("labNewsTitle", "实验室动态"));
+        titles.setNoticeTitle(configService.getConfigValue("noticeTitle", "公告通知"));
+        titles.setFriendLinkTitle(configService.getConfigValue("friendLinkTitle", "友情链接"));
+        titles.setLabEnvTitle(configService.getConfigValue("labEnvTitle", "实验室环境"));
+        resp.setTitles(titles);
+
+        // 获取友情链接
+        List<FriendLinkDTO> friendLinkDTOs = new ArrayList<>();
+        for (org.ychan.lablab.entity.config.FriendLink link : configService.getFriendLinks()) {
+            FriendLinkDTO dto = new FriendLinkDTO();
+            dto.setId(link.getId());
+            dto.setName(link.getName());
+            dto.setUrl(link.getUrl());
+            friendLinkDTOs.add(dto);
+        }
+        resp.setFriendLinks(friendLinkDTOs);
+
         return Result.success(resp);
     }
 
@@ -128,6 +149,10 @@ public class HomeController {
         private List<NoticeRespDTO> latestNotices;
         private LabIntroRespDTO labIntro;
         private ContactRespDTO contact;
+        /** 页面标题配置 */
+        private TitlesDTO titles;
+        /** 友情链接列表 */
+        private List<FriendLinkDTO> friendLinks;
 
         public String getSiteTitle() {
             return siteTitle;
@@ -184,6 +209,63 @@ public class HomeController {
         public void setContact(ContactRespDTO contact) {
             this.contact = contact;
         }
+
+        public TitlesDTO getTitles() {
+            return titles;
+        }
+
+        public void setTitles(TitlesDTO titles) {
+            this.titles = titles;
+        }
+
+        public List<FriendLinkDTO> getFriendLinks() {
+            return friendLinks;
+        }
+
+        public void setFriendLinks(List<FriendLinkDTO> friendLinks) {
+            this.friendLinks = friendLinks;
+        }
+    }
+
+    /**
+     * 页面标题配置DTO
+     */
+    public static class TitlesDTO {
+        private String homeCarouselTitle;
+        private String campusTitle;
+        private String labNewsTitle;
+        private String noticeTitle;
+        private String friendLinkTitle;
+        private String labEnvTitle;
+
+        public String getHomeCarouselTitle() { return homeCarouselTitle; }
+        public void setHomeCarouselTitle(String homeCarouselTitle) { this.homeCarouselTitle = homeCarouselTitle; }
+        public String getCampusTitle() { return campusTitle; }
+        public void setCampusTitle(String campusTitle) { this.campusTitle = campusTitle; }
+        public String getLabNewsTitle() { return labNewsTitle; }
+        public void setLabNewsTitle(String labNewsTitle) { this.labNewsTitle = labNewsTitle; }
+        public String getNoticeTitle() { return noticeTitle; }
+        public void setNoticeTitle(String noticeTitle) { this.noticeTitle = noticeTitle; }
+        public String getFriendLinkTitle() { return friendLinkTitle; }
+        public void setFriendLinkTitle(String friendLinkTitle) { this.friendLinkTitle = friendLinkTitle; }
+        public String getLabEnvTitle() { return labEnvTitle; }
+        public void setLabEnvTitle(String labEnvTitle) { this.labEnvTitle = labEnvTitle; }
+    }
+
+    /**
+     * 友情链接DTO
+     */
+    public static class FriendLinkDTO {
+        private Integer id;
+        private String name;
+        private String url;
+
+        public Integer getId() { return id; }
+        public void setId(Integer id) { this.id = id; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getUrl() { return url; }
+        public void setUrl(String url) { this.url = url; }
     }
 
     /**
