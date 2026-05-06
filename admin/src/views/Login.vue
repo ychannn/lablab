@@ -102,6 +102,12 @@ export default {
         })
         if (data.code === 200 && data.data && data.data.token) {
           setToken(data.data.token)
+          // 登录成功后获取完整的用户信息
+          const infoData = await request('/admin/info')
+          if (infoData.code === 200 && infoData.data) {
+            // 保存用户信息到localStorage
+            localStorage.setItem('admin_info', JSON.stringify(infoData.data))
+          }
           this.$emit('login-success')
         } else {
           this.error = data.message || '登录失败'

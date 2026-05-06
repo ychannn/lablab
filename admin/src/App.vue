@@ -123,7 +123,7 @@
 </template>
 
 <script>
-import { isLoggedIn, setToken, request } from './api/auth'
+import { isLoggedIn, setToken, request, setAdminInfo } from './api/auth'
 import Login from './views/Login.vue'
 import SiteSettings from './views/SiteSettings.vue'
 import BannerManage from './views/BannerManage.vue'
@@ -221,6 +221,10 @@ export default {
         const res = await request('/admin/info')
         const admin = (res && res.data !== undefined) ? res.data : (res && res.result !== undefined) ? res.result : res
         this.currentUser = admin && typeof admin === 'object' ? { id: admin.id, username: admin.username, role: admin.role, email: admin.email } : null
+        // 更新localStorage中的用户信息
+        if (this.currentUser) {
+          setAdminInfo(this.currentUser)
+        }
       } catch (_) {
         this.currentUser = null
       }
@@ -284,6 +288,8 @@ export default {
         await request('/admin/bind-email', { method: 'POST', body: JSON.stringify({ email, code }) })
         alert(this.currentAdmin && this.currentAdmin.email ? '换绑成功' : '绑定成功')
         this.currentAdmin = { ...this.currentAdmin, email }
+        // 更新localStorage中的用户信息
+        setAdminInfo(this.currentAdmin)
         this.showRebindForm = false
         this.bindCodeInput = ''
       } catch (e) {

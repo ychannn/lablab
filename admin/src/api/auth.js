@@ -1,6 +1,7 @@
 
 const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : '/api'
 const TOKEN_KEY = 'admin_token'
+const ADMIN_INFO_KEY = 'admin_info'
 
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY)
@@ -11,8 +12,27 @@ export function setToken(token) {
   else localStorage.removeItem(TOKEN_KEY)
 }
 
+export function getAdminInfo() {
+  try {
+    const info = localStorage.getItem(ADMIN_INFO_KEY)
+    return info ? JSON.parse(info) : null
+  } catch (e) {
+    return null
+  }
+}
+
+export function setAdminInfo(info) {
+  if (info) localStorage.setItem(ADMIN_INFO_KEY, JSON.stringify(info))
+  else localStorage.removeItem(ADMIN_INFO_KEY)
+}
+
 export function isLoggedIn() {
   return !!getToken()
+}
+
+export function hasBoundEmail() {
+  const info = getAdminInfo()
+  return info && info.email && info.email.trim()
 }
 
 /**

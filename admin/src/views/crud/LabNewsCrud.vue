@@ -233,8 +233,7 @@ export default {
     },
     imageFullUrl(url) {
       if (!url) return ''
-      const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : 'http://localhost:8080'
-      return url.startsWith('http') ? url : base + (url.startsWith('/') ? '' : '') + url
+      return url.startsWith('http') ? url : url
     },
     async onImageSelect(e) {
       const file = e.target && e.target.files && e.target.files[0]
