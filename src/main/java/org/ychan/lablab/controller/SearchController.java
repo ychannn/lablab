@@ -32,14 +32,4 @@ public class SearchController extends BaseController {
         SearchRespDTO result = searchService.search(keyword != null ? keyword.trim() : "", page, size);
         return Result.success(result);
     }
-
-    /**
-     * 同步数据到Elasticsearch
-     * 管理员接口
-     */
-    @GetMapping("/admin/sync")
-    public Result<Void> syncData() {
-        searchService.syncData();
-        return Result.success();
-    }
 }

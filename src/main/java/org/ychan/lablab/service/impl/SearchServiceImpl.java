@@ -2,7 +2,6 @@ package org.ychan.lablab.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-// import org.ychan.lablab.document.SearchDocument;
 import org.ychan.lablab.dto.resp.search.SearchRespDTO;
 import org.ychan.lablab.entity.news.LabNews;
 import org.ychan.lablab.entity.news.Notice;
@@ -20,9 +19,6 @@ import java.util.regex.Pattern;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
-/**
- * 搜索服务实现 - 使用数据库搜索
- */
 @Service
 @RequiredArgsConstructor
 public class SearchServiceImpl implements SearchService {
@@ -48,7 +44,6 @@ public class SearchServiceImpl implements SearchService {
             empty.setItems(allResults);
             return empty;
         }
-        // 从各个表中搜索
         allResults.addAll(searchNews(keyword));
         allResults.addAll(searchNotices(keyword));
         allResults.addAll(searchScholars(keyword));
@@ -56,7 +51,6 @@ public class SearchServiceImpl implements SearchService {
         allResults.addAll(searchPapers(keyword));
         allResults.addAll(searchProjects(keyword));
         
-        // 分页处理
         int total = allResults.size();
         int totalPages = (int) Math.ceil((double) total / size);
         int start = (page - 1) * size;
@@ -197,9 +191,6 @@ public class SearchServiceImpl implements SearchService {
         return text != null && text.toLowerCase().contains(keyword.toLowerCase());
     }
 
-    /**
-     * 对文本中的关键词进行高亮包裹（先转义 HTML 再匹配，输出可安全用于前端 v-html）
-     */
     private String highlightKeyword(String text, String keyword) {
         if (text == null) return "";
         String escapedText = escapeHtml(text);
@@ -219,25 +210,5 @@ public class SearchServiceImpl implements SearchService {
     private String truncateContent(String content, int maxLength) {
         if (content == null) return "";
         return content.length() > maxLength ? content.substring(0, maxLength) + "..." : content;
-    }
-
-    @Override
-    public void syncData() {
-        // 数据库搜索不需要同步数据
-    }
-
-    @Override
-    public void addDocument(Object document) {
-        // 数据库搜索不需要添加文档
-    }
-
-    @Override
-    public void deleteDocument(String id) {
-        // 数据库搜索不需要删除文档
-    }
-
-    @Override
-    public void addDocuments(Object documents) {
-        // 数据库搜索不需要批量添加文档
     }
 }
