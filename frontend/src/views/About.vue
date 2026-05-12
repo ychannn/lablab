@@ -12,8 +12,8 @@
       <!-- 实验室负责人 -->
       <div class="about-section">
         <h3>实验室负责人</h3>
-        <div v-if="directors && directors.length" class="directors-list">
-          <div v-for="(director, index) in directors" :key="index" class="leader-info">
+        <div v-if="labIntro.directors && labIntro.directors.length" class="directors-list">
+          <div v-for="(director, index) in labIntro.directors" :key="index" class="leader-info">
             <div class="leader-photo">
               <img :src="imageUrl(director.photo) || 'https://via.placeholder.com/200x200'" alt="负责人照片">
             </div>
@@ -56,7 +56,6 @@ export default {
   data() {
     return {
       labIntro: {},
-      directors: [],
       titles: {
         labEnvTitle: ''
       }
@@ -86,14 +85,10 @@ export default {
       try {
         const response = await fetch(apiBase + '/home')
         const data = await response.json()
-        if (data.code === 200 && data.data) {
+        if (data.data.code === 200 && data.data.data) {
           // 获取标题配置
-          if (data.data.titles) {
-            this.titles = { ...this.titles, ...data.data.titles }
-          }
-          // 获取负责人信息
-          if (data.data.directors) {
-            this.directors = data.data.directors
+          if (data.data.data.titles) {
+            this.titles = { ...this.titles, ...data.data.data.titles }
           }
         }
       } catch (error) {

@@ -50,13 +50,23 @@ lablab/
 
 在 MySQL 中创建数据库：
 
-```sql
-CREATE DATABASE IF NOT EXISTS lab DEFAULT CHARACTER SET utf8mb4;
+项目提供了完整的数据库初始化脚本 `src/main/resources/db/lab.sql`。
+
+### 2. 修改开发环境配置
+
+**这一步是接手项目后必须做的。** 打开 `src/main/resources/application-dev.yml`，将数据库连接信息改成你本地的配置：
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/lab?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root          # 改为你本地的数据库用户名
+    password: your-password # 改为你本地的数据库密码
 ```
 
-项目使用 MyBatis-Plus，启动时会自动建表。如需手动执行增量 SQL，可查看 `src/main/resources/db/` 目录下的脚本。
+如果不配置邮件功能，可以注释或删掉 `spring.mail` 下的配置。
 
-### 2. 配置邮件（可选，不影响启动）
+### 3. 配置邮件（可选，不影响启动）
 
 如需邮件验证码功能：
 
@@ -79,7 +89,6 @@ mvn spring-boot:run
 
 后端默认运行在 **8080** 端口。首次启动会自动创建默认管理员账号：
 
-> 用户名：**admin**，密码：**admin123**
 
 ### 4. 启动前端
 
@@ -107,8 +116,8 @@ npm run dev
 
 `src/main/resources/application.yml` 中 `spring.profiles.active` 控制环境：
 
-- **dev** — 开发环境，数据库连 localhost:4406
-- **prod** — 生产环境，数据库连 localhost:3306
+- **dev** — 开发环境
+- **prod** — 生产环境
 
 修改该值即可切换。两个环境对应的配置文件：
 
@@ -155,7 +164,7 @@ Authorization: Bearer <token>
 
 检查 MySQL 是否已启动，以及 `application-{profile}.yml` 中的数据库地址、用户名、密码是否正确。
 
-开发环境默认连接 `localhost:4406`，如果你的 MySQL 端口是 3306，需要修改配置文件。
+默认连接 `localhost:3306`，如果你的 MySQL 端口不同，需要修改配置文件。
 
 ### 2. 启动报 Redis 连接失败
 

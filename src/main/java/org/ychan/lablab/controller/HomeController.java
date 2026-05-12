@@ -131,6 +131,11 @@ public class HomeController {
         }
         resp.setFriendLinks(friendLinkDTOs);
 
+        // 获取实验室负责人
+        if (labIntro != null && labIntro.getDirectors() != null) {
+            resp.setDirectors(labIntro.getDirectors());
+        }
+
         return Result.success(resp);
     }
 
@@ -153,6 +158,8 @@ public class HomeController {
         private TitlesDTO titles;
         /** 友情链接列表 */
         private List<FriendLinkDTO> friendLinks;
+        /** 实验室负责人列表 */
+        private List<LabIntroRespDTO.DirectorDTO> directors;
 
         public String getSiteTitle() {
             return siteTitle;
@@ -224,6 +231,14 @@ public class HomeController {
 
         public void setFriendLinks(List<FriendLinkDTO> friendLinks) {
             this.friendLinks = friendLinks;
+        }
+
+        public List<LabIntroRespDTO.DirectorDTO> getDirectors() {
+            return directors;
+        }
+
+        public void setDirectors(List<LabIntroRespDTO.DirectorDTO> directors) {
+            this.directors = directors;
         }
     }
 
