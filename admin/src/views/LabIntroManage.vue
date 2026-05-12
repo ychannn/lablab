@@ -69,7 +69,7 @@
             <label>照片</label>
             <div class="upload-row">
               <input :ref="'photoInput' + index" type="file" accept="image/*" class="hidden" @change="e => onDirectorPhotoUpload(e, index)" />
-              <button type="button" class="btn btn-secondary btn-sm" @click="$refs['photoInput' + index].click()">{{ director.photo ? '更换照片' : '上传照片' }}</button>
+              <button type="button" class="btn btn-secondary btn-sm" @click="triggerPhotoUpload($event, index)">{{ director.photo ? '更换照片' : '上传照片' }}</button>
               <span v-if="uploadingPhotos[index]" class="upload-status">上传中…</span>
               <div v-if="director.photo" class="thumb-wrap"><img :src="imageUrl(director.photo)" alt="照片" class="thumb-img" /></div>
             </div>
@@ -165,6 +165,12 @@ export default {
         alert(err.message || '上传失败')
       } finally {
         this.uploadingLogo = false
+      }
+    },
+    triggerPhotoUpload(event, index) {
+      const input = event.target.previousElementSibling
+      if (input && input.tagName === 'INPUT' && input.type === 'file') {
+        input.click()
       }
     },
     async onDirectorPhotoUpload(e, index) {

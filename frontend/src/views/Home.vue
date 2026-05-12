@@ -761,16 +761,17 @@ export default {
 
 .link-list li {
   margin-bottom: 10px;
+  color: #333;
 }
 
 .friend-link {
   font-size: 14px;
-  color: #333;
+  color: #165DFF;
   text-decoration: none;
 }
 
 .friend-link:hover {
-  color: #165DFF;
+  color: #0d42c7;
   text-decoration: underline;
 }
 

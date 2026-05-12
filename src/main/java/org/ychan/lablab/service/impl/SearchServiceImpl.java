@@ -72,7 +72,7 @@ public class SearchServiceImpl implements SearchService {
     private List<SearchRespDTO.SearchItemDTO> searchNews(String keyword) {
         List<LabNews> newsList = labNewsMapper.selectList(null);
         return newsList.stream()
-            .filter(news -> containsKeyword(news.getTitle(), keyword) || 
+            .filter(news -> containsKeyword(news.getTitle(), keyword) ||
                            containsKeyword(news.getContent(), keyword))
             .map(news -> {
                 SearchRespDTO.SearchItemDTO item = new SearchRespDTO.SearchItemDTO();
@@ -83,7 +83,7 @@ public class SearchServiceImpl implements SearchService {
                 item.setHighlightTitle(highlightKeyword(news.getTitle(), keyword));
                 item.setHighlightContent(highlightKeyword(truncateContent(news.getContent(), 200), keyword));
                 item.setCreateTime(news.getTime() != null ? news.getTime().format(FORMATTER) : "");
-                item.setUrl("/news/detail/" + news.getId());
+                item.setUrl("/detail/news/" + news.getId());
                 return item;
             })
             .collect(Collectors.toList());
@@ -92,7 +92,7 @@ public class SearchServiceImpl implements SearchService {
     private List<SearchRespDTO.SearchItemDTO> searchNotices(String keyword) {
         List<Notice> noticeList = noticeMapper.selectList(null);
         return noticeList.stream()
-            .filter(notice -> containsKeyword(notice.getTitle(), keyword) || 
+            .filter(notice -> containsKeyword(notice.getTitle(), keyword) ||
                               containsKeyword(notice.getContent(), keyword))
             .map(notice -> {
                 SearchRespDTO.SearchItemDTO item = new SearchRespDTO.SearchItemDTO();
@@ -103,7 +103,7 @@ public class SearchServiceImpl implements SearchService {
                 item.setHighlightTitle(highlightKeyword(notice.getTitle(), keyword));
                 item.setHighlightContent(highlightKeyword(truncateContent(notice.getContent(), 200), keyword));
                 item.setCreateTime(notice.getTime() != null ? notice.getTime().format(FORMATTER) : "");
-                item.setUrl("/notice/detail/" + notice.getId());
+                item.setUrl("/detail/notice/" + notice.getId());
                 return item;
             })
             .collect(Collectors.toList());
@@ -112,7 +112,7 @@ public class SearchServiceImpl implements SearchService {
     private List<SearchRespDTO.SearchItemDTO> searchScholars(String keyword) {
         List<Scholar> scholarList = scholarMapper.selectList(null);
         return scholarList.stream()
-            .filter(scholar -> containsKeyword(scholar.getName(), keyword) || 
+            .filter(scholar -> containsKeyword(scholar.getName(), keyword) ||
                                containsKeyword(scholar.getEmail(), keyword))
             .map(scholar -> {
                 SearchRespDTO.SearchItemDTO item = new SearchRespDTO.SearchItemDTO();
@@ -123,7 +123,7 @@ public class SearchServiceImpl implements SearchService {
                 item.setHighlightTitle(highlightKeyword(scholar.getName(), keyword));
                 item.setHighlightContent(highlightKeyword(scholar.getEmail(), keyword));
                 item.setCreateTime(scholar.getCreateTime() != null ? scholar.getCreateTime().format(FORMATTER) : "");
-                item.setUrl("/scholar/detail/" + scholar.getId());
+                item.setUrl("/detail/scholar/" + scholar.getId());
                 item.setImageUrl(scholar.getPhoto());
                 return item;
             })
@@ -142,7 +142,7 @@ public class SearchServiceImpl implements SearchService {
                 item.setContent(content);
                 item.setHighlightContent(highlightKeyword(content, keyword));
                 item.setCreateTime(achievement.getCreateTime() != null ? achievement.getCreateTime().format(FORMATTER) : "");
-                item.setUrl("/achievement/detail/" + achievement.getId());
+                item.setUrl("/detail/award/" + achievement.getId());
                 return item;
             })
             .collect(Collectors.toList());
@@ -160,7 +160,7 @@ public class SearchServiceImpl implements SearchService {
                 item.setContent(content);
                 item.setHighlightContent(highlightKeyword(content, keyword));
                 item.setCreateTime(paper.getPublishTime() != null ? paper.getPublishTime().format(FORMATTER) : "");
-                item.setUrl("/paper/detail/" + paper.getId());
+                item.setUrl("/detail/paper/" + paper.getId());
                 return item;
             })
             .collect(Collectors.toList());
@@ -178,7 +178,7 @@ public class SearchServiceImpl implements SearchService {
                 item.setContent(content);
                 item.setHighlightContent(highlightKeyword(content, keyword));
                 item.setCreateTime(project.getStartTime() != null ? project.getStartTime().format(FORMATTER) : "");
-                item.setUrl("/project/detail/" + project.getId());
+                item.setUrl("/detail/project/" + project.getId());
                 return item;
             })
             .collect(Collectors.toList());
