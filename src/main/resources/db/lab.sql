@@ -152,25 +152,6 @@ CREATE TABLE `t_lab_news` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `t_message`
---
-
-DROP TABLE IF EXISTS `t_message`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `t_message` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `type` tinyint NOT NULL,
-  `title` varchar(512) DEFAULT NULL,
-  `main_text` text,
-  `create_time` datetime DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  `deleted` tinyint DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `t_notice`
 --
 
@@ -280,6 +261,46 @@ CREATE TABLE `t_scholar` (
   `deleted` tinyint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `t_scholar_paper`
+--
+
+DROP TABLE IF EXISTS `t_scholar_paper`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `t_scholar_paper` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `scholar_id` int NOT NULL COMMENT '学者ID',
+  `paper_id` int NOT NULL COMMENT '论文ID',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '修改时间',
+  `deleted` int NOT NULL DEFAULT '0' COMMENT '删除 1是 0否',
+  PRIMARY KEY (`id`),
+  KEY `idx_scholar_id` (`scholar_id`),
+  KEY `idx_paper_id` (`paper_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='学者论文关系表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `t_scholar_project`
+--
+
+DROP TABLE IF EXISTS `t_scholar_project`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `t_scholar_project` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `scholar_id` int NOT NULL COMMENT '学者ID',
+  `project_id` int NOT NULL COMMENT '科研项目ID',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '修改时间',
+  `deleted` int NOT NULL DEFAULT '0' COMMENT '删除 1是 0否',
+  PRIMARY KEY (`id`),
+  KEY `idx_scholar_id` (`scholar_id`),
+  KEY `idx_project_id` (`project_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='学者科研项目关系表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
