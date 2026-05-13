@@ -140,6 +140,10 @@ export default {
       const parts = path.split('/').map(p => decodeURIComponent(p))
       let page = parts[0] || 'home'
       let remainingParts = parts
+      if (page === 'admin') {
+        window.location.href = '/admin/'
+        return { page: 'home', searchKeyword: null, achievementsTab: null, detailType: '', detailId: null }
+      }
       if (page === 'home' && parts.length > 1) {
         page = parts[1]
         remainingParts = parts.slice(1)
@@ -443,14 +447,14 @@ export default {
 }
 
 .friend-link {
-  color: rgba(255, 255, 255, 0.8);
+  color: #165DFF;
   text-decoration: none;
   transition: color 0.3s ease;
   font-size: 14px;
 }
 
 .friend-link:hover {
-  color: #fff;
+  color: #0d42c7;
   text-decoration: underline;
 }
 

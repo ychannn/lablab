@@ -177,7 +177,7 @@ export default {
       const file = e.target.files?.[0]
       e.target.value = ''
       if (!file) return
-      this.$set(this.uploadingPhotos, index, true)
+      this.uploadingPhotos[index] = true
       try {
         const formData = new FormData()
         formData.append('file', file)
@@ -190,7 +190,7 @@ export default {
       } catch (err) {
         alert(err.message || '上传失败')
       } finally {
-        this.$set(this.uploadingPhotos, index, false)
+        this.uploadingPhotos[index] = false
       }
     },
     async onPhotosUpload(e) {

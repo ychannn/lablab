@@ -1,4 +1,4 @@
 spring:
   # 激活指定环境
   profiles:
-    active: prod
+    active: dev
